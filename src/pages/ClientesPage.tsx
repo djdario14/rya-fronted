@@ -11,6 +11,8 @@ const ClientesPage: React.FC = () => {
   const [tab, setTab] = useState<'pendientes' | 'todos'>('pendientes');
   const [search, setSearch] = useState('');
 
+  // Cambio mínimo para forzar redeploy
+  // v20260111
   return (
     <div style={{ background: '#f7f8fa', minHeight: '100vh', padding: 32, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 4px 24px #0002', width: 900, maxWidth: '100%', padding: 32 }}>
