@@ -11,7 +11,7 @@ export function useFetch<T = unknown>(url: string) {
     api.get<T>(url)
       .then((res) => setData(res.data))
       .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .then(() => setLoading(false));
   }, [url]);
 
   return { data, loading, error };
