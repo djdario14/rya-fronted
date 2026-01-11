@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import SuccessModal from '../components/SuccessModal';
+import CreditoModal from '../components/CreditoModal';
 
 // Lista básica de códigos de país
 const countryCodes = [
@@ -39,6 +41,11 @@ const ClientesPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [countryCode, setCountryCode] = useState('+593'); // Por defecto Ecuador
+  // Estados para los modals nuevos
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showCreditoModal, setShowCreditoModal] = useState(false);
+  const [nuevoCliente, setNuevoCliente] = useState<any>(null);
+  const [showPrestamoSuccess, setShowPrestamoSuccess] = useState(false);
 
   // Detectar país por IP y setear código de país
   useEffect(() => {
@@ -174,6 +181,8 @@ const ClientesPage: React.FC = () => {
                         }]);
                         setShowModal(false);
                         setForm({ nombre: '', cedula: '', direccion: '', negocio: '', telefono: '' });
+                        setNuevoCliente(nuevo);
+                        setShowSuccessModal(true);
                       } catch (err) {
                         setError('No se pudo guardar el cliente');
                       }
@@ -205,6 +214,46 @@ const ClientesPage: React.FC = () => {
               )}
         </div>
 
+        {/* Modals de éxito y crédito */}
+        {showSuccessModal && (
+          <SuccessModal
+            message="¡Cliente registrado exitosamente!"
+            onClose={() => {
+              setShowSuccessModal(false);
+              setShowCreditoModal(true);
+            }}
+          />
+        )}
+        {showCreditoModal && (
+          <CreditoModal
+            clienteNombre={nuevoCliente?.nombre || ''}
+            onClose={() => setShowCreditoModal(false)}
+            onSubmit={async (data) => {
+              try {
+                const res = await fetch('https://rya-backend-production.up.railway.app/prestamos/', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    cliente_id: nuevoCliente.id,
+                    monto: data.valor,
+                    fecha: data.fecha
+                  })
+                });
+                if (!res.ok) throw new Error('Error al guardar el préstamo');
+                setShowCreditoModal(false);
+                setShowPrestamoSuccess(true);
+              } catch (err) {
+                alert('No se pudo guardar el préstamo');
+              }
+            }}
+          />
+        )}
+        {showPrestamoSuccess && (
+          <SuccessModal
+            message="Registro Exitoso"
+            onClose={() => setShowPrestamoSuccess(false)}
+          />
+        )}
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
           <button
