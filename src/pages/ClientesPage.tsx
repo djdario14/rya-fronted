@@ -83,14 +83,14 @@ const ClientesPage: React.FC = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
         {loading && <div>Cargando clientes...</div>}
         {error && <div style={{ color: 'red' }}>Error: {error}</div>}
-        {clientes && clientes.map((cliente, idx) => (
+        {Array.isArray(clientes) && clientes.map((cliente, idx) => (
           <div key={cliente.id || idx} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px #0001', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <div style={{ fontWeight: 600, fontSize: 18, marginBottom: 4 }}>{cliente.nombre}</div>
               <div style={{ color: '#444', fontSize: 15 }}>
-                Saldo: <span style={{ color: '#219653', fontWeight: 600 }}>${'saldo' in cliente ? cliente.saldo : '---'}</span>
+                Saldo: <span style={{ color: '#219653', fontWeight: 600 }}>${String('saldo' in cliente ? cliente.saldo : '---')}</span>
                 <span style={{ margin: '0 10px' }}>|</span>
-                Atraso: <span style={{ color: '#888' }}>{'atraso' in cliente ? cliente.atraso : 0} días</span>
+                Atraso: <span style={{ color: '#888' }}>{String('atraso' in cliente ? cliente.atraso : 0)} días</span>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
