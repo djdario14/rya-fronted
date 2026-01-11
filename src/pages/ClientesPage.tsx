@@ -12,6 +12,16 @@ const ClientesPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [form, setForm] = useState({
+    nombre: '',
+    cedula: '',
+    direccion: '',
+    negocio: '',
+    telefono: '',
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     // Cargar fuente Inter de Google Fonts
@@ -83,9 +93,65 @@ const ClientesPage: React.FC = () => {
           <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 10, padding: '13px 36px', fontWeight: 600, fontSize: 19, cursor: 'pointer', boxShadow: '0 2px 12px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
             onMouseOver={e => { e.currentTarget.style.background = '#176c3a'; e.currentTarget.style.boxShadow = '0 4px 16px #176c3a33'; }}
             onMouseOut={e => { e.currentTarget.style.background = '#219653'; e.currentTarget.style.boxShadow = '0 2px 12px #21965322'; }}
+            onClick={() => setShowModal(true)}
           >
             + Agregar Cliente
           </button>
+              {/* Modal para agregar cliente */}
+              {showModal && (
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                  <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 400, width: 420, position: 'relative' }}>
+                    <h3 style={{ marginTop: 0, marginBottom: 24, fontWeight: 700, fontSize: 24 }}>Agregar Cliente</h3>
+                    <form onSubmit={async e => {
+                      e.preventDefault();
+                      setSaving(true);
+                      setError('');
+                      try {
+                        // Enviar datos al backend
+                        const res = await fetch('https://rya-backend-production.up.railway.app/clientes/', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            nombre: form.nombre,
+                            cedula: form.cedula,
+                            direccion: form.direccion,
+                            negocio: form.negocio,
+                            telefono: form.telefono
+                          })
+                        });
+                        if (!res.ok) throw new Error('Error al guardar el cliente');
+                        const nuevo = await res.json();
+                        setClientes(prev => [...prev, {
+                          nombre: nuevo.nombre,
+                          cedula: nuevo.cedula,
+                          direccion: nuevo.direccion,
+                          negocio: nuevo.negocio,
+                          telefono: nuevo.telefono
+                        }]);
+                        setShowModal(false);
+                        setForm({ nombre: '', cedula: '', direccion: '', negocio: '', telefono: '' });
+                      } catch (err) {
+                        setError('No se pudo guardar el cliente');
+                      }
+                      setSaving(false);
+                    }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                        <input type="text" placeholder="Nombre" required value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
+                        <input type="text" placeholder="Cédula" required value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
+                        <input type="text" placeholder="Dirección" required value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
+                        <input type="text" placeholder="Negocio" required value={form.negocio} onChange={e => setForm(f => ({ ...f, negocio: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
+                        <input type="text" placeholder="Teléfono" required value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
+                      </div>
+                      {error && <div style={{ color: '#e74c3c', marginTop: 12 }}>{error}</div>}
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
+                        <button type="button" onClick={() => setShowModal(false)} style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
+                        <button type="submit" disabled={saving} style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: saving ? 'not-allowed' : 'pointer', boxShadow: '0 2px 8px #21965322', opacity: saving ? 0.7 : 1 }}>{saving ? 'Guardando...' : 'Guardar'}</button>
+                      </div>
+                    </form>
+                    <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
+                  </div>
+                </div>
+              )}
         </div>
 
         {/* Tabs */}
