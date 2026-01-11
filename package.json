@@ -3,8 +3,8 @@
     "version": "1.0.0",
     "scripts": {
         "dev": "vite",
-        "prebuild": "ls -l",
-        "build": "vite build && ls -l dist",
+        "prebuild": "",
+        "build": "vite build",
         "start": "serve -s dist -l $PORT"
     },
     "dependencies": {
