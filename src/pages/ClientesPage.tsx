@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from 'react';
 
+// Lista básica de códigos de país
+const countryCodes = [
+  { code: '+1', name: 'Estados Unidos', iso: 'US' },
+  { code: '+52', name: 'México', iso: 'MX' },
+  { code: '+593', name: 'Ecuador', iso: 'EC' },
+  { code: '+57', name: 'Colombia', iso: 'CO' },
+  { code: '+54', name: 'Argentina', iso: 'AR' },
+  { code: '+34', name: 'España', iso: 'ES' },
+  { code: '+51', name: 'Perú', iso: 'PE' },
+  { code: '+56', name: 'Chile', iso: 'CL' },
+  { code: '+55', name: 'Brasil', iso: 'BR' },
+  { code: '+591', name: 'Bolivia', iso: 'BO' },
+  { code: '+502', name: 'Guatemala', iso: 'GT' },
+  // ...puedes agregar más
+];
+
 // El backend devuelve solo nombres, pero puedes adaptar el modelo según la respuesta real
 type Cliente = {
   nombre: string;
@@ -22,6 +38,35 @@ const ClientesPage: React.FC = () => {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [countryCode, setCountryCode] = useState('+593'); // Por defecto Ecuador
+
+  // Detectar país por IP y setear código de país
+  useEffect(() => {
+    fetch('https://ipapi.co/json/')
+      .then(res => res.json())
+      .then(data => {
+        const found = countryCodes.find(c => c.iso === data.country_code);
+        if (found) setCountryCode(found.code);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Cuando se abre el modal, pedir ubicación GPS y autocompletar dirección
+  useEffect(() => {
+    if (showModal) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            const coords = `${pos.coords.latitude},${pos.coords.longitude}`;
+            setForm(f => ({ ...f, direccion: coords }));
+          },
+          () => {},
+          { enableHighAccuracy: true, timeout: 10000 }
+        );
+      }
+    }
+    // eslint-disable-next-line
+  }, [showModal]);
 
   useEffect(() => {
     // Cargar fuente Inter de Google Fonts
@@ -107,7 +152,6 @@ const ClientesPage: React.FC = () => {
                       setSaving(true);
                       setError('');
                       try {
-                        // Enviar datos al backend
                         const res = await fetch('https://rya-backend-production.up.railway.app/clientes/', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
@@ -116,7 +160,7 @@ const ClientesPage: React.FC = () => {
                             cedula: form.cedula,
                             direccion: form.direccion,
                             negocio: form.negocio,
-                            telefono: form.telefono
+                            telefono: countryCode + form.telefono
                           })
                         });
                         if (!res.ok) throw new Error('Error al guardar el cliente');
@@ -138,9 +182,16 @@ const ClientesPage: React.FC = () => {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                         <input type="text" placeholder="Nombre" required value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
                         <input type="text" placeholder="Cédula" required value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
-                        <input type="text" placeholder="Dirección" required value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
+                        <input type="text" placeholder="Dirección (GPS)" required value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
                         <input type="text" placeholder="Negocio" required value={form.negocio} onChange={e => setForm(f => ({ ...f, negocio: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
-                        <input type="text" placeholder="Teléfono" required value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <select value={countryCode} onChange={e => setCountryCode(e.target.value)} style={{ padding: '10px 8px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, minWidth: 90 }}>
+                            {countryCodes.map(c => (
+                              <option key={c.code} value={c.code}>{c.code} {c.name}</option>
+                            ))}
+                          </select>
+                          <input type="tel" placeholder="Teléfono" required value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} style={{ flex: 1, padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
+                        </div>
                       </div>
                       {error && <div style={{ color: '#e74c3c', marginTop: 12 }}>{error}</div>}
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
