@@ -1,19 +1,11 @@
 {
-    "name": "rya-cobranza",
-    "private": true,
-    "workspaces": [
-        "backend",
-        "packages/*",
-        "apps/web",
-        "apps/mobile",
-        "apps/desktop"
-    ],
-    "dependencies": {
-        "react": "^19.2.3",
-        "react-dom": "^19.2.3"
+    "name": "rya-fronted",
+    "version": "1.0.0",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "start": "vite preview"
     },
-    "devDependencies": {
-        "@types/react": "^19.2.8",
-        "@types/react-dom": "^19.2.3"
-    }
+    "dependencies": {},
+    "devDependencies": {}
 }
