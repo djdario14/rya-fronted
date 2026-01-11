@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
-import { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const mockClientes = [
-  { nombre: 'Orrala', saldo: 155, atraso: 0 },
-  { nombre: 'Juan', saldo: 120, atraso: 0 },
-  { nombre: 'Alberto', saldo: 240, atraso: 0 },
-  { nombre: 'Alberto', saldo: 240, atraso: 0 },
-];
+// El backend devuelve solo nombres, pero puedes adaptar el modelo según la respuesta real
+type Cliente = {
+  nombre: string;
+  saldo?: number;
+  atraso?: number;
+};
 
 const ClientesPage: React.FC = () => {
   const [tab, setTab] = useState<'pendientes' | 'todos'>('pendientes');
   const [search, setSearch] = useState('');
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Cargar fuente Inter de Google Fonts
@@ -23,6 +24,26 @@ const ClientesPage: React.FC = () => {
       document.body.style.fontFamily = '';
       document.head.removeChild(link);
     };
+  }, []);
+
+  useEffect(() => {
+    // Obtener clientes reales del backend
+    setLoading(true);
+    fetch('https://rya-backend-production.up.railway.app/clientes/')
+      .then(res => res.json())
+      .then(data => {
+        // Si el backend devuelve solo nombres, conviértelo a objetos
+        if (Array.isArray(data)) {
+          setClientes(data.map((nombre: string) => ({ nombre })));
+        } else {
+          setClientes([]);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setClientes([]);
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -111,9 +132,13 @@ const ClientesPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Lista de clientes */}
+        {/* Lista de clientes reales */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          {mockClientes.map((cliente, idx) => (
+          {loading ? (
+            <div style={{ textAlign: 'center', color: '#888', fontSize: 18, padding: 40 }}>Cargando clientes...</div>
+          ) : clientes.length === 0 ? (
+            <div style={{ textAlign: 'center', color: '#888', fontSize: 18, padding: 40 }}>No hay clientes para mostrar.</div>
+          ) : clientes.map((cliente, idx) => (
             <div key={idx} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 4px 24px #0002', padding: '24px 36px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, transition: 'box-shadow 0.2s, transform 0.2s', animation: 'fadeIn 0.7s', border: '1px solid #f0f0f0' }}
               onMouseOver={e => { e.currentTarget.style.boxShadow = '0 8px 32px #21965322'; e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)'; }}
               onMouseOut={e => { e.currentTarget.style.boxShadow = '0 4px 24px #0002'; e.currentTarget.style.transform = 'none'; }}
@@ -121,9 +146,10 @@ const ClientesPage: React.FC = () => {
               <div>
                 <div style={{ fontWeight: 700, fontSize: 23, marginBottom: 6, letterSpacing: '-0.5px' }}>{cliente.nombre}</div>
                 <div style={{ color: '#444', fontSize: 17 }}>
-                  Saldo: <span style={{ color: '#219653', fontWeight: 700, fontSize: 18 }}>${cliente.saldo}</span>
+                  {/* Si tienes saldo y atraso reales, muéstralos aquí */}
+                  Saldo: <span style={{ color: '#219653', fontWeight: 700, fontSize: 18 }}>${cliente.saldo ?? '--'}</span>
                   <span style={{ margin: '0 12px' }}>|</span>
-                  Atraso: <span style={{ color: '#888', fontWeight: 500 }}>{cliente.atraso} días</span>
+                  Atraso: <span style={{ color: '#888', fontWeight: 500 }}>{cliente.atraso ?? '--'} días</span>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 14 }}>
