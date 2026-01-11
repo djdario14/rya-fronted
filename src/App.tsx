@@ -1,7 +1,8 @@
 import React from 'react';
+import AppRoutes from './routes';
 
 function App() {
-  return <div>RYA Cobranza Web</div>;
+  return <AppRoutes />;
 }
 
 export default App;
