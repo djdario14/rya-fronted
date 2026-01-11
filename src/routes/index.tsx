@@ -1,18 +1,12 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import MainLayout from '../layouts/MainLayout';
-
-const Home = React.lazy(() => import('../pages/Home'));
+import ClientesPage from '../pages/ClientesPage';
 
 const AppRoutes: React.FC = () => (
   <BrowserRouter>
-    <MainLayout>
-      <React.Suspense fallback={<div>Cargando...</div>}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-        </Routes>
-      </React.Suspense>
-    </MainLayout>
+    <Routes>
+      <Route path="/" element={<ClientesPage />} />
+    </Routes>
   </BrowserRouter>
 );
 
