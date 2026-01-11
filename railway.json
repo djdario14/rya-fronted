@@ -1,4 +1,8 @@
 {
-    "build": "npm run build",
-    "start": "serve -s dist -l $PORT"
+    "build": {
+        "command": "npm run build"
+    },
+    "start": {
+        "command": "serve -s dist -l $PORT"
+    }
 }
