@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Select from 'react-select';
 const motivosNoPago = [
   'No está',
   'No tiene',
@@ -364,9 +365,16 @@ const ClientesPage: React.FC = () => {
                                 {noPago && (
                                   <div style={{ marginTop: 10 }}>
                                     <label style={{ fontWeight: 500, fontSize: 15 }}>Motivo</label><br />
-                                    <select value={motivo} onChange={e => setMotivo(e.target.value)} style={{ width: '100%', padding: '8px 10px', fontSize: 16, borderRadius: 8, border: '1px solid #ccc', marginTop: 6 }}>
-                                      {motivosNoPago.map(m => <option key={m} value={m}>{m}</option>)}
-                                    </select>
+                                    <Select
+                                      options={motivosNoPago.map(m => ({ value: m, label: m }))}
+                                      value={{ value: motivo, label: motivo }}
+                                      onChange={(option: { value: string; label: string } | null) => setMotivo(option?.value || motivosNoPago[0])}
+                                      styles={{
+                                        control: (base: any) => ({ ...base, fontSize: 16, borderRadius: 8, marginTop: 6 }),
+                                        menu: (base: any) => ({ ...base, fontSize: 16, zIndex: 1000 }),
+                                      }}
+                                      placeholder="Selecciona motivo"
+                                    />
                                   </div>
                                 )}
                               </div>
