@@ -337,7 +337,7 @@ const ClientesPage: React.FC = () => {
                         {/* Modal para registrar pago */}
                         {showPagoModal && (
                           <div
-                            style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}
+                            style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', display: 'grid', placeItems: 'center', zIndex: 999 }}
                             onClick={() => setShowPagoModal(false)}
                           >
                             <div
