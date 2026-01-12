@@ -338,7 +338,7 @@ const ClientesPage: React.FC = () => {
                         {showPagoModal && (
                           <div
                             style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}
-                            onClick={e => e.stopPropagation()}
+                            onClick={() => setShowPagoModal(false)}
                           >
                             <div
                               style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0003', padding: 36, minWidth: 340, maxWidth: '90vw', width: 400, position: 'relative' }}
