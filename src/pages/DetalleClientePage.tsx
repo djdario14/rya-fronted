@@ -59,9 +59,36 @@ const DetalleClientePage: React.FC = () => {
 
   return (
     <div style={{ background: '#f7f8fa', minHeight: '100vh', padding: 32, display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ background: '#fff', borderRadius: 18, boxShadow: '0 8px 32px #0002', width: 700, maxWidth: '100%', padding: 36, border: '1px solid #f0f0f0' }}>
-        {/* Header azul + Botón Volver */}
-        <div style={{ background: '#29487d', borderRadius: 14, padding: 28, color: '#fff', display: 'flex', alignItems: 'center', marginBottom: 24, position: 'relative' }}>
+      <div style={{ background: '#fff', borderRadius: 18, boxShadow: '0 8px 32px #0002', width: 700, maxWidth: '100%', padding: 36, border: '1px solid #f0f0f0', position: 'relative' }}>
+        {/* Botón Volver fuera del header */}
+        <button
+          style={{
+            position: 'absolute',
+            top: 18,
+            left: 18,
+            background: '#29487d',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '8px 22px 8px 16px',
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px #0001',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 7,
+            zIndex: 2,
+            transition: 'background 0.2s',
+          }}
+          onClick={() => navigate(-1)}
+          onMouseOver={e => (e.currentTarget.style.background = '#18325a')}
+          onMouseOut={e => (e.currentTarget.style.background = '#29487d')}
+        >
+          <span style={{ fontSize: 19, marginRight: 2 }}>←</span> Volver
+        </button>
+        {/* Header azul */}
+        <div style={{ background: '#29487d', borderRadius: 14, padding: 28, color: '#fff', display: 'flex', alignItems: 'center', marginBottom: 24 }}>
           <div style={{ width: 70, height: 70, borderRadius: '50%', background: '#fff', color: '#29487d', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, fontWeight: 700, marginRight: 32 }}>
             <span role="img" aria-label="user">👤</span>
           </div>
@@ -73,10 +100,6 @@ const DetalleClientePage: React.FC = () => {
           <button style={{ background: '#fff', color: '#29487d', border: 'none', borderRadius: 8, padding: '10px 22px', fontWeight: 600, fontSize: 16, cursor: 'pointer', marginLeft: 18 }}
             onClick={() => window.open(`https://maps.google.com/?q=${cliente.lat},${cliente.lng}`, '_blank')}
           >VER MAPA</button>
-          <button
-            style={{ position: 'absolute', left: 24, top: 24, background: '#fff', color: '#29487d', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer', boxShadow: '0 2px 8px #0001' }}
-            onClick={() => navigate(-1)}
-          >← Volver</button>
         </div>
         {/* Saldo y acciones */}
         <div style={{ display: 'flex', gap: 24 }}>
