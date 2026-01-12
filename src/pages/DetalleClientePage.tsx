@@ -60,8 +60,8 @@ const DetalleClientePage: React.FC = () => {
   return (
     <div style={{ background: '#f7f8fa', minHeight: '100vh', padding: 32, display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'Inter, sans-serif' }}>
       <div style={{ background: '#fff', borderRadius: 18, boxShadow: '0 8px 32px #0002', width: 700, maxWidth: '100%', padding: 36, border: '1px solid #f0f0f0' }}>
-        {/* Header azul */}
-        <div style={{ background: '#29487d', borderRadius: 14, padding: 28, color: '#fff', display: 'flex', alignItems: 'center', marginBottom: 24 }}>
+        {/* Header azul + Botón Volver */}
+        <div style={{ background: '#29487d', borderRadius: 14, padding: 28, color: '#fff', display: 'flex', alignItems: 'center', marginBottom: 24, position: 'relative' }}>
           <div style={{ width: 70, height: 70, borderRadius: '50%', background: '#fff', color: '#29487d', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, fontWeight: 700, marginRight: 32 }}>
             <span role="img" aria-label="user">👤</span>
           </div>
@@ -73,6 +73,10 @@ const DetalleClientePage: React.FC = () => {
           <button style={{ background: '#fff', color: '#29487d', border: 'none', borderRadius: 8, padding: '10px 22px', fontWeight: 600, fontSize: 16, cursor: 'pointer', marginLeft: 18 }}
             onClick={() => window.open(`https://maps.google.com/?q=${cliente.lat},${cliente.lng}`, '_blank')}
           >VER MAPA</button>
+          <button
+            style={{ position: 'absolute', left: 24, top: 24, background: '#fff', color: '#29487d', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer', boxShadow: '0 2px 8px #0001' }}
+            onClick={() => navigate(-1)}
+          >← Volver</button>
         </div>
         {/* Saldo y acciones */}
         <div style={{ display: 'flex', gap: 24 }}>
@@ -86,10 +90,8 @@ const DetalleClientePage: React.FC = () => {
                 <div>Atraso<br /><span style={{ color: '#222', fontWeight: 700, fontSize: 22 }}>${cliente.atraso}</span></div>
               </div>
             </div>
-            <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #0001', padding: 22 }}>
-              <div style={{ fontSize: 18, color: '#29487d', fontWeight: 600, marginBottom: 8 }}>Dirección:</div>
-              <div style={{ fontSize: 17, color: '#444', marginBottom: 6 }}><span role="img" aria-label="location">📍</span> {cliente.direccion}</div>
-              <div style={{ fontSize: 15, color: '#888' }}><span role="img" aria-label="gps">✉️</span> {cliente.lat}, {cliente.lng}</div>
+            <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #0001', padding: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 70 }}>
+              <div style={{ fontSize: 20, color: '#29487d', fontWeight: 700, letterSpacing: 0.5 }}>Pagos registrados</div>
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 180 }}>
