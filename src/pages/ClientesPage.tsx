@@ -373,8 +373,10 @@ const ClientesPage: React.FC = () => {
                                       }}
                                       styles={{
                                         control: (base: any) => ({ ...base, fontSize: 16, borderRadius: 8, marginTop: 6 }),
-                                        menu: (base: any) => ({ ...base, fontSize: 16, zIndex: 1000 }),
+                                        menu: (base: any) => ({ ...base, fontSize: 16, zIndex: 9999 }),
+                                        menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
                                       }}
+                                      menuPortalTarget={typeof window !== 'undefined' ? document.body : undefined}
                                       placeholder="Selecciona motivo"
                                     />
                                   </div>
