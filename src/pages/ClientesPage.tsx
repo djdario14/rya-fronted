@@ -336,8 +336,14 @@ const ClientesPage: React.FC = () => {
                 </button>
                         {/* Modal para registrar pago */}
                         {showPagoModal && (
-                          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}>
-                            <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0003', padding: 36, minWidth: 340, maxWidth: '90vw', width: 400, position: 'relative' }}>
+                          <div
+                            style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}
+                            onClick={e => e.stopPropagation()}
+                          >
+                            <div
+                              style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0003', padding: 36, minWidth: 340, maxWidth: '90vw', width: 400, position: 'relative' }}
+                              onClick={e => e.stopPropagation()}
+                            >
                               <button onClick={() => setShowPagoModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: '#e9ecef', border: 'none', borderRadius: 8, padding: '6px 16px', fontWeight: 600, cursor: 'pointer', fontSize: 16 }}>✕</button>
                               <h2 style={{ marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Registrar pago de {pagoCliente?.nombre}</h2>
                               <div style={{ marginBottom: 18 }}>
