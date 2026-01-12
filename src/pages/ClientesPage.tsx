@@ -1,4 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+const motivosNoPago = [
+  'No está',
+  'No tiene',
+  'Paga mañana',
+  'Dejó de trabajar',
+  'Clavo',
+];
 import { useNavigate } from 'react-router-dom';
 import SuccessModal from '../components/SuccessModal';
 import CreditoModal from '../components/CreditoModal';
@@ -28,6 +36,11 @@ type Cliente = {
 };
 
 const ClientesPage: React.FC = () => {
+    const [showPagoModal, setShowPagoModal] = useState(false);
+    const [pagoCliente, setPagoCliente] = useState(null);
+    const [monto, setMonto] = useState('');
+    const [noPago, setNoPago] = useState(false);
+    const [motivo, setMotivo] = useState(motivosNoPago[0]);
   const [tab, setTab] = useState<'pendientes' | 'todos'>('pendientes');
   const [search, setSearch] = useState('');
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -317,10 +330,46 @@ const ClientesPage: React.FC = () => {
                   style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
                   onMouseOver={e => { e.currentTarget.style.background = '#176c3a'; e.currentTarget.style.boxShadow = '0 4px 16px #176c3a33'; }}
                   onMouseOut={e => { e.currentTarget.style.background = '#219653'; e.currentTarget.style.boxShadow = '0 2px 8px #21965322'; }}
-                  onClick={e => e.stopPropagation()}
+                  onClick={e => { e.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ?? ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
                 >
                   Abonar
                 </button>
+                        {/* Modal para registrar pago */}
+                        {showPagoModal && (
+                          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}>
+                            <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0003', padding: 36, minWidth: 340, maxWidth: '90vw', width: 400, position: 'relative' }}>
+                              <button onClick={() => setShowPagoModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: '#e9ecef', border: 'none', borderRadius: 8, padding: '6px 16px', fontWeight: 600, cursor: 'pointer', fontSize: 16 }}>✕</button>
+                              <h2 style={{ marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Registrar pago de {pagoCliente?.nombre}</h2>
+                              <div style={{ marginBottom: 18 }}>
+                                <label style={{ fontWeight: 600, fontSize: 16 }}>Monto</label><br />
+                                <input
+                                  type="number"
+                                  value={monto}
+                                  disabled={noPago}
+                                  onChange={e => setMonto(e.target.value)}
+                                  style={{ width: '100%', padding: '10px 12px', fontSize: 17, borderRadius: 8, border: '1px solid #ccc', marginTop: 6, marginBottom: 8 }}
+                                  placeholder="Monto a abonar"
+                                />
+                              </div>
+                              <div style={{ marginBottom: 18 }}>
+                                <label style={{ fontWeight: 600, fontSize: 16 }}>
+                                  <input type="checkbox" checked={noPago} onChange={e => setNoPago(e.target.checked)} style={{ marginRight: 8 }} /> No pago
+                                </label>
+                                {noPago && (
+                                  <div style={{ marginTop: 10 }}>
+                                    <label style={{ fontWeight: 500, fontSize: 15 }}>Motivo</label><br />
+                                    <select value={motivo} onChange={e => setMotivo(e.target.value)} style={{ width: '100%', padding: '8px 10px', fontSize: 16, borderRadius: 8, border: '1px solid #ccc', marginTop: 6 }}>
+                                      {motivosNoPago.map(m => <option key={m} value={m}>{m}</option>)}
+                                    </select>
+                                  </div>
+                                )}
+                              </div>
+                              <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', width: '100%' }}
+                                onClick={() => { /* Aquí irá la lógica para registrar el pago */ setShowPagoModal(false); }}
+                              >Registrar</button>
+                            </div>
+                          </div>
+                        )}
                 <button style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', transition: 'background 0.2s' }}
                   onMouseOver={e => { e.currentTarget.style.background = '#d1e7dd'; }}
                   onMouseOut={e => { e.currentTarget.style.background = '#e9ecef'; }}
