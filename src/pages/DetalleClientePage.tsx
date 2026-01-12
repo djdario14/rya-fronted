@@ -118,7 +118,7 @@ const DetalleClientePage: React.FC = () => {
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 180 }}>
-            <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 10, padding: '16px 0', fontWeight: 700, fontSize: 19, cursor: 'pointer', marginBottom: 8 }}>+ ABONAR</button>
+            <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 10, padding: '16px 0', fontWeight: 700, fontSize: 19, cursor: 'pointer', marginBottom: 8 }}>Historial Crediticio</button>
             <button style={{ background: '#29487d', color: '#fff', border: 'none', borderRadius: 10, padding: '16px 0', fontWeight: 700, fontSize: 17, cursor: 'pointer', marginBottom: 8 }}>AGENDAR VISITA</button>
             <button style={{ background: '#fff', color: '#29487d', border: '1px solid #29487d', borderRadius: 10, padding: '16px 0', fontWeight: 700, fontSize: 17, cursor: 'pointer' }}>ENVIAR MENSAJE</button>
           </div>
