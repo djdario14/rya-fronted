@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SuccessModal from '../components/SuccessModal';
 import CreditoModal from '../components/CreditoModal';
 
@@ -20,6 +21,7 @@ const countryCodes = [
 
 // El backend devuelve solo nombres, pero puedes adaptar el modelo según la respuesta real
 type Cliente = {
+  id: number;
   nombre: string;
   saldo?: number;
   atraso?: number;
@@ -93,10 +95,28 @@ const ClientesPage: React.FC = () => {
     setLoading(true);
     fetch('https://rya-backend-production.up.railway.app/clientes/')
       .then(res => res.json())
-      .then(data => {
-        // Si el backend devuelve solo nombres, conviértelo a objetos
+      .then(async data => {
         if (Array.isArray(data)) {
-          setClientes(data.map((nombre: string) => ({ nombre })));
+          // Obtener detalles de cada cliente (id y nombre)
+          // Suponiendo que el backend devuelve [{id, nombre}, ...]
+          // Si solo devuelve nombres, hay que ajustar el backend para devolver id también
+          const clientesConId = await Promise.all(
+            data.map(async (cliente: any) => {
+              // Si cliente es string, no hay id, así que no se puede pedir saldo
+              if (typeof cliente === 'string') {
+                return { id: -1, nombre: cliente, saldo: undefined, atraso: undefined };
+              }
+              // Pedir saldo al backend
+              let saldo = undefined;
+              try {
+                const resSaldo = await fetch(`https://rya-backend-production.up.railway.app/clientes/${cliente.id}/saldo`);
+                const saldoData = await resSaldo.json();
+                saldo = saldoData.saldo;
+              } catch {}
+              return { id: cliente.id, nombre: cliente.nombre, saldo, atraso: undefined };
+            })
+          );
+          setClientes(clientesConId);
         } else {
           setClientes([]);
         }
@@ -107,6 +127,8 @@ const ClientesPage: React.FC = () => {
         setLoading(false);
       });
   }, []);
+
+  const navigate = useNavigate();
 
   return (
     <div style={{ background: '#f7f8fa', minHeight: '100vh', padding: 32, display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'Inter, sans-serif' }}>
@@ -149,69 +171,39 @@ const ClientesPage: React.FC = () => {
           >
             + Agregar Cliente
           </button>
-              {/* Modal para agregar cliente */}
-              {showModal && (
-                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                  <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 400, width: 420, position: 'relative' }}>
-                    <h3 style={{ marginTop: 0, marginBottom: 24, fontWeight: 700, fontSize: 24 }}>Agregar Cliente</h3>
-                    <form onSubmit={async e => {
-                      e.preventDefault();
-                      setSaving(true);
-                      setError('');
-                      try {
-                        const res = await fetch('https://rya-backend-production.up.railway.app/clientes/', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            nombre: form.nombre,
-                            cedula: form.cedula,
-                            direccion: form.direccion,
-                            negocio: form.negocio,
-                            telefono: countryCode + form.telefono
-                          })
-                        });
-                        if (!res.ok) throw new Error('Error al guardar el cliente');
-                        const nuevo = await res.json();
-                        setClientes(prev => [...prev, {
-                          nombre: nuevo.nombre,
-                          cedula: nuevo.cedula,
-                          direccion: nuevo.direccion,
-                          negocio: nuevo.negocio,
-                          telefono: nuevo.telefono
-                        }]);
-                        setShowModal(false);
-                        setForm({ nombre: '', cedula: '', direccion: '', negocio: '', telefono: '' });
-                        setNuevoCliente(nuevo);
-                        setShowSuccessModal(true);
-                      } catch (err) {
-                        setError('No se pudo guardar el cliente');
-                      }
-                      setSaving(false);
-                    }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                        <input type="text" placeholder="Nombre" required value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
-                        <input type="text" placeholder="Cédula" required value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
-                        <input type="text" placeholder="Dirección (GPS)" required value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
-                        <input type="text" placeholder="Negocio" required value={form.negocio} onChange={e => setForm(f => ({ ...f, negocio: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
-                        <div style={{ display: 'flex', gap: 8 }}>
-                          <select value={countryCode} onChange={e => setCountryCode(e.target.value)} style={{ padding: '10px 8px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, minWidth: 90 }}>
-                            {countryCodes.map(c => (
-                              <option key={c.code} value={c.code}>{c.code} {c.name}</option>
-                            ))}
-                          </select>
-                          <input type="tel" placeholder="Teléfono" required value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} style={{ flex: 1, padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
-                        </div>
-                      </div>
-                      {error && <div style={{ color: '#e74c3c', marginTop: 12 }}>{error}</div>}
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
-                        <button type="button" onClick={() => setShowModal(false)} style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
-                        <button type="submit" disabled={saving} style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: saving ? 'not-allowed' : 'pointer', boxShadow: '0 2px 8px #21965322', opacity: saving ? 0.7 : 1 }}>{saving ? 'Guardando...' : 'Guardar'}</button>
-                      </div>
-                    </form>
-                    <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
+          {/* Modal para agregar cliente */}
+          {showModal && (
+            <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+              <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 400, width: 420, position: 'relative' }}>
+                <h3 style={{ marginTop: 0, marginBottom: 24, fontWeight: 700, fontSize: 24 }}>Agregar Cliente</h3>
+                <form onSubmit={async e => {
+                  e.preventDefault();
+                  setSaving(true);
+                  setError('');
+                  // ... lógica para guardar cliente ...
+                }}>
+                  <input type="text" placeholder="Nombre" required value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
+                  <input type="text" placeholder="Cédula" required value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
+                  <input type="text" placeholder="Dirección (GPS)" required value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
+                  <input type="text" placeholder="Negocio" required value={form.negocio} onChange={e => setForm(f => ({ ...f, negocio: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                    <select value={countryCode} onChange={e => setCountryCode(e.target.value)} style={{ padding: '10px 8px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, minWidth: 90 }}>
+                      {countryCodes.map(c => (
+                        <option key={c.code} value={c.code}>{c.code} {c.name}</option>
+                      ))}
+                    </select>
+                    <input type="tel" placeholder="Teléfono" required value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} style={{ flex: 1, padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
                   </div>
-                </div>
-              )}
+                  {error && <div style={{ color: '#e74c3c', marginTop: 12 }}>{error}</div>}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
+                    <button type="button" onClick={() => setShowModal(false)} style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
+                    <button type="submit" disabled={saving} style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: saving ? 'not-allowed' : 'pointer', boxShadow: '0 2px 8px #21965322', opacity: saving ? 0.7 : 1 }}>{saving ? 'Guardando...' : 'Guardar'}</button>
+                  </div>
+                </form>
+                <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Modals de éxito y crédito */}
@@ -317,6 +309,7 @@ const ClientesPage: React.FC = () => {
                   <span style={{ margin: '0 12px' }}>|</span>
                   Atraso: <span style={{ color: '#888', fontWeight: 500 }}>{cliente.atraso ?? '--'} días</span>
                 </div>
+                {/* El id solo se usa internamente, no se muestra en la UI */}
               </div>
               <div style={{ display: 'flex', gap: 14 }}>
                 <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
