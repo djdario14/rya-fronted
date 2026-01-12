@@ -297,9 +297,10 @@ const ClientesPage: React.FC = () => {
           ) : clientes.length === 0 ? (
             <div style={{ textAlign: 'center', color: '#888', fontSize: 18, padding: 40 }}>No hay clientes para mostrar.</div>
           ) : clientes.map((cliente, idx) => (
-            <div key={idx} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 4px 24px #0002', padding: '24px 36px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, transition: 'box-shadow 0.2s, transform 0.2s', animation: 'fadeIn 0.7s', border: '1px solid #f0f0f0' }}
+            <div key={idx} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 4px 24px #0002', padding: '24px 36px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, transition: 'box-shadow 0.2s, transform 0.2s', animation: 'fadeIn 0.7s', border: '1px solid #f0f0f0', cursor: cliente.id !== -1 ? 'pointer' : 'default' }}
               onMouseOver={e => { e.currentTarget.style.boxShadow = '0 8px 32px #21965322'; e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)'; }}
               onMouseOut={e => { e.currentTarget.style.boxShadow = '0 4px 24px #0002'; e.currentTarget.style.transform = 'none'; }}
+              onClick={() => cliente.id !== -1 && navigate(`/clientes/${cliente.id}`)}
             >
               <div>
                 <div style={{ fontWeight: 700, fontSize: 23, marginBottom: 6, letterSpacing: '-0.5px' }}>{cliente.nombre}</div>
