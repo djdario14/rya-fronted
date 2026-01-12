@@ -367,8 +367,10 @@ const ClientesPage: React.FC = () => {
                                     <label style={{ fontWeight: 500, fontSize: 15 }}>Motivo</label><br />
                                     <Select
                                       options={motivosNoPago.map(m => ({ value: m, label: m }))}
-                                      value={{ value: motivo, label: motivo }}
-                                      onChange={(option: { value: string; label: string } | null) => setMotivo(option?.value || motivosNoPago[0])}
+                                      value={motivosNoPago.map(m => ({ value: m, label: m })).find(opt => opt.value === motivo) || { value: motivosNoPago[0], label: motivosNoPago[0] }}
+                                      onChange={(option: { value: string; label: string } | null) => {
+                                        if (option) setMotivo(option.value);
+                                      }}
                                       styles={{
                                         control: (base: any) => ({ ...base, fontSize: 16, borderRadius: 8, marginTop: 6 }),
                                         menu: (base: any) => ({ ...base, fontSize: 16, zIndex: 1000 }),
