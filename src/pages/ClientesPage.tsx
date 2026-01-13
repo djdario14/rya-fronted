@@ -111,26 +111,30 @@ const ClientesPage: React.FC = () => {
       .then(res => res.json())
       .then(async data => {
         if (Array.isArray(data)) {
-          // Obtener detalles de cada cliente (id y nombre)
-          // Suponiendo que el backend devuelve [{id, nombre}, ...]
-          // Si solo devuelve nombres, hay que ajustar el backend para devolver id también
-          const clientesConId = await Promise.all(
+          const clientesConSaldo = await Promise.all(
             data.map(async (cliente: any) => {
-              // Si cliente es string, no hay id, así que no se puede pedir saldo
               if (typeof cliente === 'string') {
                 return { id: -1, nombre: cliente, saldo: undefined, atraso: undefined };
               }
-              // Pedir saldo al backend
-              let saldo = undefined;
+              // Obtener datos de crédito y pagos
+              let valorCredito = 0, intereses = 0, pagos = 0, cuota = undefined;
               try {
-                const resSaldo = await fetch(`https://rya-backend-production.up.railway.app/clientes/${cliente.id}/saldo`);
-                const saldoData = await resSaldo.json();
-                saldo = saldoData.saldo;
+                const resCredito = await fetch(`https://rya-backend-production.up.railway.app/clientes/${cliente.id}/credito`);
+                const creditoData = await resCredito.json();
+                valorCredito = creditoData.valor ?? 0;
+                intereses = creditoData.intereses ?? 0;
+                cuota = creditoData.cuota;
               } catch {}
-              return { id: cliente.id, nombre: cliente.nombre, saldo, atraso: undefined };
+              try {
+                const resPagos = await fetch(`https://rya-backend-production.up.railway.app/clientes/${cliente.id}/pagos`);
+                const pagosData = await resPagos.json();
+                pagos = pagosData.total ?? 0;
+              } catch {}
+              const saldo = valorCredito + intereses - pagos;
+              return { id: cliente.id, nombre: cliente.nombre, saldo, atraso: undefined, cuota };
             })
           );
-          setClientes(clientesConId);
+          setClientes(clientesConSaldo);
         } else {
           setClientes([]);
         }
@@ -231,38 +235,48 @@ const ClientesPage: React.FC = () => {
           />
         )}
         {showCreditoModal && (
-          <CreditoModal
-            clienteNombre={nuevoCliente?.nombre || ''}
-            onClose={() => setShowCreditoModal(false)}
-            onSubmit={async (data) => {
-              try {
-                const res = await fetch('https://rya-backend-production.up.railway.app/prestamos/', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    cliente_id: nuevoCliente.id,
-                    monto: data.valor,
-                    fecha: data.fecha
-                  })
-                });
-                if (!res.ok) throw new Error('Error al guardar el préstamo');
-                setShowCreditoModal(false);
-                setShowPrestamoSuccess(true);
-              } catch (err) {
-                alert('No se pudo guardar el préstamo');
-              }
-            }}
-          />
-        )}
-        {showPrestamoSuccess && (
-          <SuccessModal
-            message="Registro Exitoso"
-            onClose={() => setShowPrestamoSuccess(false)}
-          />
-        )}
-        {/* Tabs */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
-          <button
+          <div style={{ maxWidth: '700px', margin: '0 auto', padding: '2rem 0' }}>
+            <h2 style={{ textAlign: 'center', fontSize: '2rem', fontWeight: 700, marginBottom: '2rem', color: '#2c3e50' }}>Clientes</h2>
+            {loading ? (
+              <div style={{ textAlign: 'center', color: '#888', fontSize: '1.2rem' }}>Cargando...</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {clientes.map(cliente => (
+                  <div key={cliente.id} style={{ boxShadow: '0 2px 8px rgba(44,62,80,0.08)', borderRadius: '12px', background: '#fff', padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 600, color: '#34495e', marginBottom: '0.5rem' }}>{cliente.nombre}</div>
+                      <div style={{ fontSize: '1rem', color: '#888', marginBottom: '0.25rem' }}>
+                        Saldo:&nbsp;
+                        <span style={{ color: cliente.saldo > 0 ? '#e74c3c' : '#27ae60', fontWeight: 700, fontSize: '1.1rem' }}>
+                          {cliente.saldo?.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}
+                        </span>
+                      </div>
+                      {cliente.cuota && (
+                        <div style={{ fontSize: '0.95rem', color: '#888' }}>
+                          Cuota:&nbsp;
+                          <span style={{ color: '#2980b9', fontWeight: 600 }}>
+                            {cliente.cuota?.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '140px', alignItems: 'flex-end' }}>
+                      {cliente.saldo > 0 ? (
+                        <button style={{ background: 'linear-gradient(90deg,#007bff,#2980b9)', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem 1.2rem', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 1px 4px rgba(44,62,80,0.08)' }} onClick={() => handleAbonar(cliente)}>
+                          Abonar
+                        </button>
+                      ) : (
+                        <button style={{ background: 'linear-gradient(90deg,#27ae60,#2ecc71)', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.6rem 1.2rem', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 1px 4px rgba(44,62,80,0.08)' }} onClick={() => handleNuevoCredito(cliente)}>
+                          Nuevo crédito
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {/* ...modales y lógica extra... */}
+          </div>
             onClick={() => setTab('pendientes')}
             style={{
               background: tab === 'pendientes' ? '#219653' : '#e9ecef',
