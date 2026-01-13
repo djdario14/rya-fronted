@@ -105,45 +105,39 @@ const ClientesPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Obtener clientes reales del backend
-    setLoading(true);
-    fetch('https://rya-backend-production.up.railway.app/clientes/')
-      .then(res => res.json())
-      .then(async data => {
-        if (Array.isArray(data)) {
-          const clientesConSaldo = await Promise.all(
-            data.map(async (cliente: any) => {
-              if (typeof cliente === 'string') {
-                return { id: -1, nombre: cliente, saldo: undefined, atraso: undefined };
-              }
-              // Obtener datos de crédito y pagos
-              let valorCredito = 0, intereses = 0, pagos = 0, cuota = undefined;
-              try {
-                const resCredito = await fetch(`https://rya-backend-production.up.railway.app/clientes/${cliente.id}/credito`);
-                const creditoData = await resCredito.json();
-                valorCredito = creditoData.valor ?? 0;
-                intereses = creditoData.intereses ?? 0;
-                cuota = creditoData.cuota;
-              } catch {}
-              try {
-                const resPagos = await fetch(`https://rya-backend-production.up.railway.app/clientes/${cliente.id}/pagos`);
-                const pagosData = await resPagos.json();
-                pagos = pagosData.total ?? 0;
-              } catch {}
-              const saldo = valorCredito + intereses - pagos;
-              return { id: cliente.id, nombre: cliente.nombre, saldo, atraso: undefined, cuota };
-            })
-          );
-          setClientes(clientesConSaldo);
-        } else {
+      // Obtener clientes reales del backend
+      setLoading(true);
+      fetch('https://rya-backend-production.up.railway.app/clientes/')
+        .then(res => res.json())
+        .then(async data => {
+          if (Array.isArray(data)) {
+            const clientesConSaldo = await Promise.all(
+              data.map(async (cliente: any) => {
+                if (typeof cliente === 'string') {
+                  return { id: -1, nombre: cliente, saldo: undefined, atraso: undefined };
+                }
+                // Obtener datos de saldo y cuotas
+                let saldo = 0, atraso = 0, cuota = undefined;
+                try {
+                  const resSaldo = await fetch(`https://rya-backend-production.up.railway.app/clientes/${cliente.id}/saldo`);
+                  const saldoData = await resSaldo.json();
+                  saldo = saldoData.saldo ?? 0;
+                  atraso = saldoData.atraso ?? 0;
+                  cuota = saldoData.cuotasTotal ? Math.round((saldoData.prestamo + (saldoData.prestamo * 0.2)) / saldoData.cuotasTotal) : undefined;
+                } catch {}
+                return { id: cliente.id, nombre: cliente.nombre, saldo, atraso, cuota };
+              })
+            );
+            setClientes(clientesConSaldo);
+          } else {
+            setClientes([]);
+          }
+          setLoading(false);
+        })
+        .catch(() => {
           setClientes([]);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setClientes([]);
-        setLoading(false);
-      });
+          setLoading(false);
+        });
   }, []);
 
   const navigate = useNavigate();
