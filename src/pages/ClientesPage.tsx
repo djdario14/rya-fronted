@@ -327,14 +327,25 @@ const ClientesPage: React.FC = () => {
                 {/* El id solo se usa internamente, no se muestra en la UI */}
               </div>
               <div style={{ display: 'flex', gap: 14 }}>
-                                        <button
-                                          style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
-                                          onMouseOver={e => { e.currentTarget.style.background = '#176c3a'; e.currentTarget.style.boxShadow = '0 4px 16px #176c3a33'; }}
-                                          onMouseOut={e => { e.currentTarget.style.background = '#219653'; e.currentTarget.style.boxShadow = '0 2px 8px #21965322'; }}
-                                          onClick={e => { e.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo('No tiene'); }}
-                                        >
-                                          Abonar
-                                        </button>
+                                        {cliente.cuota && cliente.cuota > 0 ? (
+                                          <button
+                                            style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
+                                            onMouseOver={e => { e.currentTarget.style.background = '#176c3a'; e.currentTarget.style.boxShadow = '0 4px 16px #176c3a33'; }}
+                                            onMouseOut={e => { e.currentTarget.style.background = '#219653'; e.currentTarget.style.boxShadow = '0 2px 8px #21965322'; }}
+                                            onClick={e => { e.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo('No tiene'); }}
+                                          >
+                                            Abonar
+                                          </button>
+                                        ) : (
+                                          <button
+                                            style={{ background: '#29487d', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #29487d22', transition: 'background 0.2s, box-shadow 0.2s' }}
+                                            onMouseOver={e => { e.currentTarget.style.background = '#18325a'; e.currentTarget.style.boxShadow = '0 4px 16px #18325a33'; }}
+                                            onMouseOut={e => { e.currentTarget.style.background = '#29487d'; e.currentTarget.style.boxShadow = '0 2px 8px #29487d22'; }}
+                                            onClick={e => { e.stopPropagation(); setNuevoCliente(cliente); setShowCreditoModal(true); }}
+                                          >
+                                            Nuevo crédito
+                                          </button>
+                                        )}
                         {/* Modal para registrar pago (fuera del mapeo de clientes) */}
                         {showPagoModal && pagoCliente && (
                           <div
