@@ -331,12 +331,12 @@ const ClientesPage: React.FC = () => {
                                           style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
                                           onMouseOver={e => { e.currentTarget.style.background = '#176c3a'; e.currentTarget.style.boxShadow = '0 4px 16px #176c3a33'; }}
                                           onMouseOut={e => { e.currentTarget.style.background = '#219653'; e.currentTarget.style.boxShadow = '0 2px 8px #21965322'; }}
-                                          onClick={e => { e.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
+                                          onClick={e => { e.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo('No tiene'); }}
                                         >
                                           Abonar
                                         </button>
-                        {/* Modal para registrar pago */}
-                        {showPagoModal && (
+                        {/* Modal para registrar pago (fuera del mapeo de clientes) */}
+                        {showPagoModal && pagoCliente && (
                           <div
                             style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', display: 'grid', placeItems: 'center', zIndex: 999 }}
                             onClick={() => setShowPagoModal(false)}
@@ -415,15 +415,15 @@ const ClientesPage: React.FC = () => {
                                   }
                                 }}
                               >Registrar</button>
-                                    {/* Modal de éxito */}
-                                    {showSuccessModal && (
-                                      <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', display: 'grid', placeItems: 'center', zIndex: 9999 }}>
-                                        <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0003', padding: 36, minWidth: 300, maxWidth: '90vw', width: 340, textAlign: 'center' }}>
-                                          <div style={{ fontSize: 38, color: '#219653', marginBottom: 18 }}>✔</div>
-                                          <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 8 }}>Abono exitoso</div>
-                                        </div>
-                                      </div>
-                                    )}
+                              {/* Modal de éxito */}
+                              {showSuccessModal && (
+                                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', display: 'grid', placeItems: 'center', zIndex: 9999 }}>
+                                  <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0003', padding: 36, minWidth: 300, maxWidth: '90vw', width: 340, textAlign: 'center' }}>
+                                    <div style={{ fontSize: 38, color: '#219653', marginBottom: 18 }}>✔</div>
+                                    <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 8 }}>Abono exitoso</div>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
