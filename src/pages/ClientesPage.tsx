@@ -327,6 +327,14 @@ const ClientesPage: React.FC = () => {
                 {/* El id solo se usa internamente, no se muestra en la UI */}
               </div>
               <div style={{ display: 'flex', gap: 14 }}>
+                                        <button
+                                          style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
+                                          onMouseOver={e => { e.currentTarget.style.background = '#176c3a'; e.currentTarget.style.boxShadow = '0 4px 16px #176c3a33'; }}
+                                          onMouseOut={e => { e.currentTarget.style.background = '#219653'; e.currentTarget.style.boxShadow = '0 2px 8px #21965322'; }}
+                                          onClick={e => { e.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
+                                        >
+                                          Abonar
+                                        </button>
                         {/* Modal para registrar pago */}
                         {showPagoModal && (
                           <div
@@ -338,28 +346,34 @@ const ClientesPage: React.FC = () => {
                               onClick={e => e.stopPropagation()}
                             >
                               <button onClick={() => setShowPagoModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: '#e9ecef', border: 'none', borderRadius: 8, padding: '6px 16px', fontWeight: 600, cursor: 'pointer', fontSize: 16 }}>✕</button>
-                              <h2 style={{ marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Registrar pago de {pagoCliente?.nombre}</h2>
+                              <h2 style={{ marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Registro de abono</h2>
                               <div style={{ marginBottom: 18 }}>
-                                <label style={{ fontWeight: 600, fontSize: 16 }}>Monto</label><br />
+                                <label style={{ fontWeight: 600, fontSize: 16 }}>Monto del abono</label><br />
                                 <input
                                   type="number"
                                   value={monto}
                                   disabled={noPago}
                                   onChange={e => setMonto(e.target.value)}
                                   style={{ width: '100%', padding: '10px 12px', fontSize: 17, borderRadius: 8, border: '1px solid #ccc', marginTop: 6, marginBottom: 8 }}
-                                  placeholder="Monto a abonar"
+                                  placeholder="Monto del abono"
                                 />
                               </div>
                               <div style={{ marginBottom: 18 }}>
                                 <label style={{ fontWeight: 600, fontSize: 16 }}>
-                                  <input type="checkbox" checked={noPago} onChange={e => setNoPago(e.target.checked)} style={{ marginRight: 8 }} /> No pago
+                                  <input type="checkbox" checked={noPago} onChange={e => setNoPago(e.target.checked)} style={{ marginRight: 8 }} /> No registrar abono
                                 </label>
                                 {noPago && (
                                   <div style={{ marginTop: 10 }}>
                                     <label style={{ fontWeight: 500, fontSize: 15 }}>Motivo</label><br />
                                     <Select
-                                      options={motivosNoPago.map(m => ({ value: m, label: m }))}
-                                      value={motivosNoPago.map(m => ({ value: m, label: m })).find(opt => opt.value === motivo) || { value: motivosNoPago[0], label: motivosNoPago[0] }}
+                                      options={[
+                                        { value: 'No tiene', label: 'No tiene' },
+                                        { value: 'No se encuentra', label: 'No se encuentra' },
+                                        { value: 'Dejo de trabajar', label: 'Dejo de trabajar' },
+                                        { value: 'Mañana paga', label: 'Mañana paga' },
+                                        { value: 'Clavo', label: 'Clavo' },
+                                      ]}
+                                      value={{ value: motivo, label: motivo }}
                                       onChange={(option: { value: string; label: string } | null) => {
                                         if (option) setMotivo(option.value);
                                       }}
@@ -374,9 +388,42 @@ const ClientesPage: React.FC = () => {
                                   </div>
                                 )}
                               </div>
-                              <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', width: '100%' }}
-                                onClick={() => { /* Aquí irá la lógica para registrar el pago */ setShowPagoModal(false); }}
+                              <button
+                                style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', width: '100%' }}
+                                onClick={async () => {
+                                  if (!pagoCliente) return;
+                                  let payload: any = {
+                                    cliente_id: pagoCliente.id,
+                                    fecha: new Date().toISOString().slice(0, 10),
+                                  };
+                                  if (!noPago) {
+                                    payload.monto = Number(monto);
+                                  } else {
+                                    payload.motivo_no_pago = motivo;
+                                  }
+                                  try {
+                                    await fetch('https://rya-backend-production.up.railway.app/pagos/', {
+                                      method: 'POST',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify(payload),
+                                    });
+                                    setShowPagoModal(false);
+                                    setTimeout(() => setShowSuccessModal(false), 2000);
+                                    setShowSuccessModal(true);
+                                  } catch {
+                                    alert('Error al registrar abono');
+                                  }
+                                }}
                               >Registrar</button>
+                                    {/* Modal de éxito */}
+                                    {showSuccessModal && (
+                                      <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', display: 'grid', placeItems: 'center', zIndex: 9999 }}>
+                                        <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0003', padding: 36, minWidth: 300, maxWidth: '90vw', width: 340, textAlign: 'center' }}>
+                                          <div style={{ fontSize: 38, color: '#219653', marginBottom: 18 }}>✔</div>
+                                          <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 8 }}>Abono exitoso</div>
+                                        </div>
+                                      </div>
+                                    )}
                             </div>
                           </div>
                         )}
