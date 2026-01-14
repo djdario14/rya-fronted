@@ -66,6 +66,7 @@ const ClientesPage: React.FC = () => {
   const [showCreditoModal, setShowCreditoModal] = useState(false);
   const [nuevoCliente, setNuevoCliente] = useState<any>(null);
   const [showPrestamoSuccess, setShowPrestamoSuccess] = useState(false);
+  const [showPagoSuccess, setShowPagoSuccess] = useState(false);
 
   // Detectar país por IP y setear código de país
   useEffect(() => {
@@ -442,7 +443,22 @@ const ClientesPage: React.FC = () => {
                     });
                     if (!res.ok) throw new Error('Error al registrar abono');
                     setShowPagoModal(false);
-                    fetchClientes();
+                    setShowPagoSuccess(true);
+                    // Actualizar solo el cliente abonado en la lista
+                    try {
+                      const resSaldo = await fetch(`https://rya-backend-production.up.railway.app/clientes/${pagoCliente?.id}/saldo`);
+                      const saldoData = await resSaldo.json();
+                      setClientes(clientes => clientes.map(c =>
+                        c.id === pagoCliente?.id
+                          ? {
+                              ...c,
+                              saldo: saldoData.prestamo + (saldoData.prestamo ? saldoData.prestamo * 0.2 : 0) - ((saldoData.cuotasPagadas && saldoData.cuotasTotal) ? ((saldoData.prestamo + (saldoData.prestamo ? saldoData.prestamo * 0.2 : 0)) / saldoData.cuotasTotal) * saldoData.cuotasPagadas : 0),
+                              atraso: saldoData.atraso ?? 0,
+                              cuota: saldoData.cuotasTotal ? Math.round((saldoData.prestamo + (saldoData.prestamo ? saldoData.prestamo * 0.2 : 0)) / saldoData.cuotasTotal) : undefined
+                            }
+                          : c
+                      ));
+                    } catch {}
                   } catch {
                     alert('No se pudo registrar el abono');
                   }
@@ -475,6 +491,12 @@ const ClientesPage: React.FC = () => {
                 <button onClick={() => setShowPagoModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
               </div>
             </div>
+          )}
+          {showPagoSuccess && (
+            <SuccessModal
+              message="¡Abono registrado exitosamente!"
+              onClose={() => setShowPagoSuccess(false)}
+            />
           )}
         </div>
 
