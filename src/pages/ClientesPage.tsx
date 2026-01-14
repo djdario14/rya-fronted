@@ -256,10 +256,19 @@ const ClientesPage: React.FC = () => {
                         telefono: telefonoCompleto
                       })
                     });
-                    if (!res.ok) throw new Error('Error al guardar cliente');
-                    setShowModal(false);
-                    setForm({ nombre: '', cedula: '', direccion: '', negocio: '', telefono: '' });
-                    setCountryCode('+593');
+                    if (res.status === 409) {
+                      setError('La cédula ya está registrada');
+                    } else if (!res.ok) {
+                      setError('No se pudo guardar el cliente');
+                    } else {
+                      // Cliente agregado con éxito
+                      const nuevo = await res.json();
+                      setShowModal(false);
+                      setForm({ nombre: '', cedula: '', direccion: '', negocio: '', telefono: '' });
+                      setCountryCode('+593');
+                      setNuevoCliente(nuevo);
+                      setShowSuccessModal(true);
+                    }
                   } catch (err) {
                     setError('No se pudo guardar el cliente');
                   }
@@ -304,7 +313,17 @@ const ClientesPage: React.FC = () => {
           <CreditoModal 
             clienteNombre={nuevoCliente?.nombre ?? ''}
             onClose={() => setShowCreditoModal(false)}
-            onSubmit={() => {}}
+            onSubmit={() => {
+              setShowCreditoModal(false);
+              setShowPrestamoSuccess(true);
+            }}
+          />
+        )}
+
+        {showPrestamoSuccess && (
+          <SuccessModal
+            message="¡Crédito registrado exitosamente!"
+            onClose={() => setShowPrestamoSuccess(false)}
           />
         )}
 
