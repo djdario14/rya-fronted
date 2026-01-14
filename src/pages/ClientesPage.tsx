@@ -291,7 +291,6 @@ const ClientesPage: React.FC = () => {
           ) : clientes.length === 0 ? (
             <div style={{ textAlign: 'center', color: '#888', fontSize: 18, padding: 40 }}>No hay clientes para mostrar.</div>
           ) : clientes
-              .filter(cliente => tab === 'todos' || (cliente.saldo ?? 0) > 0)
               .filter(cliente => cliente.nombre.toLowerCase().includes(search.toLowerCase()))
               .map((cliente, idx) => (
                 <div key={idx} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 4px 24px #0002', padding: '24px 36px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, transition: 'box-shadow 0.2s, transform 0.2s', animation: 'fadeIn 0.7s', border: '1px solid #f0f0f0', cursor: cliente.id !== -1 ? 'pointer' : 'default' }}
