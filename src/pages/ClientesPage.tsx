@@ -313,9 +313,26 @@ const ClientesPage: React.FC = () => {
           <CreditoModal 
             clienteNombre={nuevoCliente?.nombre ?? ''}
             onClose={() => setShowCreditoModal(false)}
-            onSubmit={() => {
-              setShowCreditoModal(false);
-              setShowPrestamoSuccess(true);
+            onSubmit={async (data) => {
+              if (!nuevoCliente?.id) return;
+              // Registrar préstamo en backend
+              try {
+                const res = await fetch('https://rya-backend-production.up.railway.app/prestamos/', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    cliente_id: nuevoCliente.id,
+                    monto: data.valor,
+                    fecha: data.fecha,
+                    estado: 'activo'
+                  })
+                });
+                if (!res.ok) throw new Error('Error al registrar crédito');
+                setShowCreditoModal(false);
+                setShowPrestamoSuccess(true);
+              } catch {
+                alert('No se pudo registrar el crédito');
+              }
             }}
           />
         )}
