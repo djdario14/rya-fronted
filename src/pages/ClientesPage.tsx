@@ -104,43 +104,44 @@ const ClientesPage: React.FC = () => {
     };
   }, []);
 
+  // Función para refrescar clientes
+  const fetchClientes = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('https://rya-backend-production.up.railway.app/clientes/');
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        const clientesConSaldo = await Promise.all(
+          data.map(async (cliente: any) => {
+            if (typeof cliente === 'string') {
+              return { id: -1, nombre: cliente, saldo: undefined, atraso: undefined };
+            }
+            let valorPrestamo = 0, intereses = 0, pagos = 0, saldo = 0, atraso = 0, cuota = undefined;
+            try {
+              const resSaldo = await fetch(`https://rya-backend-production.up.railway.app/clientes/${cliente.id}/saldo`);
+              const saldoData = await resSaldo.json();
+              valorPrestamo = saldoData.prestamo ?? 0;
+              intereses = saldoData.prestamo ? saldoData.prestamo * 0.2 : 0;
+              pagos = saldoData.cuotasPagadas && saldoData.cuotasTotal ? ((valorPrestamo + intereses) / saldoData.cuotasTotal) * saldoData.cuotasPagadas : 0;
+              saldo = valorPrestamo + intereses - pagos;
+              atraso = saldoData.atraso ?? 0;
+              cuota = saldoData.cuotasTotal ? Math.round((valorPrestamo + intereses) / saldoData.cuotasTotal) : undefined;
+            } catch {}
+            return { id: cliente.id, nombre: cliente.nombre, saldo, atraso, cuota };
+          })
+        );
+        setClientes(clientesConSaldo);
+      } else {
+        setClientes([]);
+      }
+    } catch {
+      setClientes([]);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-      // Obtener clientes reales del backend
-      setLoading(true);
-      fetch('https://rya-backend-production.up.railway.app/clientes/')
-        .then(res => res.json())
-        .then(async data => {
-          if (Array.isArray(data)) {
-            const clientesConSaldo = await Promise.all(
-              data.map(async (cliente: any) => {
-                if (typeof cliente === 'string') {
-                  return { id: -1, nombre: cliente, saldo: undefined, atraso: undefined };
-                }
-                // Obtener datos de préstamo, intereses y pagos
-                let valorPrestamo = 0, intereses = 0, pagos = 0, saldo = 0, atraso = 0, cuota = undefined;
-                try {
-                  const resSaldo = await fetch(`https://rya-backend-production.up.railway.app/clientes/${cliente.id}/saldo`);
-                  const saldoData = await resSaldo.json();
-                  valorPrestamo = saldoData.prestamo ?? 0;
-                  intereses = saldoData.prestamo ? saldoData.prestamo * 0.2 : 0;
-                  pagos = saldoData.cuotasPagadas && saldoData.cuotasTotal ? ((valorPrestamo + intereses) / saldoData.cuotasTotal) * saldoData.cuotasPagadas : 0;
-                  saldo = valorPrestamo + intereses - pagos;
-                  atraso = saldoData.atraso ?? 0;
-                  cuota = saldoData.cuotasTotal ? Math.round((valorPrestamo + intereses) / saldoData.cuotasTotal) : undefined;
-                } catch {}
-                return { id: cliente.id, nombre: cliente.nombre, saldo, atraso, cuota };
-              })
-            );
-            setClientes(clientesConSaldo);
-          } else {
-            setClientes([]);
-          }
-          setLoading(false);
-        })
-        .catch(() => {
-          setClientes([]);
-          setLoading(false);
-        });
+    fetchClientes();
   }, []);
 
   const navigate = useNavigate();
@@ -268,6 +269,7 @@ const ClientesPage: React.FC = () => {
                       setCountryCode('+593');
                       setNuevoCliente(nuevo);
                       setShowSuccessModal(true);
+                      fetchClientes();
                     }
                   } catch (err) {
                     setError('No se pudo guardar el cliente');
@@ -330,6 +332,7 @@ const ClientesPage: React.FC = () => {
                 if (!res.ok) throw new Error('Error al registrar crédito');
                 setShowCreditoModal(false);
                 setShowPrestamoSuccess(true);
+                fetchClientes();
               } catch {
                 alert('No se pudo registrar el crédito');
               }
