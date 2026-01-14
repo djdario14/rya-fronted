@@ -116,14 +116,17 @@ const ClientesPage: React.FC = () => {
                 if (typeof cliente === 'string') {
                   return { id: -1, nombre: cliente, saldo: undefined, atraso: undefined };
                 }
-                // Obtener datos de saldo y cuotas
-                let saldo = 0, atraso = 0, cuota = undefined;
+                // Obtener datos de préstamo, intereses y pagos
+                let valorPrestamo = 0, intereses = 0, pagos = 0, saldo = 0, atraso = 0, cuota = undefined;
                 try {
                   const resSaldo = await fetch(`https://rya-backend-production.up.railway.app/clientes/${cliente.id}/saldo`);
                   const saldoData = await resSaldo.json();
-                  saldo = saldoData.saldo ?? 0;
+                  valorPrestamo = saldoData.prestamo ?? 0;
+                  intereses = saldoData.prestamo ? saldoData.prestamo * 0.2 : 0;
+                  pagos = saldoData.cuotasPagadas && saldoData.cuotasTotal ? ((valorPrestamo + intereses) / saldoData.cuotasTotal) * saldoData.cuotasPagadas : 0;
+                  saldo = valorPrestamo + intereses - pagos;
                   atraso = saldoData.atraso ?? 0;
-                  cuota = saldoData.cuotasTotal ? Math.round((saldoData.prestamo + (saldoData.prestamo * 0.2)) / saldoData.cuotasTotal) : undefined;
+                  cuota = saldoData.cuotasTotal ? Math.round((valorPrestamo + intereses) / saldoData.cuotasTotal) : undefined;
                 } catch {}
                 return { id: cliente.id, nombre: cliente.nombre, saldo, atraso, cuota };
               })
