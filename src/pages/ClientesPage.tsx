@@ -242,8 +242,8 @@ const ClientesPage: React.FC = () => {
                   e.preventDefault();
                   setSaving(true);
                   setError('');
-                  // Unir código de país y número antes de guardar
-                  const telefonoCompleto = `+593${form.telefono}`;
+                  // Unir código de país seleccionado y número antes de guardar
+                  const telefonoCompleto = `${countryCode}${form.telefono}`;
                   try {
                     const res = await fetch('https://rya-backend-production.up.railway.app/clientes/', {
                       method: 'POST',
@@ -259,6 +259,7 @@ const ClientesPage: React.FC = () => {
                     if (!res.ok) throw new Error('Error al guardar cliente');
                     setShowModal(false);
                     setForm({ nombre: '', cedula: '', direccion: '', negocio: '', telefono: '' });
+                    setCountryCode('+593');
                   } catch (err) {
                     setError('No se pudo guardar el cliente');
                   }
