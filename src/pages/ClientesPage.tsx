@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import Select from 'react-select';
+// Motivos de no pago
 const motivosNoPago = [
-  'No está',
   'No tiene',
-  'Paga mañana',
+  'No está',
   'Dejó de trabajar',
+  'Mañana paga',
   'Clavo',
 ];
+
+import React, { useState, useEffect } from 'react';
+import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import SuccessModal from '../components/SuccessModal';
 import CreditoModal from '../components/CreditoModal';
+
+
 
 // Lista básica de códigos de país
 const countryCodes = [
@@ -65,13 +69,16 @@ const ClientesPage: React.FC = () => {
 
   // Detectar país por IP y setear código de país
   useEffect(() => {
-    fetch('https://ipapi.co/json/')
-      .then(res => res.json())
-      .then(data => {
+
+    const fetchCountryCode = async () => {
+      try {
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
         const found = countryCodes.find(c => c.iso === data.country_code);
         if (found) setCountryCode(found.code);
-      })
-      .catch(() => {});
+      } catch {}
+    };
+    fetchCountryCode();
   }, []);
 
   // Cuando se abre el modal, pedir ubicación GPS y autocompletar dirección
@@ -375,7 +382,7 @@ const ClientesPage: React.FC = () => {
                         style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
                         onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#176c3a'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px #176c3a33'; }}
                         onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#219653'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px #21965322'; }}
-                        onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo('No tiene'); }}
+                        onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
                       >
                         Abonar
                       </button>
@@ -398,6 +405,65 @@ const ClientesPage: React.FC = () => {
                   </div>
                 </div>
               ))}
+          {/* Modal para registrar abono (fuera del map) */}
+          {showPagoModal && (
+            <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
+              <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 400, width: 420, position: 'relative' }}>
+                <h3 style={{ marginTop: 0, marginBottom: 24, fontWeight: 700, fontSize: 24 }}>Registrar Abono para {pagoCliente?.nombre}</h3>
+                <form onSubmit={async e => {
+                  e.preventDefault();
+                  if (noPago) {
+                    // Aquí podrías guardar el motivo de no pago si lo deseas
+                    setShowPagoModal(false);
+                    return;
+                  }
+                  // Registrar abono en backend
+                  try {
+                    const res = await fetch('https://rya-backend-production.up.railway.app/pagos/', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        prestamo_id: pagoCliente?.id,
+                        monto: Number(monto),
+                        fecha: new Date().toISOString().slice(0, 10)
+                      })
+                    });
+                    if (!res.ok) throw new Error('Error al registrar abono');
+                    setShowPagoModal(false);
+                    fetchClientes();
+                  } catch {
+                    alert('No se pudo registrar el abono');
+                  }
+                }}>
+                  <div style={{ marginBottom: 16 }}>
+                    <label>Monto de abono</label>
+                    <input type="number" required min={1} value={monto} onChange={e => setMonto(e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+                  </div>
+                  <div style={{ marginBottom: 16 }}>
+                    <label>
+                      <input type="checkbox" checked={noPago} onChange={e => setNoPago(e.target.checked)} style={{ marginRight: 8 }} />
+                      No registrar pago
+                    </label>
+                  </div>
+                  {noPago && (
+                    <div style={{ marginBottom: 16 }}>
+                      <label>Motivo</label>
+                      <select value={motivo} onChange={e => setMotivo(e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }}>
+                        {motivosNoPago.map(m => (
+                          <option key={m} value={m}>{m}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+                    <button type="button" onClick={() => setShowPagoModal(false)} style={{ background: '#eee', color: '#333', border: 'none', borderRadius: 10, padding: '10px 24px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
+                    <button type="submit" style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer' }}>Registrar</button>
+                  </div>
+                </form>
+                <button onClick={() => setShowPagoModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
+              </div>
+            </div>
+          )}
         </div>
 
       </div>
