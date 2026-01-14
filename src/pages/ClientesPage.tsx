@@ -413,8 +413,20 @@ const ClientesPage: React.FC = () => {
                 <form onSubmit={async e => {
                   e.preventDefault();
                   if (noPago) {
-                    // Aquí podrías guardar el motivo de no pago si lo deseas
                     setShowPagoModal(false);
+                    return;
+                  }
+                  // Buscar préstamo activo del cliente
+                  let prestamoId = null;
+                  try {
+                    const res = await fetch(`https://rya-backend-production.up.railway.app/prestamos/?cliente_id=${pagoCliente?.id}&estado=activo`);
+                    const prestamos = await res.json();
+                    if (Array.isArray(prestamos) && prestamos.length > 0) {
+                      prestamoId = prestamos[0].id;
+                    }
+                  } catch {}
+                  if (!prestamoId) {
+                    alert('No se encontró préstamo activo para este cliente');
                     return;
                   }
                   // Registrar abono en backend
@@ -423,7 +435,7 @@ const ClientesPage: React.FC = () => {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
-                        prestamo_id: pagoCliente?.id,
+                        prestamo_id: prestamoId,
                         monto: Number(monto),
                         fecha: new Date().toISOString().slice(0, 10)
                       })
