@@ -242,7 +242,27 @@ const ClientesPage: React.FC = () => {
                   e.preventDefault();
                   setSaving(true);
                   setError('');
-                  // ... lógica para guardar cliente ...
+                  // Unir código de país y número antes de guardar
+                  const telefonoCompleto = `+593${form.telefono}`;
+                  try {
+                    const res = await fetch('https://rya-backend-production.up.railway.app/clientes/', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        nombre: form.nombre,
+                        cedula: form.cedula,
+                        direccion: form.direccion,
+                        negocio: form.negocio,
+                        telefono: telefonoCompleto
+                      })
+                    });
+                    if (!res.ok) throw new Error('Error al guardar cliente');
+                    setShowModal(false);
+                    setForm({ nombre: '', cedula: '', direccion: '', negocio: '', telefono: '' });
+                  } catch (err) {
+                    setError('No se pudo guardar el cliente');
+                  }
+                  setSaving(false);
                 }}>
                   <input type="text" placeholder="Nombre" required value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
                   <input type="text" placeholder="Cédula" required value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
