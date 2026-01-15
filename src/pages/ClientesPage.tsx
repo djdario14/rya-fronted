@@ -162,6 +162,11 @@ const ClientesPage: React.FC = () => {
     setLoading(false);
   };
 
+  // Llamar a fetchClientes al montar el componente
+  useEffect(() => {
+    fetchClientes();
+  }, []);
+
   // --- RETURN PRINCIPAL REESTRUCTURADO ---
   return (
     <div style={{ padding: 32, maxWidth: 900, margin: '0 auto' }}>
@@ -413,7 +418,7 @@ const ClientesPage: React.FC = () => {
                   if (Array.isArray(prestamos) && prestamos.length > 0) {
                     prestamoId = prestamos[0].id;
                   }
-                } catch {}
+                } catch (err) {}
                 if (!prestamoId) {
                   alert('No se encontró préstamo activo para este cliente');
                   return;
@@ -436,60 +441,30 @@ const ClientesPage: React.FC = () => {
                   try {
                     const resSaldo = await fetch(`https://rya-backend-production.up.railway.app/clientes/${pagoCliente?.id}/saldo`);
                     const saldoData = await resSaldo.json();
-                    setClientes(clientes => clientes.map(c =>
-                      c.id === pagoCliente?.id
-                        ? {
-                            ...c,
-                            saldo: saldoData.prestamo + (saldoData.prestamo ? saldoData.prestamo * 0.2 : 0) - ((saldoData.cuotasPagadas && saldoData.cuotasTotal) ? ((saldoData.prestamo + (saldoData.prestamo ? saldoData.prestamo * 0.2 : 0)) / saldoData.cuotasTotal) * saldoData.cuotasPagadas : 0),
-                            atraso: saldoData.atraso ?? 0,
-                            cuota: saldoData.cuotasTotal ? Math.round((saldoData.prestamo + (saldoData.prestamo ? saldoData.prestamo * 0.2 : 0)) / saldoData.cuotasTotal) : undefined
-                          }
-                        : c
-                    ));
-                  } catch {}
-                } catch {
-                  alert('No se pudo registrar el abono');
-                }
+                    setClientes(clientes => clientes.map(c => {
+                      if (c.id === pagoCliente?.id) {
+                        return { ...c, saldo: saldoData.saldo, atraso: saldoData.atraso };
+                      }
+                      return c;
+                    }));
+                  } catch (err) {}
+                  fetchClientes();
+                } catch (err) {}
               }}>
-                <div style={{ marginBottom: 16 }}>
-                  <label>Monto de abono</label>
-                  <input type="number" required min={1} value={monto} onChange={e => setMonto(e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
-                </div>
-                <div style={{ marginBottom: 16 }}>
-                  <label>
-                    <input type="checkbox" checked={noPago} onChange={e => setNoPago(e.target.checked)} style={{ marginRight: 8 }} />
-                    No registrar pago
-                  </label>
-                </div>
-                {noPago && (
-                  <div style={{ marginBottom: 16 }}>
-                    <label>Motivo</label>
-                    <select value={motivo} onChange={e => setMotivo(e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }}>
-                      {motivosNoPago.map(m => (
-                        <option key={m} value={m}>{m}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
-                  <button type="button" onClick={() => setShowPagoModal(false)} style={{ background: '#eee', color: '#333', border: 'none', borderRadius: 10, padding: '10px 24px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
-                  <button type="submit" style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer' }}>Registrar</button>
+                <input type="number" placeholder="Monto" required value={monto} onChange={e => setMonto(e.target.value)} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12, width: '100%' }} />
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
+                  <button type="button" onClick={() => setShowPagoModal(false)} style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
+                  <button type="submit" style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px #21965322' }}>Guardar abono</button>
                 </div>
               </form>
               <button onClick={() => setShowPagoModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
             </div>
           </div>
         )}
-        {showPagoSuccess && (
-          <SuccessModal
-            message="¡Abono registrado exitosamente!"
-            onClose={() => setShowPagoSuccess(false)}
-          />
-        )}
-      </div>
-    </div>
+    {/* cierre de la lista de clientes y modales */}
+  </div>
+</div>
   );
-
 };
 
 export default ClientesPage;
