@@ -170,8 +170,47 @@ const ClientesPage: React.FC = () => {
   // --- RETURN PRINCIPAL REESTRUCTURADO ---
   return (
     <div style={{ padding: 32, maxWidth: 900, margin: '0 auto' }}>
-      {/* Tabs para filtrar clientes */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 32 }}>
+      {/* Barra superior */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
+          <button style={{ background: 'none', border: 'none', fontSize: 28, cursor: 'pointer', color: '#444', marginRight: 8 }} title="Menú">
+            <span style={{ fontWeight: 700 }}>&#9776;</span>
+          </button>
+          <input
+            type="text"
+            placeholder="Buscar cliente"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{
+              flex: 1,
+              padding: '12px 20px',
+              borderRadius: 10,
+              border: '1px solid #e0e0e0',
+              fontSize: 18,
+              background: '#fafbfc',
+              outline: 'none',
+              marginRight: 16
+            }}
+          />
+          <span style={{ fontSize: 22, color: '#f1b900', marginRight: 18 }} title="Notificaciones">🔔</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', borderRadius: 20, padding: '6px 16px', boxShadow: '0 1px 4px #0001', fontWeight: 600, fontSize: 16 }}>
+            <span style={{ fontSize: 22, color: '#6c63ff' }}>👤</span>
+            Usuario
+            <span style={{ background: '#e74c3c', color: '#fff', borderRadius: '50%', fontSize: 13, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 4 }}>1</span>
+          </div>
+        </div>
+        <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 10, padding: '13px 36px', fontWeight: 600, fontSize: 19, cursor: 'pointer', boxShadow: '0 2px 12px #21965322', transition: 'background 0.2s, box-shadow 0.2s', marginLeft: 24 }}
+          onMouseOver={e => { e.currentTarget.style.background = '#176c3a'; e.currentTarget.style.boxShadow = '0 4px 16px #176c3a33'; }}
+          onMouseOut={e => { e.currentTarget.style.background = '#219653'; e.currentTarget.style.boxShadow = '0 2px 12px #21965322'; }}
+          onClick={() => setShowModal(true)}
+        >
+          + Agregar Cliente
+        </button>
+      </div>
+
+      {/* Título y tabs */}
+      <h2 style={{ margin: '0 0 12px 0', fontSize: 34, fontWeight: 700, letterSpacing: '-1px' }}>Clientes</h2>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
         <button
           onClick={() => setTab('pendientes')}
           style={{
@@ -187,8 +226,6 @@ const ClientesPage: React.FC = () => {
             outline: 'none',
             transition: 'all 0.2s',
           }}
-          onMouseOver={e => { if (tab !== 'pendientes') (e.currentTarget as HTMLButtonElement).style.background = '#d1e7dd'; }}
-          onMouseOut={e => { if (tab !== 'pendientes') (e.currentTarget as HTMLButtonElement).style.background = '#e9ecef'; }}
         >
           Pendientes
         </button>
@@ -207,100 +244,87 @@ const ClientesPage: React.FC = () => {
             outline: 'none',
             transition: 'all 0.2s',
           }}
-          onMouseOver={e => { if (tab !== 'todos') (e.currentTarget as HTMLButtonElement).style.background = '#d1e7dd'; }}
-          onMouseOut={e => { if (tab !== 'todos') (e.currentTarget as HTMLButtonElement).style.background = '#e9ecef'; }}
         >
           Todos
         </button>
       </div>
 
-      {/* Título y botón agregar */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <h2 style={{ margin: 0, fontSize: 34, fontWeight: 700, letterSpacing: '-1px' }}>Clientes</h2>
-        <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 10, padding: '13px 36px', fontWeight: 600, fontSize: 19, cursor: 'pointer', boxShadow: '0 2px 12px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
-          onMouseOver={e => { e.currentTarget.style.background = '#176c3a'; e.currentTarget.style.boxShadow = '0 4px 16px #176c3a33'; }}
-          onMouseOut={e => { e.currentTarget.style.background = '#219653'; e.currentTarget.style.boxShadow = '0 2px 12px #21965322'; }}
-          onClick={() => setShowModal(true)}
-        >
-          + Agregar Cliente
-        </button>
-        {/* Modal para agregar cliente */}
-        {showModal && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-            <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 400, width: 420, position: 'relative' }}>
-              <h3 style={{ marginTop: 0, marginBottom: 24, fontWeight: 700, fontSize: 24 }}>Agregar Cliente</h3>
-              <form onSubmit={async e => {
-                e.preventDefault();
-                setSaving(true);
-                setError('');
-                // Unir código de país seleccionado y número antes de guardar
-                const telefonoCompleto = `${countryCode}${form.telefono}`;
-                try {
-                  const res = await fetch('https://rya-backend-production.up.railway.app/clientes/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      nombre: form.nombre,
-                      cedula: form.cedula,
-                      direccion: form.direccion,
-                      negocio: form.negocio,
-                      telefono: telefonoCompleto
-                    })
-                  });
-                  if (res.status === 409) {
-                    setError('La cédula ya está registrada');
-                  } else if (!res.ok) {
-                    setError('No se pudo guardar el cliente');
-                  } else {
-                    // Cliente agregado con éxito
-                    const nuevo = await res.json();
-                    setShowModal(false);
-                    setForm({
-                      id: -1,
-                      nombre: '',
-                      cedula: '',
-                      direccion: '',
-                      negocio: '',
-                      telefono: '',
-                      saldo: 0,
-                      prestamo: 0,
-                      cuotasPagadas: 0,
-                      cuotasTotal: 0,
-                      atraso: 0,
-                    });
-                    setCountryCode('+593');
-                    setNuevoCliente(nuevo);
-                    setShowSuccessModal(true);
-                    fetchClientes();
-                  }
-                } catch (err) {
+      {/* Modal para agregar cliente */}
+      {showModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 400, width: 420, position: 'relative' }}>
+            <h3 style={{ marginTop: 0, marginBottom: 24, fontWeight: 700, fontSize: 24 }}>Agregar Cliente</h3>
+            <form onSubmit={async e => {
+              e.preventDefault();
+              setSaving(true);
+              setError('');
+              // Unir código de país seleccionado y número antes de guardar
+              const telefonoCompleto = `${countryCode}${form.telefono}`;
+              try {
+                const res = await fetch('https://rya-backend-production.up.railway.app/clientes/', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    nombre: form.nombre,
+                    cedula: form.cedula,
+                    direccion: form.direccion,
+                    negocio: form.negocio,
+                    telefono: telefonoCompleto
+                  })
+                });
+                if (res.status === 409) {
+                  setError('La cédula ya está registrada');
+                } else if (!res.ok) {
                   setError('No se pudo guardar el cliente');
+                } else {
+                  // Cliente agregado con éxito
+                  const nuevo = await res.json();
+                  setShowModal(false);
+                  setForm({
+                    id: -1,
+                    nombre: '',
+                    cedula: '',
+                    direccion: '',
+                    negocio: '',
+                    telefono: '',
+                    saldo: 0,
+                    prestamo: 0,
+                    cuotasPagadas: 0,
+                    cuotasTotal: 0,
+                    atraso: 0,
+                  });
+                  setCountryCode('+593');
+                  setNuevoCliente(nuevo);
+                  setShowSuccessModal(true);
+                  fetchClientes();
                 }
-                setSaving(false);
-              }}>
-                <input type="text" placeholder="Nombre" required value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
-                <input type="text" placeholder="Cédula" required value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
-                <input type="text" placeholder="Dirección (GPS)" required value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
-                <input type="text" placeholder="Negocio" required value={form.negocio} onChange={e => setForm(f => ({ ...f, negocio: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
-                <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                  <select value={countryCode} onChange={e => setCountryCode(e.target.value)} style={{ padding: '10px 8px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, minWidth: 90 }}>
-                    {countryCodes.map(c => (
-                      <option key={c.code} value={c.code}>{c.code} {c.name}</option>
-                    ))}
-                  </select>
-                  <input type="tel" placeholder="Teléfono" required value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} style={{ flex: 1, padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
-                </div>
-                {error && <div style={{ color: '#e74c3c', marginTop: 12 }}>{error}</div>}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
-                  <button type="button" onClick={() => setShowModal(false)} style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
-                  <button type="submit" disabled={saving} style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: saving ? 'not-allowed' : 'pointer', boxShadow: '0 2px 8px #21965322', opacity: saving ? 0.7 : 1 }}>{saving ? 'Guardando...' : 'Guardar'}</button>
-                </div>
-              </form>
-              <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
-            </div>
+              } catch (err) {
+                setError('No se pudo guardar el cliente');
+              }
+              setSaving(false);
+            }}>
+              <input type="text" placeholder="Nombre" required value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
+              <input type="text" placeholder="Cédula" required value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
+              <input type="text" placeholder="Dirección (GPS)" required value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
+              <input type="text" placeholder="Negocio" required value={form.negocio} onChange={e => setForm(f => ({ ...f, negocio: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <select value={countryCode} onChange={e => setCountryCode(e.target.value)} style={{ padding: '10px 8px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, minWidth: 90 }}>
+                  {countryCodes.map(c => (
+                    <option key={c.code} value={c.code}>{c.code} {c.name}</option>
+                  ))}
+                </select>
+                <input type="tel" placeholder="Teléfono" required value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} style={{ flex: 1, padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
+              </div>
+              {error && <div style={{ color: '#e74c3c', marginTop: 12 }}>{error}</div>}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
+                <button type="button" onClick={() => setShowModal(false)} style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
+                <button type="submit" disabled={saving} style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: saving ? 'not-allowed' : 'pointer', boxShadow: '0 2px 8px #21965322', opacity: saving ? 0.7 : 1 }}>{saving ? 'Guardando...' : 'Guardar'}</button>
+              </div>
+            </form>
+            <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Modals de éxito y crédito */}
       {showSuccessModal && (
