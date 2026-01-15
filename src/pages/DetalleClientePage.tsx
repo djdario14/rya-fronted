@@ -21,6 +21,7 @@ const DetalleClientePage: React.FC = () => {
   const navigate = useNavigate();
   const [cliente, setCliente] = useState<ClienteDetalle | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pagos, setPagos] = useState([]);
 
   useEffect(() => {
     async function fetchCliente() {
@@ -46,8 +47,13 @@ const DetalleClientePage: React.FC = () => {
           lat: data.direccion?.split(',')[0],
           lng: data.direccion?.split(',')[1],
         });
+        // Obtener pagos registrados
+        const resPagos = await fetch(`https://rya-backend-production.up.railway.app/pagos/cliente/${id}`);
+        const pagosData = await resPagos.json();
+        setPagos(pagosData);
       } catch {
         setCliente(null);
+        setPagos([]);
       }
       setLoading(false);
     }
@@ -113,8 +119,20 @@ const DetalleClientePage: React.FC = () => {
                 <div>Atraso<br /><span style={{ color: '#222', fontWeight: 700, fontSize: 22 }}>${cliente.atraso}</span></div>
               </div>
             </div>
-            <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #0001', padding: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 70 }}>
-              <div style={{ fontSize: 20, color: '#29487d', fontWeight: 700, letterSpacing: 0.5 }}>Pagos registrados</div>
+            <div style={{ background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #0001', padding: 22, minHeight: 70 }}>
+              <div style={{ fontSize: 20, color: '#29487d', fontWeight: 700, letterSpacing: 0.5, marginBottom: 10 }}>Pagos registrados</div>
+              {pagos.length === 0 ? (
+                <div style={{ color: '#888', fontSize: 16 }}>No hay pagos registrados</div>
+              ) : (
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {pagos.map((pago: any) => (
+                    <li key={pago.id} style={{ marginBottom: 8, fontSize: 16, color: '#29487d', background: '#f2f6fa', borderRadius: 7, padding: '7px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Monto: <b>${pago.monto}</b></span>
+                      <span>Fecha: {pago.fecha}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 180 }}>
