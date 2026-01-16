@@ -9,6 +9,7 @@ const motivosNoPago = [
 
 import React, { useState, useEffect } from 'react';
 import SidebarMenu from '../components/SidebarMenu';
+import OrdenarClientesModal from '../components/OrdenarClientesModal';
 import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import SuccessModal from '../components/SuccessModal';
@@ -50,6 +51,7 @@ type Cliente = {
 
 const ClientesPage: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showOrdenarModal, setShowOrdenarModal] = useState(false);
     const navigate = useNavigate();
     const [showPagoModal, setShowPagoModal] = useState(false);
     const [pagoCliente, setPagoCliente] = useState<Cliente | null>(null);
@@ -173,7 +175,25 @@ const ClientesPage: React.FC = () => {
   return (
     <div style={{ padding: 32, maxWidth: 900, margin: '0 auto' }}>
       {/* Sidebar y barra superior */}
-      <SidebarMenu open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <SidebarMenu
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onEnrutarClientes={() => {
+          setSidebarOpen(false);
+          setShowOrdenarModal(true);
+        }}
+      />
+      <OrdenarClientesModal
+        open={showOrdenarModal}
+        clientes={clientes.map(c => ({ id: c.id, nombre: c.nombre }))}
+        onClose={() => setShowOrdenarModal(false)}
+        onSave={orden => {
+          // Aquí podrías guardar el orden en backend o localStorage si lo deseas
+          // Por ahora solo reordena la lista localmente
+          setClientes(prev => orden.map(o => prev.find(c => c.id === o.id) || { id: o.id, nombre: o.nombre }));
+          setShowOrdenarModal(false);
+        }}
+      />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
           <button

@@ -4,16 +4,18 @@ import { useNavigate } from 'react-router-dom';
 interface SidebarMenuProps {
   open: boolean;
   onClose: () => void;
+  onEnrutarClientes?: () => void;
 }
 
-const SidebarMenu: React.FC<SidebarMenuProps> = ({ open, onClose }) => {
+const SidebarMenu: React.FC<SidebarMenuProps> = ({ open, onClose, onEnrutarClientes }) => {
   const navigate = useNavigate();
   // Puedes ajustar las rutas según la estructura real
   const handleEnrutarClientes = () => {
-    onClose();
-    // Aquí podrías navegar a una ruta específica si existe
-    // navigate('/enrutar-clientes');
-    // Por ahora solo cierra el menú
+    if (typeof onEnrutarClientes === 'function') {
+      onEnrutarClientes();
+    } else {
+      onClose();
+    }
   };
   const handleRegistrarGasto = () => {
     onClose();
