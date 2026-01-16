@@ -19,7 +19,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ open, onClose, onEnrutarClien
   };
   const handleRegistrarGasto = () => {
     onClose();
-    // navigate('/registrar-gasto');
+    navigate('/registrar-gasto');
   };
   const handleCambiarTema = () => {
     onClose();
