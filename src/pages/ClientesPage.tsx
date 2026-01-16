@@ -477,14 +477,16 @@ const ClientesPage: React.FC = () => {
                   fetchClientes();
                 } catch (err) {}
               }}>
-                <div style={{ marginBottom: 18, padding: '10px 0', background: '#f7f8fa', borderRadius: 8 }}>
-                  <label htmlFor="noPago" style={{ fontSize: 16, color: '#29487d', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <input type="checkbox" id="noPago" checked={noPago} onChange={e => setNoPago(e.target.checked)} style={{ marginRight: 8, accentColor: '#219653', width: 18, height: 18 }} />
-                    No registrar abono
-                  </label>
-                </div>
                 {!noPago ? (
-                  <input type="number" placeholder="Monto del abono" required value={monto} onChange={e => setMonto(e.target.value)} style={{ padding: '12px 16px', borderRadius: 8, border: '1.5px solid #219653', fontSize: 18, marginBottom: 18, width: '100%' }} />
+                  <>
+                    <input type="number" placeholder="Monto del abono" required value={monto} onChange={e => setMonto(e.target.value)} style={{ padding: '12px 16px', borderRadius: 8, border: '1.5px solid #219653', fontSize: 18, marginBottom: 18, width: '100%' }} />
+                    <div style={{ marginBottom: 18, padding: '10px 0', background: '#f7f8fa', borderRadius: 8 }}>
+                      <label htmlFor="noPago" style={{ fontSize: 16, color: '#29487d', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <input type="checkbox" id="noPago" checked={noPago} onChange={e => setNoPago(e.target.checked)} style={{ marginRight: 8, accentColor: '#219653', width: 18, height: 18 }} />
+                        No registrar abono
+                      </label>
+                    </div>
+                  </>
                 ) : (
                   <div style={{ marginBottom: 18 }}>
                     <label style={{ fontSize: 16, color: '#29487d', fontWeight: 600, marginBottom: 6, display: 'block' }}>Motivo de no abono:</label>
