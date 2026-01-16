@@ -156,6 +156,24 @@ const ClientesPage: React.FC = () => {
             return { id: cliente.id, nombre: cliente.nombre, saldo, atraso, cuota };
           })
         );
+        // Leer orden personalizado de localStorage
+        const ordenGuardado = localStorage.getItem('orden_clientes');
+        if (ordenGuardado) {
+          try {
+            const ordenIds = JSON.parse(ordenGuardado);
+            if (Array.isArray(ordenIds)) {
+              // Ordenar clientesConSaldo según el orden guardado
+              clientesConSaldo.sort((a, b) => {
+                const ia = ordenIds.indexOf(a.id);
+                const ib = ordenIds.indexOf(b.id);
+                if (ia === -1 && ib === -1) return 0;
+                if (ia === -1) return 1;
+                if (ib === -1) return -1;
+                return ia - ib;
+              });
+            }
+          } catch {}
+        }
         setClientes(clientesConSaldo);
       } else {
         setClientes([]);
@@ -188,8 +206,8 @@ const ClientesPage: React.FC = () => {
         clientes={clientes.map(c => ({ id: c.id, nombre: c.nombre }))}
         onClose={() => setShowOrdenarModal(false)}
         onSave={orden => {
-          // Aquí podrías guardar el orden en backend o localStorage si lo deseas
-          // Por ahora solo reordena la lista localmente
+          // Guardar el orden en localStorage
+          localStorage.setItem('orden_clientes', JSON.stringify(orden.map(o => o.id)));
           setClientes(prev => orden.map(o => prev.find(c => c.id === o.id) || { id: o.id, nombre: o.nombre }));
           setShowOrdenarModal(false);
         }}
