@@ -126,9 +126,12 @@ const DetalleClientePage: React.FC = () => {
               ) : (
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {pagos.map((pago: any) => (
-                    <li key={pago.id} style={{ marginBottom: 8, fontSize: 16, color: '#29487d', background: '#f2f6fa', borderRadius: 7, padding: '7px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span>Monto: <b>${pago.monto}</b></span>
-                      <span>Fecha: {pago.fecha}</span>
+                    <li key={pago.id} style={{ marginBottom: 8, fontSize: 16, color: '#29487d', background: '#f2f6fa', borderRadius: 7, padding: '7px 12px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {pago.motivo_no_pago ? (
+                        <span style={{ color: '#e74c3c', fontWeight: 600 }}>Motivo: {pago.motivo_no_pago}</span>
+                      ) : (
+                        <span>Monto: <b>${pago.monto}</b> | Fecha: {pago.fecha}</span>
+                      )}
                     </li>
                   ))}
                 </ul>
