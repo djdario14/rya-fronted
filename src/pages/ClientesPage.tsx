@@ -427,11 +427,13 @@ const ClientesPage: React.FC = () => {
         {showPagoModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
             <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 400, width: 420, position: 'relative' }}>
-              <h3 style={{ marginTop: 0, marginBottom: 24, fontWeight: 700, fontSize: 24 }}>Registrar Abono para {pagoCliente?.nombre}</h3>
+              <h3 style={{ marginTop: 0, marginBottom: 24, fontWeight: 700, fontSize: 24, textAlign: 'center' }}>Registrar Abono para {pagoCliente?.nombre}</h3>
               <form onSubmit={async e => {
                 e.preventDefault();
                 if (noPago) {
+                  // Aquí podrías guardar el motivo de no pago en backend si lo deseas
                   setShowPagoModal(false);
+                  setShowPagoSuccess(true);
                   return;
                 }
                 // Buscar préstamo activo del cliente
@@ -475,10 +477,27 @@ const ClientesPage: React.FC = () => {
                   fetchClientes();
                 } catch (err) {}
               }}>
-                <input type="number" placeholder="Monto" required value={monto} onChange={e => setMonto(e.target.value)} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12, width: '100%' }} />
+                <div style={{ marginBottom: 18, padding: '10px 0', background: '#f7f8fa', borderRadius: 8 }}>
+                  <label htmlFor="noPago" style={{ fontSize: 16, color: '#29487d', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input type="checkbox" id="noPago" checked={noPago} onChange={e => setNoPago(e.target.checked)} style={{ marginRight: 8, accentColor: '#219653', width: 18, height: 18 }} />
+                    No registrar abono
+                  </label>
+                </div>
+                {!noPago ? (
+                  <input type="number" placeholder="Monto del abono" required value={monto} onChange={e => setMonto(e.target.value)} style={{ padding: '12px 16px', borderRadius: 8, border: '1.5px solid #219653', fontSize: 18, marginBottom: 18, width: '100%' }} />
+                ) : (
+                  <div style={{ marginBottom: 18 }}>
+                    <label style={{ fontSize: 16, color: '#29487d', fontWeight: 600, marginBottom: 6, display: 'block' }}>Motivo de no abono:</label>
+                    <select value={motivo} onChange={e => setMotivo(e.target.value)} style={{ padding: '12px 16px', borderRadius: 8, border: '1.5px solid #e0e0e0', fontSize: 17, width: '100%' }}>
+                      {motivosNoPago.map(m => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
                   <button type="button" onClick={() => setShowPagoModal(false)} style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
-                  <button type="submit" style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px #21965322' }}>Guardar abono</button>
+                  <button type="submit" style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px #21965322' }}>{noPago ? 'Guardar motivo' : 'Guardar abono'}</button>
                 </div>
               </form>
               <button onClick={() => setShowPagoModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
