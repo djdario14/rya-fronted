@@ -28,6 +28,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ open, onClose }) => {
     // Aquí podrías limpiar sesión o navegar a login
     // navigate('/login');
   };
+  return (
     <div
       style={{
         position: 'fixed',
