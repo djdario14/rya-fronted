@@ -1,4 +1,5 @@
 {
+    // Cambio menor para forzar redeploy y limpiar caché en Vercel
     "name": "rya-fronted",
     "version": "1.0.0",
     "scripts": {
