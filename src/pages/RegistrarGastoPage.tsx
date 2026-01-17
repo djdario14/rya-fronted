@@ -169,7 +169,10 @@ const RegistrarGastoPage: React.FC = () => {
         </form>
       </div>
       <div style={getGastosCardStyle(darkMode)}>
-        <h3 style={{ ...getSectionTitleStyle(darkMode), fontSize: 24, marginBottom: 18 }}>Gastos de la semana</h3>
+          <h3 style={{ ...getSectionTitleStyle(darkMode), fontSize: 24, marginBottom: 8 }}>Gastos de la semana</h3>
+          <div style={{ color: darkMode ? '#b3c6ff' : '#888', fontSize: 15, marginBottom: 10 }}>
+            Solo se muestran los gastos registrados en la semana actual.
+          </div>
         {loading ? (
           <div style={{ color: darkMode ? '#b3c6ff' : '#888', fontSize: 16 }}>Cargando gastos...</div>
         ) : gastos.length === 0 ? (

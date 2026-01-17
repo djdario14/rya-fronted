@@ -1,5 +1,9 @@
 import React from "react";
-import { DragDropContext, Droppable, Draggable, DropResult, DraggableProvided, DraggableStateSnapshot, DroppableProvided } from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+type DropResult = any;
+type DraggableProvided = any;
+type DraggableStateSnapshot = any;
+type DroppableProvided = any;
 
 interface OrdenarClientesModalProps {
   open: boolean;
