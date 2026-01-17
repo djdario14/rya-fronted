@@ -8,6 +8,7 @@ const motivosNoPago = [
 ];
 
 import React, { useState, useEffect } from 'react';
+import api from '../api/client';
 import SidebarMenu from '../components/SidebarMenu';
 import OrdenarClientesModal from '../components/OrdenarClientesModal';
 import Select from 'react-select';
@@ -134,8 +135,8 @@ const ClientesPage: React.FC = () => {
   const fetchClientes = async () => {
     setLoading(true);
     try {
-      const res = await fetch('https://rya-backend-production.up.railway.app/clientes/');
-      const data = await res.json();
+      const res = await api.get('/clientes/');
+      const data = res.data;
       if (Array.isArray(data)) {
         const clientesConSaldo = await Promise.all(
           data.map(async (cliente: any) => {
@@ -144,8 +145,8 @@ const ClientesPage: React.FC = () => {
             }
             let valorPrestamo = 0, intereses = 0, pagos = 0, saldo = 0, atraso = 0, cuota = undefined;
             try {
-              const resSaldo = await fetch(`https://rya-backend-production.up.railway.app/clientes/${cliente.id}/saldo`);
-              const saldoData = await resSaldo.json();
+              const resSaldo = await api.get(`/clientes/${cliente.id}/saldo`);
+              const saldoData = resSaldo.data as any;
               valorPrestamo = saldoData.prestamo ?? 0;
               intereses = saldoData.prestamo ? saldoData.prestamo * 0.2 : 0;
               pagos = saldoData.cuotasPagadas && saldoData.cuotasTotal ? ((valorPrestamo + intereses) / saldoData.cuotasTotal) * saldoData.cuotasPagadas : 0;
@@ -307,45 +308,37 @@ const ClientesPage: React.FC = () => {
               // Unir código de país seleccionado y número antes de guardar
               const telefonoCompleto = `${countryCode}${form.telefono}`;
               try {
-                const res = await fetch('https://rya-backend-production.up.railway.app/clientes/', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    nombre: form.nombre,
-                    cedula: form.cedula,
-                    direccion: form.direccion,
-                    negocio: form.negocio,
-                    telefono: telefonoCompleto
-                  })
+                const res = await api.post('/clientes/', {
+                  nombre: form.nombre,
+                  cedula: form.cedula,
+                  direccion: form.direccion,
+                  negocio: form.negocio,
+                  telefono: telefonoCompleto
                 });
-                if (res.status === 409) {
+                setShowModal(false);
+                setForm({
+                  id: -1,
+                  nombre: '',
+                  cedula: '',
+                  direccion: '',
+                  negocio: '',
+                  telefono: '',
+                  saldo: 0,
+                  prestamo: 0,
+                  cuotasPagadas: 0,
+                  cuotasTotal: 0,
+                  atraso: 0,
+                });
+                setCountryCode('+593');
+                setNuevoCliente(res.data);
+                setShowSuccessModal(true);
+                fetchClientes();
+              } catch (err: any) {
+                if (err.response?.status === 409) {
                   setError('La cédula ya está registrada');
-                } else if (!res.ok) {
-                  setError('No se pudo guardar el cliente');
                 } else {
-                  // Cliente agregado con éxito
-                  const nuevo = await res.json();
-                  setShowModal(false);
-                  setForm({
-                    id: -1,
-                    nombre: '',
-                    cedula: '',
-                    direccion: '',
-                    negocio: '',
-                    telefono: '',
-                    saldo: 0,
-                    prestamo: 0,
-                    cuotasPagadas: 0,
-                    cuotasTotal: 0,
-                    atraso: 0,
-                  });
-                  setCountryCode('+593');
-                  setNuevoCliente(nuevo);
-                  setShowSuccessModal(true);
-                  fetchClientes();
+                  setError('No se pudo guardar el cliente');
                 }
-              } catch (err) {
-                setError('No se pudo guardar el cliente');
               }
               setSaving(false);
             }}>
@@ -390,17 +383,12 @@ const ClientesPage: React.FC = () => {
             if (!nuevoCliente?.id) return;
             // Registrar préstamo en backend
             try {
-              const res = await fetch('https://rya-backend-production.up.railway.app/prestamos/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  cliente_id: nuevoCliente.id,
-                  monto: data.valor,
-                  fecha: data.fecha,
-                  estado: 'activo'
-                })
+              await api.post('/prestamos/', {
+                cliente_id: nuevoCliente.id,
+                monto: data.valor,
+                fecha: data.fecha,
+                estado: 'activo'
               });
-              if (!res.ok) throw new Error('Error al registrar crédito');
               setShowCreditoModal(false);
               setShowPrestamoSuccess(true);
               fetchClientes();
@@ -485,8 +473,8 @@ const ClientesPage: React.FC = () => {
                 // Buscar préstamo activo del cliente
                 let prestamoId = null;
                 try {
-                  const res = await fetch(`https://rya-backend-production.up.railway.app/prestamos/?cliente_id=${pagoCliente?.id}&estado=activo`);
-                  const prestamos = await res.json();
+                  const res = await api.get(`/prestamos/?cliente_id=${pagoCliente?.id}&estado=activo`);
+                  const prestamos = res.data;
                   if (Array.isArray(prestamos) && prestamos.length > 0) {
                     prestamoId = prestamos[0].id;
                   }
@@ -497,22 +485,17 @@ const ClientesPage: React.FC = () => {
                 }
                 // Registrar abono en backend
                 try {
-                  const res = await fetch('https://rya-backend-production.up.railway.app/pagos/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      prestamo_id: prestamoId,
-                      monto: Number(monto),
-                      fecha: new Date().toISOString().slice(0, 10)
-                    })
+                  await api.post('/pagos/', {
+                    prestamo_id: prestamoId,
+                    monto: Number(monto),
+                    fecha: new Date().toISOString().slice(0, 10)
                   });
-                  if (!res.ok) throw new Error('Error al registrar abono');
                   setShowPagoModal(false);
                   setShowPagoSuccess(true);
                   // Actualizar solo el cliente abonado en la lista
                   try {
-                    const resSaldo = await fetch(`https://rya-backend-production.up.railway.app/clientes/${pagoCliente?.id}/saldo`);
-                    const saldoData = await resSaldo.json();
+                    const resSaldo = await api.get(`/clientes/${pagoCliente?.id}/saldo`);
+                    const saldoData = resSaldo.data as any;
                     setClientes(clientes => clientes.map(c => {
                       if (c.id === pagoCliente?.id) {
                         return { ...c, saldo: saldoData.saldo, atraso: saldoData.atraso };

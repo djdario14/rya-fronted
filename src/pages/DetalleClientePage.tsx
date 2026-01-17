@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import api from '../api/client';
 import { useParams, useNavigate } from 'react-router-dom';
 
 interface ClienteDetalle {
@@ -21,18 +22,18 @@ const DetalleClientePage: React.FC = () => {
   const navigate = useNavigate();
   const [cliente, setCliente] = useState<ClienteDetalle | null>(null);
   const [loading, setLoading] = useState(true);
-  const [pagos, setPagos] = useState([]);
+  const [pagos, setPagos] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchCliente() {
       setLoading(true);
       try {
         // Obtener datos básicos del cliente
-        const res = await fetch(`https://rya-backend-production.up.railway.app/clientes/${id}`);
-        const data = await res.json();
+        const res = await api.get(`/clientes/${id}`);
+        const data = res.data as ClienteDetalle;
         // Obtener saldo y detalles reales
-        const resSaldo = await fetch(`https://rya-backend-production.up.railway.app/clientes/${id}/saldo`);
-        const saldoData = await resSaldo.json();
+        const resSaldo = await api.get(`/clientes/${id}/saldo`);
+        const saldoData = resSaldo.data as any;
         setCliente({
           id: data.id,
           nombre: data.nombre,
@@ -44,13 +45,12 @@ const DetalleClientePage: React.FC = () => {
           cuotasPagadas: saldoData.cuotasPagadas ?? 0,
           cuotasTotal: saldoData.cuotasTotal ?? 30,
           atraso: saldoData.atraso ?? 0,
-          lat: data.direccion?.split(',')[0],
-          lng: data.direccion?.split(',')[1],
+          lat: data.direccion?.split(',')[0] ? Number(data.direccion?.split(',')[0]) : undefined,
+          lng: data.direccion?.split(',')[1] ? Number(data.direccion?.split(',')[1]) : undefined,
         });
         // Obtener pagos registrados
-        const resPagos = await fetch(`https://rya-backend-production.up.railway.app/pagos/cliente/${id}`);
-        const pagosData = await resPagos.json();
-        setPagos(pagosData);
+        const resPagos = await api.get(`/pagos/cliente/${id}`);
+        setPagos(resPagos.data as any[]);
       } catch {
         setCliente(null);
         setPagos([]);
