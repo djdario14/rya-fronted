@@ -1,9 +1,6 @@
 {
     "name": "rya-fronted",
     "version": "1.0.0",
-    "engines": {
-        "node": "24.x"
-    },
     "scripts": {
         "dev": "vite",
         "prebuild": "",
@@ -11,17 +8,21 @@
         "start": "serve -s dist -l $PORT"
     },
     "dependencies": {
-        "@hello-pangea/dnd": "^18.0.1",
+        "@hello-pangea/dnd": "18.0.1",
+        "@types/react-select": "^5.0.0",
         "axios": "^1.13.2",
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-router-dom": "^7.12.0",
         "react-select": "^5.10.2",
-        "serve": "^14.2.5",
-        "vite": "^5.2.8"
+        "serve": "^14.2.5"
     },
     "devDependencies": {
         "@types/axios": "^0.9.36",
-        "@vitejs/plugin-react": "^4.2.1"
+        "@vitejs/plugin-react": "^5.1.2",
+        "vite": "^7.3.1"
+    },
+    "engines": {
+        "node": "24.x"
     }
 }
