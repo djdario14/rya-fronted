@@ -3,6 +3,73 @@ import React, { useState, useEffect } from 'react';
 import api from '../api/client';
 import { Gasto, GastoCreate } from '../../../packages/types/gasto';
 
+// Estilos base reutilizables
+const cardStyle: React.CSSProperties = {
+  background: '#fff',
+  borderRadius: 16,
+  boxShadow: '0 4px 24px #0002',
+  padding: 36,
+  maxWidth: 440,
+  margin: '40px auto',
+  fontFamily: 'Inter, sans-serif',
+};
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '12px 16px',
+  borderRadius: 10,
+  border: '1.5px solid #e0e0e0',
+  fontSize: 17,
+  background: '#fafbfc',
+  outline: 'none',
+  marginBottom: 8,
+  transition: 'border 0.2s',
+};
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontWeight: 600,
+  marginBottom: 6,
+  color: '#29487d',
+  fontSize: 16,
+};
+const buttonStyle: React.CSSProperties = {
+  background: '#219653',
+  color: '#fff',
+  border: 'none',
+  borderRadius: 10,
+  padding: '13px 36px',
+  fontWeight: 700,
+  fontSize: 19,
+  cursor: 'pointer',
+  boxShadow: '0 2px 12px #21965322',
+  transition: 'background 0.2s, box-shadow 0.2s',
+  marginTop: 8,
+};
+const sectionTitleStyle: React.CSSProperties = {
+  margin: 0,
+  marginBottom: 24,
+  fontWeight: 700,
+  fontSize: 32,
+  color: '#219653',
+  letterSpacing: '-1px',
+  textAlign: 'left',
+};
+const successStyle: React.CSSProperties = {
+  color: '#219653',
+  marginBottom: 12,
+  fontWeight: 600,
+};
+const errorStyle: React.CSSProperties = {
+  color: '#e74c3c',
+  marginBottom: 12,
+  fontWeight: 600,
+};
+const gastosCardStyle: React.CSSProperties = {
+  ...cardStyle,
+  maxWidth: 440,
+  margin: '32px auto 0 auto',
+  padding: 28,
+};
+
 const RegistrarGastoPage: React.FC = () => {
 
   const [monto, setMonto] = useState('');
@@ -24,11 +91,6 @@ const RegistrarGastoPage: React.FC = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchGastosSemana();
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -56,47 +118,47 @@ const RegistrarGastoPage: React.FC = () => {
       setError('Error al registrar el gasto');
     }
   };
-
   return (
-    <div>
-      <div style={{ maxWidth: 420, margin: '40px auto', background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0002', padding: 36 }}>
-        <h2 style={{ margin: 0, marginBottom: 24, fontWeight: 700, fontSize: 28, color: '#219653' }}>Registrar Gasto</h2>
+    <div style={{ minHeight: '100vh', background: '#f7f8fa', padding: '32px 0' }}>
+      <div style={cardStyle}>
+        <h2 style={sectionTitleStyle}>Registrar Gasto</h2>
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 18 }}>
-            <label style={{ display: 'block', fontWeight: 600, marginBottom: 6 }}>Monto</label>
-            <input type="number" value={monto} onChange={e => setMonto(e.target.value)} style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 17 }} />
+            <label style={labelStyle}>Monto</label>
+            <input type="number" value={monto} onChange={e => setMonto(e.target.value)} style={inputStyle} />
           </div>
           <div style={{ marginBottom: 18 }}>
-            <label style={{ display: 'block', fontWeight: 600, marginBottom: 6 }}>Descripción</label>
-            <input type="text" value={descripcion} onChange={e => setDescripcion(e.target.value)} style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 17 }} />
+            <label style={labelStyle}>Descripción</label>
+            <input type="text" value={descripcion} onChange={e => setDescripcion(e.target.value)} style={inputStyle} />
           </div>
           <div style={{ marginBottom: 18 }}>
-            <label style={{ display: 'block', fontWeight: 600, marginBottom: 6 }}>Fecha</label>
-            <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} style={{ width: '100%', padding: 10, borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 17 }} />
+            <label style={labelStyle}>Fecha</label>
+            <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} style={inputStyle} />
           </div>
-          {error && <div style={{ color: '#e74c3c', marginBottom: 12 }}>{error}</div>}
-          {success && <div style={{ color: '#219653', marginBottom: 12 }}>¡Gasto registrado!</div>}
-          <button type="submit" style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 32px', fontWeight: 600, fontSize: 18, cursor: 'pointer', boxShadow: '0 2px 12px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}>
+          {error && <div style={errorStyle}>{error}</div>}
+          {success && <div style={successStyle}>¡Gasto registrado!</div>}
+          <button type="submit" style={buttonStyle}
+            onMouseOver={e => { e.currentTarget.style.background = '#176c3a'; e.currentTarget.style.boxShadow = '0 4px 16px #176c3a33'; }}
+            onMouseOut={e => { e.currentTarget.style.background = '#219653'; e.currentTarget.style.boxShadow = '0 2px 12px #21965322'; }}
+          >
             Guardar Gasto
           </button>
         </form>
       </div>
-      <div style={{ maxWidth: 420, margin: '32px auto 0', background: '#fff', borderRadius: 16, boxShadow: '0 4px 16px #0001', padding: 24 }}>
-        <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 700, fontSize: 22, color: '#219653' }}>Gastos de la semana</h3>
+      <div style={gastosCardStyle}>
+        <h3 style={{ ...sectionTitleStyle, fontSize: 24, marginBottom: 18 }}>Gastos de la semana</h3>
         {loading ? (
-          <div>Cargando...</div>
+          <div style={{ color: '#888', fontSize: 16 }}>Cargando gastos...</div>
         ) : gastos.length === 0 ? (
-          <div style={{ color: '#888' }}>No hay gastos registrados esta semana.</div>
+          <div style={{ color: '#888', fontSize: 16 }}>No hay gastos registrados esta semana.</div>
         ) : (
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {gastos.map(gasto => (
-              <li key={gasto.id} style={{ borderBottom: '1px solid #eee', padding: '10px 0' }}>
-                <div style={{ fontWeight: 600, color: '#219653' }}>${gasto.monto.toFixed(2)}</div>
-                <div style={{ color: '#333' }}>{gasto.descripcion}</div>
-                <div style={{ color: '#888', fontSize: 13 }}>{new Date(gasto.fecha).toLocaleDateString()}</div>
-              </li>
-            ))}
-          </ul>
+          gastos.map(g => (
+            <div key={g.id} style={{ marginBottom: 14, padding: 12, background: '#f7f8fa', borderRadius: 8, boxShadow: '0 1px 4px #0001' }}>
+              <div style={{ fontWeight: 700, color: '#219653', fontSize: 18 }}>${g.monto.toFixed(2)}</div>
+              <div style={{ color: '#29487d', fontWeight: 600 }}>{g.descripcion}</div>
+              <div style={{ color: '#888', fontSize: 15 }}>{new Date(g.fecha).toLocaleDateString()}</div>
+            </div>
+          ))
         )}
       </div>
     </div>
