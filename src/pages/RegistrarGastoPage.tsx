@@ -178,13 +178,24 @@ const RegistrarGastoPage: React.FC = () => {
         ) : gastos.length === 0 ? (
           <div style={{ color: darkMode ? '#b3c6ff' : '#888', fontSize: 16 }}>No hay gastos registrados esta semana.</div>
         ) : (
-          gastos.map(g => (
-            <div key={g.id} style={{ marginBottom: 14, padding: 12, background: darkMode ? '#23272f' : '#f7f8fa', borderRadius: 8, boxShadow: darkMode ? '0 1px 4px #0008' : '0 1px 4px #0001' }}>
-              <div style={{ fontWeight: 700, color: darkMode ? '#b3c6ff' : '#219653', fontSize: 18 }}>${g.monto.toFixed(2)}</div>
-              <div style={{ color: darkMode ? '#b3c6ff' : '#29487d', fontWeight: 600 }}>{g.descripcion}</div>
-              <div style={{ color: darkMode ? '#b3c6ff' : '#888', fontSize: 15 }}>{new Date(g.fecha).toLocaleDateString()}</div>
-            </div>
-          ))
+          gastos
+            .filter(g => {
+              const fechaGasto = new Date(g.fecha);
+              const hoy = new Date();
+              // Limpiar horas para comparar solo fechas
+              fechaGasto.setHours(0,0,0,0);
+              hoy.setHours(0,0,0,0);
+              const diffMs = hoy.getTime() - fechaGasto.getTime();
+              const diffDias = diffMs / (1000 * 60 * 60 * 24);
+              return diffDias <= 6 && diffDias >= 0;
+            })
+            .map(g => (
+              <div key={g.id} style={{ marginBottom: 14, padding: 12, background: darkMode ? '#23272f' : '#f7f8fa', borderRadius: 8, boxShadow: darkMode ? '0 1px 4px #0008' : '0 1px 4px #0001' }}>
+                <div style={{ fontWeight: 700, color: darkMode ? '#b3c6ff' : '#219653', fontSize: 18 }}>${g.monto.toFixed(2)}</div>
+                <div style={{ color: darkMode ? '#b3c6ff' : '#29487d', fontWeight: 600 }}>{g.descripcion}</div>
+                <div style={{ color: darkMode ? '#b3c6ff' : '#888', fontSize: 15 }}>{new Date(g.fecha).toLocaleDateString()}</div>
+              </div>
+            ))
         )}
       </div>
     </div>
