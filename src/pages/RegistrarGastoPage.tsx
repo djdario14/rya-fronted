@@ -113,7 +113,10 @@ const RegistrarGastoPage: React.FC = () => {
       setSuccess(true);
       setMonto('');
       setDescripcion('');
-      fetchGastosSemana();
+      // Esperar a que el backend procese antes de refrescar la lista
+      setTimeout(() => {
+        fetchGastosSemana();
+      }, 200);
     } catch (err) {
       setError('Error al registrar el gasto');
     }
