@@ -64,6 +64,9 @@ const ClientesPage: React.FC = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showNuevoModal, setShowNuevoModal] = useState(false);
+  const [showPrestamoSelector, setShowPrestamoSelector] = useState(false);
+  const [prestamoCliente, setPrestamoCliente] = useState<Cliente | null>(null);
   const [form, setForm] = useState<Cliente>({
     id: -1,
     nombre: '',
@@ -249,9 +252,9 @@ const ClientesPage: React.FC = () => {
         <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 10, padding: '13px 36px', fontWeight: 600, fontSize: 19, cursor: 'pointer', boxShadow: '0 2px 12px #21965322', transition: 'background 0.2s, box-shadow 0.2s', marginLeft: 24 }}
           onMouseOver={e => { e.currentTarget.style.background = '#176c3a'; e.currentTarget.style.boxShadow = '0 4px 16px #176c3a33'; }}
           onMouseOut={e => { e.currentTarget.style.background = '#219653'; e.currentTarget.style.boxShadow = '0 2px 12px #21965322'; }}
-          onClick={() => setShowModal(true)}
+          onClick={() => setShowNuevoModal(true)}
         >
-          + Agregar Cliente
+          NUEVO
         </button>
       </div>
 
@@ -295,6 +298,44 @@ const ClientesPage: React.FC = () => {
           Todos
         </button>
       </div>
+
+      {/* Modal selector NUEVO */}
+      {showNuevoModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
+          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 320, width: 340, position: 'relative', display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <h3 style={{ margin: 0, fontWeight: 700, fontSize: 22, textAlign: 'center' }}>¿Qué deseas crear?</h3>
+            <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '14px 0', fontWeight: 600, fontSize: 18, cursor: 'pointer' }}
+              onClick={() => { setShowNuevoModal(false); setShowModal(true); }}>
+              Cliente
+            </button>
+            <button style={{ background: '#29487d', color: '#fff', border: 'none', borderRadius: 8, padding: '14px 0', fontWeight: 600, fontSize: 18, cursor: 'pointer' }}
+              onClick={() => { setShowNuevoModal(false); setShowPrestamoSelector(true); }}>
+              Préstamo
+            </button>
+            <button onClick={() => setShowNuevoModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal para seleccionar cliente con saldo=0 para préstamo */}
+      {showPrestamoSelector && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200 }}>
+          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 320, width: 380, position: 'relative', maxHeight: 500, overflowY: 'auto' }}>
+            <h3 style={{ margin: 0, fontWeight: 700, fontSize: 22, textAlign: 'center', marginBottom: 18 }}>Selecciona un cliente sin saldo</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {clientes.filter(c => (c.saldo ?? 0) === 0).length === 0 ? (
+                <div style={{ color: '#888', textAlign: 'center' }}>No hay clientes con saldo 0.</div>
+              ) : clientes.filter(c => (c.saldo ?? 0) === 0).map(c => (
+                <button key={c.id} style={{ background: '#e9ecef', color: '#29487d', border: 'none', borderRadius: 8, padding: '12px', fontWeight: 600, fontSize: 17, cursor: 'pointer', textAlign: 'left' }}
+                  onClick={() => { setPrestamoCliente(c); setShowPrestamoSelector(false); setShowCreditoModal(true); setNuevoCliente(c); }}>
+                  {c.nombre}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setShowPrestamoSelector(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
+          </div>
+        </div>
+      )}
 
       {/* Modal para agregar cliente */}
       {showModal && (
