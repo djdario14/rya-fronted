@@ -52,7 +52,6 @@ interface ClienteDetalle {
               }
               fetchCliente();
             }, [id]);
-                </ul>
               )}
             </div>
           </div>
