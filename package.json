@@ -19,7 +19,9 @@
     },
     "devDependencies": {
         "@types/axios": "^0.9.36",
+        "@types/react-router": "^5.1.20",
         "@vitejs/plugin-react": "^5.1.2",
+        "typescript": "^5.9.3",
         "vite": "^7.3.1"
     },
     "engines": {
