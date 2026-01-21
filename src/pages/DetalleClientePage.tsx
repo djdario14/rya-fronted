@@ -3,40 +3,8 @@ import api from '../api/client';
 import { useParams, useNavigate } from 'react-router-dom';
 
 interface ClienteDetalle {
-  id: number;
-  nombre: string;
-  cedula: string;
-  telefono: string;
-  direccion: string;
-  saldo: number;
-  prestamo: number;
-  cuotasPagadas: number;
-  cuotasTotal: number;
-  atraso: number;
-  lat?: number;
-  lng?: number;
-}
-
-const DetalleClientePage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const [cliente, setCliente] = useState<ClienteDetalle | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [pagos, setPagos] = useState<any[]>([]);
-
-  useEffect(() => {
-    async function fetchCliente() {
-      setLoading(true);
-      try {
-        // Obtener datos básicos del cliente
-        const res = await api.get(`/clientes/${id}`);
-        const data = res.data as ClienteDetalle;
-        // Obtener saldo y detalles reales
-        const resSaldo = await api.get(`/clientes/${id}/saldo`);
-        const saldoData = resSaldo.data as any;
-        setCliente({
-          id: data.id,
-          nombre: data.nombre,
+          </div>
+  );
           cedula: data.cedula,
           telefono: data.telefono,
           direccion: data.direccion,
