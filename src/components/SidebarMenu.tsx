@@ -1,3 +1,4 @@
+// Cambio mínimo para forzar redeploy
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
