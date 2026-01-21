@@ -112,7 +112,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ open, onClose, onEnrutarClien
           <span style={{ fontSize: 22 }}>🔒</span> Cerrar sesión
         </button>
       </div>
-    // ...existing code...
+    </div>
   );
 };
 
