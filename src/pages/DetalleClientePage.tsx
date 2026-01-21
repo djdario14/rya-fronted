@@ -66,7 +66,16 @@ const DetalleClientePage: React.FC = () => {
       <button onClick={() => navigate(-1)} style={{ position: 'absolute', top: 18, left: 18, background: '#29487d', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 17, padding: '7px 22px', boxShadow: '0 2px 8px #29487d22', zIndex: 2 }}>
         ← Volver
       </button>
-      {/* Aquí va el resto del layout y los botones, puedes pegar el JSX que ya tenías aquí */}
+      <div style={{ padding: '60px 32px 32px 32px' }}>
+        <h2 style={{ color: '#29487d', marginBottom: 16 }}>{cliente.nombre}</h2>
+        <div><b>Cédula:</b> {cliente.cedula}</div>
+        <div><b>Teléfono:</b> {cliente.telefono}</div>
+        <div><b>Dirección:</b> {cliente.direccion}</div>
+        <div><b>Saldo:</b> ${cliente.saldo}</div>
+        <div><b>Préstamo:</b> ${cliente.prestamo}</div>
+        <div><b>Cuotas pagadas:</b> {cliente.cuotasPagadas} / {cliente.cuotasTotal}</div>
+        <div><b>Atraso:</b> {cliente.atraso} días</div>
+      </div>
     </div>
   );
 };
