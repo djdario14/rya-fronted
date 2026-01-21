@@ -61,20 +61,56 @@ const DetalleClientePage: React.FC = () => {
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: '40px auto', background: '#fff', borderRadius: 22, boxShadow: '0 4px 32px #29487d22', padding: 0, position: 'relative' }}>
+    <div style={{ maxWidth: 800, margin: '40px auto', background: '#f7f8fa', borderRadius: 28, boxShadow: '0 8px 40px #29487d18', padding: 0, position: 'relative' }}>
       {/* Botón Volver flotante */}
-      <button onClick={() => navigate(-1)} style={{ position: 'absolute', top: 18, left: 18, background: '#29487d', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 17, padding: '7px 22px', boxShadow: '0 2px 8px #29487d22', zIndex: 2 }}>
+      <button onClick={() => navigate(-1)} style={{ position: 'absolute', top: 24, left: 24, background: '#2e7d5a', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 18, padding: '8px 28px', boxShadow: '0 2px 12px #29487d22', zIndex: 2 }}>
         ← Volver
       </button>
-      <div style={{ padding: '60px 32px 32px 32px' }}>
-        <h2 style={{ color: '#29487d', marginBottom: 16 }}>{cliente.nombre}</h2>
-        <div><b>Cédula:</b> {cliente.cedula}</div>
-        <div><b>Teléfono:</b> {cliente.telefono}</div>
-        <div><b>Dirección:</b> {cliente.direccion}</div>
-        <div><b>Saldo:</b> ${cliente.saldo}</div>
-        <div><b>Préstamo:</b> ${cliente.prestamo}</div>
-        <div><b>Cuotas pagadas:</b> {cliente.cuotasPagadas} / {cliente.cuotasTotal}</div>
-        <div><b>Atraso:</b> {cliente.atraso} días</div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, padding: '60px 32px 32px 32px' }}>
+        {/* Panel principal */}
+        <div style={{ flex: 2, minWidth: 320 }}>
+          <div style={{ background: '#217a5b', borderRadius: 16, color: '#fff', padding: '24px 24px 18px 24px', marginBottom: 18, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+              <div style={{ width: 54, height: 54, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
+                <span style={{ fontSize: 32, color: '#217a5b' }}>👤</span>
+              </div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 24 }}>{cliente.nombre}</div>
+                <div style={{ fontSize: 15, marginTop: 2 }}>Cédula: {cliente.cedula}</div>
+                <div style={{ fontSize: 15 }}>Tel: {cliente.telefono}</div>
+                <div style={{ fontSize: 15 }}>Dirección: {cliente.direccion}</div>
+              </div>
+            </div>
+            <button style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff', borderRadius: 8, fontWeight: 600, fontSize: 15, padding: '7px 18px', cursor: 'pointer' }}>
+              VER MAPA
+            </button>
+          </div>
+          <div style={{ display: 'flex', gap: 18, marginBottom: 18 }}>
+            <div style={{ background: '#fff', borderRadius: 12, flex: 1, padding: 18, boxShadow: '0 2px 8px #29487d11' }}>
+              <div style={{ color: '#217a5b', fontWeight: 700, fontSize: 22, marginBottom: 2 }}>${cliente.saldo.toFixed(2)}</div>
+              <div style={{ color: '#888', fontSize: 13 }}>Saldo</div>
+            </div>
+            <div style={{ background: '#fff', borderRadius: 12, flex: 1, padding: 18, boxShadow: '0 2px 8px #29487d11' }}>
+              <div style={{ color: '#888', fontSize: 13 }}>Préstamo registrado:</div>
+              <div style={{ color: '#222', fontWeight: 600, fontSize: 16, marginTop: 2 }}>${cliente.prestamo}</div>
+              <div style={{ color: '#888', fontSize: 13 }}>Cuotas</div>
+              <div style={{ color: '#222', fontWeight: 600, fontSize: 16 }}>{cliente.cuotasPagadas} / {cliente.cuotasTotal}</div>
+              <div style={{ color: '#888', fontSize: 13 }}>Atraso</div>
+              <div style={{ color: '#c62828', fontWeight: 600, fontSize: 16 }}>{cliente.atraso} días</div>
+            </div>
+          </div>
+          <div style={{ background: '#fff', borderRadius: 12, padding: 18, boxShadow: '0 2px 8px #29487d11', marginBottom: 18 }}>
+            <div style={{ color: '#888', fontWeight: 600, marginBottom: 6 }}>Pagos registrados</div>
+            <div style={{ color: '#aaa', fontSize: 15 }}>No hay pagos registrados</div>
+          </div>
+        </div>
+        {/* Panel lateral de acciones */}
+        <div style={{ flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <button style={{ background: '#fff', color: '#217a5b', border: '1.5px solid #217a5b', borderRadius: 10, fontWeight: 600, fontSize: 16, padding: '12px 0', marginBottom: 2, cursor: 'pointer', boxShadow: '0 2px 8px #29487d11' }}>Historial Crediticio</button>
+          <button style={{ background: '#e8f5e9', color: '#217a5b', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 16, padding: '12px 0', cursor: 'pointer', boxShadow: '0 2px 8px #29487d11' }}>Agendar Visita</button>
+          <button style={{ background: '#e3f2fd', color: '#217a5b', border: 'none', borderRadius: 10, fontWeight: 600, fontSize: 16, padding: '12px 0', cursor: 'pointer', boxShadow: '0 2px 8px #29487d11' }}>Enviar Mensaje</button>
+          <button style={{ background: '#fff', color: '#888', border: '1.5px solid #ccc', borderRadius: 10, fontWeight: 600, fontSize: 16, padding: '12px 0', cursor: 'pointer', boxShadow: '0 2px 8px #29487d11' }}>EDITAR CLIENTE</button>
+        </div>
       </div>
     </div>
   );
