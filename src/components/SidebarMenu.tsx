@@ -89,15 +89,6 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ open, onClose, onEnrutarClien
         <button onClick={() => { onClose(); navigate('/'); }} style={menuBtnStyle}>
           <span style={{ fontSize: 22 }}>🏠</span> Inicio
         </button>
-        <button onClick={() => { onClose(); navigate('/clientes'); }} style={menuBtnStyle}>
-          <span style={{ fontSize: 22 }}>👥</span> Clientes
-        </button>
-        <button onClick={() => { onClose(); navigate('/prestamos'); }} style={menuBtnStyle}>
-          <span style={{ fontSize: 22 }}>📄</span> Préstamos
-        </button>
-        <button onClick={() => { onClose(); navigate('/pagos'); }} style={menuBtnStyle}>
-          <span style={{ fontSize: 22 }}>💳</span> Pagos / Abonos
-        </button>
         <button onClick={() => { onClose(); navigate('/reportes'); }} style={menuBtnStyle}>
           <span style={{ fontSize: 22 }}>📊</span> Reportes
         </button>
