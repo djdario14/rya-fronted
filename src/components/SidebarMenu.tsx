@@ -8,6 +8,24 @@ interface SidebarMenuProps {
   onEnrutarClientes?: () => void;
 }
 
+// Estilo base para los botones del menú
+const menuBtnStyle: React.CSSProperties = {
+  background: '#fff',
+  border: 'none',
+  color: '#29487d',
+  fontWeight: 600,
+  fontSize: 17,
+  display: 'flex',
+  alignItems: 'center',
+  gap: 12,
+  cursor: 'pointer',
+  padding: '12px 0 12px 8px',
+  borderRadius: 10,
+  boxShadow: '0 1px 4px #29487d11',
+  marginBottom: 2,
+  transition: 'background 0.2s',
+};
+
 const SidebarMenu: React.FC<SidebarMenuProps> = ({ open, onClose, onEnrutarClientes }) => {
   const navigate = useNavigate();
   // Puedes ajustar las rutas según la estructura real
@@ -97,20 +115,6 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ open, onClose, onEnrutarClien
     // Estilo base para los botones del menú
     const menuBtnStyle: React.CSSProperties = {
       background: '#fff',
-      border: 'none',
-      color: '#29487d',
-      fontWeight: 600,
-      fontSize: 17,
-      display: 'flex',
-      alignItems: 'center',
-      gap: 12,
-      cursor: 'pointer',
-      padding: '12px 0 12px 8px',
-      borderRadius: 10,
-      boxShadow: '0 1px 4px #29487d11',
-      marginBottom: 2,
-      transition: 'background 0.2s',
-    };
     </div>
   );
 };
