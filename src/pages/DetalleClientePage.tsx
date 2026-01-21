@@ -88,15 +88,17 @@ const DetalleClientePage: React.FC = () => {
                     <div style={{ color: '#888', fontSize: 16 }}>No hay pagos registrados</div>
                   ) : (
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                      {pagos.map((pago: any) => (
-                        <li key={pago.id} style={{ marginBottom: 8, fontSize: 16, color: '#29487d', background: '#f7f8fa', borderRadius: 7, padding: '7px 12px', display: 'flex', flexDirection: 'column', gap: 2, border: '1px solid #e0e0e0' }}>
-                          {pago.motivo_no_pago ? (
-                            <span style={{ color: '#e74c3c', fontWeight: 600 }}>Motivo: {pago.motivo_no_pago}</span>
-                          ) : (
-                            <span>Monto: <b>${pago.monto}</b> | Fecha: {pago.fecha}</span>
-                          )}
-                        </li>
-                      ))}
+                      {pagos.map((pago: any) => {
+                        return (
+                          <li key={pago.id} style={{ marginBottom: 8, fontSize: 16, color: '#29487d', background: '#f7f8fa', borderRadius: 7, padding: '7px 12px', display: 'flex', flexDirection: 'column', gap: 2, border: '1px solid #e0e0e0' }}>
+                            {pago.motivo_no_pago ? (
+                              <span style={{ color: '#e74c3c', fontWeight: 600 }}>Motivo: {pago.motivo_no_pago}</span>
+                            ) : (
+                              <span>Monto: <b>${pago.monto}</b> | Fecha: {pago.fecha}</span>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </div>
