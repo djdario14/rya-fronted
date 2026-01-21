@@ -66,24 +66,50 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ open, onClose, onEnrutarClien
       >
         ×
       </button>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 18, padding: '0 32px' }}>
-        <button onClick={handleEnrutarClientes} style={{ background: '#f3f0ff', border: '1.5px solid #e0e0e0', color: '#7c3aed', fontWeight: 700, fontSize: 18, display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '10px 0', borderRadius: 10, boxShadow: '0 1px 4px #7c3aed11' }}>
-          <span role="img" aria-label="mapa" style={{ fontSize: 22 }}>🗺️</span>
-          Enrutar Clientes
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '0 24px' }}>
+        <button onClick={() => { onClose(); navigate('/'); }} style={menuBtnStyle}>
+          <span style={{ fontSize: 22 }}>🏠</span> Inicio
         </button>
-        <button onClick={handleRegistrarGasto} style={{ background: '#fff7ed', border: '1.5px solid #e0e0e0', color: '#ed8936', fontWeight: 700, fontSize: 18, display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '10px 0', borderRadius: 10, boxShadow: '0 1px 4px #ed893611' }}>
-          <span role="img" aria-label="gasto" style={{ fontSize: 22 }}>💸</span>
-          Registrar Gasto
+        <button onClick={() => { onClose(); navigate('/clientes'); }} style={menuBtnStyle}>
+          <span style={{ fontSize: 22 }}>👥</span> Clientes
         </button>
-        <button onClick={handleCambiarTema} style={{ background: '#fefcbf', border: '1.5px solid #e0e0e0', color: '#b7791f', fontWeight: 700, fontSize: 18, display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '10px 0', borderRadius: 10, boxShadow: '0 1px 4px #ecc94b11' }}>
-          <span role="img" aria-label="tema" style={{ fontSize: 22 }}>🌞</span>
-          Cambiar tema
+        <button onClick={() => { onClose(); navigate('/prestamos'); }} style={menuBtnStyle}>
+          <span style={{ fontSize: 22 }}>📄</span> Préstamos
         </button>
-        <button onClick={handleSalir} style={{ background: '#fff5f5', border: '1.5px solid #e0e0e0', color: '#e53e3e', fontWeight: 700, fontSize: 18, display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '10px 0', borderRadius: 10, boxShadow: '0 1px 4px #e53e3e11' }}>
-          <span role="img" aria-label="salir" style={{ fontSize: 22 }}>🚪</span>
-          Salir
+        <button onClick={() => { onClose(); navigate('/pagos'); }} style={menuBtnStyle}>
+          <span style={{ fontSize: 22 }}>💳</span> Pagos / Abonos
+        </button>
+        <button onClick={() => { onClose(); navigate('/reportes'); }} style={menuBtnStyle}>
+          <span style={{ fontSize: 22 }}>📊</span> Reportes
+        </button>
+        <button onClick={() => { onClose(); navigate('/gps'); }} style={menuBtnStyle}>
+          <span style={{ fontSize: 22 }}>🗺️</span> Rutas / GPS
+        </button>
+        <button onClick={() => { onClose(); navigate('/configuracion'); }} style={menuBtnStyle}>
+          <span style={{ fontSize: 22 }}>⚙️</span> Configuración
+        </button>
+        <div style={{ flex: 1 }} />
+        <button onClick={handleSalir} style={{ ...menuBtnStyle, background: '#f5f6fa', color: '#29487d', marginTop: 18 }}>
+          <span style={{ fontSize: 22 }}>🔒</span> Cerrar sesión
         </button>
       </div>
+    // Estilo base para los botones del menú
+    const menuBtnStyle: React.CSSProperties = {
+      background: '#fff',
+      border: 'none',
+      color: '#29487d',
+      fontWeight: 600,
+      fontSize: 17,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      cursor: 'pointer',
+      padding: '12px 0 12px 8px',
+      borderRadius: 10,
+      boxShadow: '0 1px 4px #29487d11',
+      marginBottom: 2,
+      transition: 'background 0.2s',
+    };
     </div>
   );
 };
