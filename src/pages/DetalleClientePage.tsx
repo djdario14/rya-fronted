@@ -22,60 +22,38 @@ interface ClienteDetalle {
             <button onClick={() => navigate(-1)} style={{ position: 'absolute', top: 18, left: 18, background: '#29487d', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 17, padding: '7px 22px', boxShadow: '0 2px 8px #29487d22', zIndex: 2 }}>
               ← Volver
             </button>
-            {/* Header azul */}
-            <div style={{ background: '#29487d', borderTopLeftRadius: 22, borderTopRightRadius: 22, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, padding: '32px 32px 24px 32px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
-                <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#e5e5f7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="#6c3eb6"/><ellipse cx="12" cy="17" rx="7" ry="5" fill="#6c3eb6"/></svg>
-                </div>
-                <div>
-                  <div style={{ fontSize: 28, fontWeight: 700 }}>{cliente?.nombre}</div>
-                  <div style={{ fontSize: 16, marginTop: 2 }}>Cédula: <span style={{ fontWeight: 600 }}>{cliente?.cedula}</span></div>
-                  <div style={{ fontSize: 16 }}>Tel: <span style={{ fontWeight: 600, color: '#7ed6fa' }}>{cliente?.telefono}</span></div>
-                </div>
-              </div>
-              <button style={{ background: '#fff', color: '#29487d', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '7px 22px', boxShadow: '0 2px 8px #29487d22', marginLeft: 18 }}>
-                Ver mapa
-              </button>
-            </div>
-            {/* Saldo y acciones */}
-            <div style={{ display: 'flex', gap: 24, padding: '32px 32px 0 32px' }}>
-              <div style={{ flex: 2 }}>
-                <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px #29487d11', padding: '28px 24px', marginBottom: 18, textAlign: 'center', minWidth: 260 }}>
-                  <div style={{ fontSize: 18, color: '#888', marginBottom: 8, textAlign: 'left' }}>Saldo</div>
-                  <div style={{ fontSize: 38, fontWeight: 700, color: '#219653', marginBottom: 18, textAlign: 'left' }}>{formatMoney(cliente?.saldo ?? 0)}</div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 18, color: '#29487d', fontWeight: 600, marginTop: 10 }}>
-                    <div style={{ textAlign: 'left' }}>Préstamo<br /><span style={{ color: '#222', fontWeight: 700, fontSize: 22 }}>${cliente?.prestamo ?? 0}</span></div>
-                    <div style={{ textAlign: 'center' }}>Cuotas<br /><span style={{ color: '#222', fontWeight: 700, fontSize: 22 }}>{cliente?.cuotas ?? 0} / {cliente?.cuotasTotal ?? 0}</span></div>
-                    <div style={{ textAlign: 'right' }}>Atraso<br /><span style={{ color: '#222', fontWeight: 700, fontSize: 22 }}>${cliente?.atraso ?? 0}</span></div>
-                  </div>
-                </div>
-                <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px #29487d11', padding: '22px 24px', minHeight: 70 }}>
-                  <div style={{ fontSize: 20, color: '#29487d', fontWeight: 700, letterSpacing: 0.5, marginBottom: 10 }}>Pagos registrados</div>
-                  {pagos.length === 0 ? (
-                    <div style={{ color: '#888', fontSize: 16 }}>No hay pagos registrados</div>
-                  ) : (
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                      {pagos.map((pago: any) => {
-                        return (
-                          <li key={pago.id} style={{ marginBottom: 8, fontSize: 16, color: '#29487d', background: '#f7f8fa', borderRadius: 7, padding: '7px 12px', display: 'flex', flexDirection: 'column', gap: 2, border: '1px solid #e0e0e0' }}>
-                            {pago.motivo_no_pago ? (
-                              <span style={{ color: '#e74c3c', fontWeight: 600 }}>Motivo: {pago.motivo_no_pago}</span>
-                            ) : (
-                              <span>Monto: <b>${pago.monto}</b> | Fecha: {pago.fecha}</span>
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </div>
-              </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 18, minWidth: 200, marginTop: 10 }}>
-                <button style={{ background: '#fff', color: '#29487d', border: '2px solid #29487d', borderRadius: 10, padding: '15px 0', fontWeight: 700, fontSize: 17, cursor: 'pointer', marginBottom: 0, boxShadow: '0 1px 4px #29487d11' }}>Historial crediticio</button>
-                <button style={{ background: '#fff', color: '#29487d', border: '2px solid #29487d', borderRadius: 10, padding: '15px 0', fontWeight: 700, fontSize: 17, cursor: 'pointer', marginBottom: 0, boxShadow: '0 1px 4px #29487d11' }}>Agendar visita</button>
-                <button style={{ background: '#fff', color: '#29487d', border: '2px solid #29487d', borderRadius: 10, padding: '15px 0', fontWeight: 700, fontSize: 17, cursor: 'pointer', marginBottom: 0, boxShadow: '0 1px 4px #29487d11', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}
-                  onClick={() => {
+            useEffect(() => {
+              async function fetchCliente() {
+                setLoading(true);
+                try {
+                  // Obtener datos básicos del cliente
+                  const res = await api.get(`/clientes/${id}`);
+                  const data = res.data as ClienteDetalle;
+                  // Obtener saldo y detalles reales
+                  const resSaldo = await api.get(`/clientes/${id}/saldo`);
+                  const saldoData = resSaldo.data as any;
+                  setCliente({
+                    id: data.id,
+                    nombre: data.nombre,
+                    cedula: data.cedula,
+                    telefono: data.telefono,
+                    direccion: data.direccion,
+                    saldo: saldoData.saldo ?? 0,
+                    prestamo: saldoData.prestamo ?? 0,
+                    cuotasPagadas: saldoData.cuotasPagadas ?? 0,
+                    cuotasTotal: saldoData.cuotasTotal ?? 30,
+                    atraso: saldoData.atraso ?? 0,
+                    lat: data.direccion?.split(',')[0] ? Number(data.direccion?.split(',')[0]) : undefined,
+                    lng: data.direccion?.split(',')[1] ? Number(data.direccion?.split(',')[1]) : undefined,
+                  });
+                } catch (error) {
+                  // Manejo de error si es necesario
+                } finally {
+                  setLoading(false);
+                }
+              }
+              fetchCliente();
+            }, [id]);
                     if (cliente?.telefono) {
                       const numero = cliente.telefono.replace(/[^\d+]/g, '');
                       window.open(`https://wa.me/${numero}`, '_blank');
