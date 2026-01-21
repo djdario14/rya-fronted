@@ -112,10 +112,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ open, onClose, onEnrutarClien
           <span style={{ fontSize: 22 }}>🔒</span> Cerrar sesión
         </button>
       </div>
-    // Estilo base para los botones del menú
-    const menuBtnStyle: React.CSSProperties = {
-      background: '#fff',
-    </div>
+    // ...existing code...
   );
 };
 
