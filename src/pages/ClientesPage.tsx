@@ -453,51 +453,170 @@ const ClientesPage: React.FC = () => {
           <div style={{ textAlign: 'center', color: '#888', fontSize: 18, padding: 40 }}>Cargando clientes...</div>
         ) : clientes.length === 0 ? (
           <div style={{ textAlign: 'center', color: '#888', fontSize: 18, padding: 40 }}>No hay clientes para mostrar.</div>
-        ) : clientes
-            .filter(cliente => cliente.nombre.toLowerCase().includes(search.toLowerCase()))
-            .map((cliente, idx) => (
-              <div key={idx} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 4px 24px #0002', padding: '24px 36px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, transition: 'box-shadow 0.2s, transform 0.2s', animation: 'fadeIn 0.7s', border: '1px solid #f0f0f0', cursor: cliente.id !== -1 ? 'pointer' : 'default' }}
-                onMouseOver={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 32px #21965322'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px) scale(1.01)'; }}
-                onMouseOut={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 24px #0002'; (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}
-                onClick={() => cliente.id !== -1 && navigate(`/clientes/${cliente.id}`)}
-              >
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 23, marginBottom: 6, letterSpacing: '-0.5px' }}>{cliente.nombre}</div>
-                  <div style={{ color: '#444', fontSize: 17 }}>
-                    Saldo: <span style={{ color: '#219653', fontWeight: 700, fontSize: 18 }}>${cliente.saldo ?? 0}</span>
-                    <span style={{ margin: '0 12px' }}>|</span>
-                    Atraso: <span style={{ color: '#888', fontWeight: 500 }}>{cliente.atraso ?? '--'} días</span>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: 14 }}>
-                  {(cliente.saldo ?? 0) > 0 ? (
-                    <button
-                      style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
-                      onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#176c3a'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px #176c3a33'; }}
-                      onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#219653'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px #21965322'; }}
-                      onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
+        ) : (
+          <div>
+            <style>{`
+              @media (max-width: 700px) {
+                .cliente-card {
+                  display: flex !important;
+                  flex-direction: column !important;
+                  align-items: stretch !important;
+                  padding: 18px 12px !important;
+                  margin-bottom: 18px !important;
+                  border-radius: 18px !important;
+                  box-shadow: 0 2px 12px #0001 !important;
+                  border: 1.5px solid #e0e0e0 !important;
+                  background: #fff !important;
+                  animation: fadeIn 0.7s;
+                }
+                .cliente-card-header {
+                  display: flex;
+                  flex-direction: row;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 10px;
+                }
+                .cliente-card-nombre {
+                  font-size: 20px !important;
+                  font-weight: 700;
+                  margin-bottom: 0 !important;
+                }
+                .cliente-card-info {
+                  font-size: 15px !important;
+                  color: #444;
+                  margin-bottom: 10px;
+                }
+                .cliente-card-actions {
+                  display: flex;
+                  flex-direction: column;
+                  gap: 10px;
+                  margin-top: 8px;
+                }
+                .cliente-card-abonar {
+                  background: #219653;
+                  color: #fff;
+                  border: none;
+                  border-radius: 8px;
+                  padding: 13px 0;
+                  font-weight: 700;
+                  font-size: 17px;
+                  cursor: pointer;
+                  box-shadow: 0 2px 8px #21965322;
+                  width: 100%;
+                }
+                .cliente-card-nuevo {
+                  background: #29487d;
+                  color: #fff;
+                  border: none;
+                  border-radius: 8px;
+                  padding: 13px 0;
+                  font-weight: 700;
+                  font-size: 17px;
+                  cursor: pointer;
+                  box-shadow: 0 2px 8px #29487d22;
+                  width: 100%;
+                }
+                .cliente-card-ver {
+                  background: #e9ecef;
+                  color: #444;
+                  border: none;
+                  border-radius: 8px;
+                  padding: 12px 0;
+                  font-weight: 600;
+                  font-size: 16px;
+                  cursor: pointer;
+                  width: 100%;
+                }
+              }
+            `}</style>
+            {clientes
+              .filter(cliente => cliente.nombre.toLowerCase().includes(search.toLowerCase()))
+              .map((cliente, idx) => {
+                const isMobile = window.innerWidth <= 700;
+                if (isMobile) {
+                  return (
+                    <div key={idx} className="cliente-card" onClick={() => cliente.id !== -1 && navigate(`/clientes/${cliente.id}`)}>
+                      <div className="cliente-card-header">
+                        <span className="cliente-card-nombre">{cliente.nombre}</span>
+                        <span style={{ color: '#219653', fontWeight: 700, fontSize: 16 }}>${cliente.saldo ?? 0}</span>
+                      </div>
+                      <div className="cliente-card-info">
+                        Atraso: <span style={{ color: '#888', fontWeight: 500 }}>{cliente.atraso ?? '--'} días</span>
+                      </div>
+                      <div className="cliente-card-actions">
+                        {(cliente.saldo ?? 0) > 0 ? (
+                          <button
+                            className="cliente-card-abonar"
+                            onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
+                          >
+                            Abonar
+                          </button>
+                        ) : (
+                          <button
+                            className="cliente-card-nuevo"
+                            onClick={ev => { ev.stopPropagation(); setNuevoCliente(cliente); setShowCreditoModal(true); }}
+                          >
+                            Nuevo crédito
+                          </button>
+                        )}
+                        <button
+                          className="cliente-card-ver"
+                          onClick={ev => { ev.stopPropagation(); navigate(`/clientes/${cliente.id}`); }}
+                        >
+                          Ver
+                        </button>
+                      </div>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div key={idx} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 4px 24px #0002', padding: '24px 36px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, transition: 'box-shadow 0.2s, transform 0.2s', animation: 'fadeIn 0.7s', border: '1px solid #f0f0f0', cursor: cliente.id !== -1 ? 'pointer' : 'default' }}
+                      onMouseOver={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 32px #21965322'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px) scale(1.01)'; }}
+                      onMouseOut={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 24px #0002'; (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}
+                      onClick={() => cliente.id !== -1 && navigate(`/clientes/${cliente.id}`)}
                     >
-                      Abonar
-                    </button>
-                  ) : (
-                    <button
-                      style={{ background: '#29487d', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #29487d22', transition: 'background 0.2s, box-shadow 0.2s' }}
-                      onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#18325a'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px #18325a33'; }}
-                      onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#29487d'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px #29487d22'; }}
-                      onClick={ev => { ev.stopPropagation(); setNuevoCliente(cliente); setShowCreditoModal(true); }}
-                    >
-                      Nuevo crédito
-                    </button>
-                  )}
-                  <button style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', transition: 'background 0.2s' }}
-                    onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#d1e7dd'; }}
-                    onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#e9ecef'; }}
-                  >
-                    Ver
-                  </button>
-                </div>
-              </div>
-            ))}
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 23, marginBottom: 6, letterSpacing: '-0.5px' }}>{cliente.nombre}</div>
+                        <div style={{ color: '#444', fontSize: 17 }}>
+                          Saldo: <span style={{ color: '#219653', fontWeight: 700, fontSize: 18 }}>${cliente.saldo ?? 0}</span>
+                          <span style={{ margin: '0 12px' }}>|</span>
+                          Atraso: <span style={{ color: '#888', fontWeight: 500 }}>{cliente.atraso ?? '--'} días</span>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: 14 }}>
+                        {(cliente.saldo ?? 0) > 0 ? (
+                          <button
+                            style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
+                            onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#176c3a'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px #176c3a33'; }}
+                            onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#219653'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px #21965322'; }}
+                            onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
+                          >
+                            Abonar
+                          </button>
+                        ) : (
+                          <button
+                            style={{ background: '#29487d', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #29487d22', transition: 'background 0.2s, box-shadow 0.2s' }}
+                            onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#18325a'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px #18325a33'; }}
+                            onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#29487d'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px #29487d22'; }}
+                            onClick={ev => { ev.stopPropagation(); setNuevoCliente(cliente); setShowCreditoModal(true); }}
+                          >
+                            Nuevo crédito
+                          </button>
+                        )}
+                        <button style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', transition: 'background 0.2s' }}
+                          onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#d1e7dd'; }}
+                          onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#e9ecef'; }}
+                          onClick={ev => { ev.stopPropagation(); navigate(`/clientes/${cliente.id}`); }}
+                        >
+                          Ver
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+              })}
+          </div>
+        )}
         {/* Modal para registrar abono (fuera del map) */}
         {showPagoModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
