@@ -210,3 +210,5 @@ const ClientesPage: React.FC = () => {
     </div>
   );
 }
+
+export default ClientesPage;
