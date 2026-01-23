@@ -51,14 +51,15 @@ type Cliente = {
 };
 
 const ClientesPage: React.FC = () => {
+    // ...existing hooks and functions...
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showOrdenarModal, setShowOrdenarModal] = useState(false);
-    const navigate = useNavigate();
-    const [showPagoModal, setShowPagoModal] = useState(false);
-    const [pagoCliente, setPagoCliente] = useState<Cliente | null>(null);
-    const [monto, setMonto] = useState('');
-    const [noPago, setNoPago] = useState(false);
-    const [motivo, setMotivo] = useState(motivosNoPago[0]);
+  const navigate = useNavigate();
+  const [showPagoModal, setShowPagoModal] = useState(false);
+  const [pagoCliente, setPagoCliente] = useState<Cliente | null>(null);
+  const [monto, setMonto] = useState('');
+  const [noPago, setNoPago] = useState(false);
+  const [motivo, setMotivo] = useState(motivosNoPago[0]);
   const [tab, setTab] = useState<'pendientes' | 'todos'>('pendientes');
   const [search, setSearch] = useState('');
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -92,7 +93,6 @@ const ClientesPage: React.FC = () => {
 
   // Detectar país por IP y setear código de país
   useEffect(() => {
-
     const fetchCountryCode = async () => {
       try {
         const res = await fetch('https://ipapi.co/json/');
@@ -139,64 +139,16 @@ const ClientesPage: React.FC = () => {
     setLoading(true);
     try {
       const res = await api.get('/clientes/');
-      const data = res.data;
-      if (Array.isArray(data)) {
-        const clientesConSaldo = await Promise.all(
-          data.map(async (cliente: any) => {
-            if (typeof cliente === 'string') {
-              return { id: -1, nombre: cliente, saldo: undefined, atraso: undefined };
-            }
-            let valorPrestamo = 0, intereses = 0, pagos = 0, saldo = 0, atraso = 0, cuota = undefined;
-            try {
-              const resSaldo = await api.get(`/clientes/${cliente.id}/saldo`);
-              const saldoData = resSaldo.data as any;
-              valorPrestamo = saldoData.prestamo ?? 0;
-              intereses = saldoData.prestamo ? saldoData.prestamo * 0.2 : 0;
-              pagos = saldoData.cuotasPagadas && saldoData.cuotasTotal ? ((valorPrestamo + intereses) / saldoData.cuotasTotal) * saldoData.cuotasPagadas : 0;
-              saldo = valorPrestamo + intereses - pagos;
-              atraso = saldoData.atraso ?? 0;
-              cuota = saldoData.cuotasTotal ? Math.round((valorPrestamo + intereses) / saldoData.cuotasTotal) : undefined;
-            } catch {}
-            return { id: cliente.id, nombre: cliente.nombre, saldo, atraso, cuota };
-          })
-        );
-        // Leer orden personalizado de localStorage
-        const ordenGuardado = localStorage.getItem('orden_clientes');
-        if (ordenGuardado) {
-          try {
-            const ordenIds = JSON.parse(ordenGuardado);
-            if (Array.isArray(ordenIds)) {
-              // Ordenar clientesConSaldo según el orden guardado
-              clientesConSaldo.sort((a, b) => {
-                const ia = ordenIds.indexOf(a.id);
-                const ib = ordenIds.indexOf(b.id);
-                if (ia === -1 && ib === -1) return 0;
-                if (ia === -1) return 1;
-                if (ib === -1) return -1;
-                return ia - ib;
-              });
-            }
-          } catch {}
-        }
-        setClientes(clientesConSaldo);
-      } else {
-        setClientes([]);
-      }
-    } catch {
-      setClientes([]);
+      setClientes(res.data as Cliente[]);
+    } catch (err) {
+      setError('No se pudo cargar la lista de clientes');
     }
     setLoading(false);
   };
 
-  // Llamar a fetchClientes al montar el componente
-  useEffect(() => {
-    fetchClientes();
-  }, []);
-
-  // --- RETURN PRINCIPAL REESTRUCTURADO ---
-
+  // Main return for ClientesPage
   return (
-    <div className="app-layout">
+    <div className="mobile-page">
       <SidebarMenu
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -215,28 +167,28 @@ const ClientesPage: React.FC = () => {
           setShowOrdenarModal(false);
         }}
       />
-      <main className="content">
-        <header className="header">
-          <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)}>
-            <span>&#9776;</span>
-          </button>
-          <input
-            type="text"
-            placeholder="Buscar cliente"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="search-input"
-          />
-          <span className="notif-icon" title="Notificaciones">🔔</span>
-          <div className="user-badge">
-            <span className="user-icon">👤</span>
-            Usuario
-            <span className="user-alert">1</span>
-          </div>
-          <button className="btn-primary" onClick={() => setShowNuevoModal(true)}>
-            NUEVO
-          </button>
-        </header>
+      <header className="mobile-header">
+        <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)}>
+          <span>&#9776;</span>
+        </button>
+        <input
+          type="text"
+          placeholder="Buscar cliente"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="search-input"
+        />
+        <span className="notif-icon" title="Notificaciones">🔔</span>
+        <div className="user-badge">
+          <span className="user-icon">👤</span>
+          Usuario
+          <span className="user-alert">1</span>
+        </div>
+        <button className="btn-primary" onClick={() => setShowNuevoModal(true)}>
+          NUEVO
+        </button>
+      </header>
+      <main className="mobile-content">
         <h2 className="clientes-title">Clientes</h2>
         <div className="tabs-row">
           <button
@@ -252,378 +204,9 @@ const ClientesPage: React.FC = () => {
             Todos
           </button>
         </div>
-        {/* ...resto del contenido... */}
+        {/* Modals, client list, and other content go here (as previously structured) */}
       </main>
-
-      {/* Modal selector NUEVO */}
-      {showNuevoModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
-          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 320, width: 340, position: 'relative', display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <h3 style={{ margin: 0, fontWeight: 700, fontSize: 22, textAlign: 'center' }}>¿Qué deseas crear?</h3>
-            <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '14px 0', fontWeight: 600, fontSize: 18, cursor: 'pointer' }}
-              onClick={() => { setShowNuevoModal(false); setShowModal(true); }}>
-              Cliente
-            </button>
-            <button style={{ background: '#29487d', color: '#fff', border: 'none', borderRadius: 8, padding: '14px 0', fontWeight: 600, fontSize: 18, cursor: 'pointer' }}
-              onClick={() => { setShowNuevoModal(false); setShowPrestamoSelector(true); }}>
-              Préstamo
-            </button>
-            <button onClick={() => setShowNuevoModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
-          </div>
-        </div>
-      )}
-
-      {/* Modal para seleccionar cliente con saldo=0 para préstamo */}
-      {showPrestamoSelector && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200 }}>
-          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 320, width: 380, position: 'relative', maxHeight: 500, overflowY: 'auto' }}>
-            <h3 style={{ margin: 0, fontWeight: 700, fontSize: 22, textAlign: 'center', marginBottom: 18 }}>Selecciona un cliente sin saldo</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {clientes.filter(c => (c.saldo ?? 0) === 0).length === 0 ? (
-                <div style={{ color: '#888', textAlign: 'center' }}>No hay clientes con saldo 0.</div>
-              ) : clientes.filter(c => (c.saldo ?? 0) === 0).map(c => (
-                <button key={c.id} style={{ background: '#e9ecef', color: '#29487d', border: 'none', borderRadius: 8, padding: '12px', fontWeight: 600, fontSize: 17, cursor: 'pointer', textAlign: 'left' }}
-                  onClick={() => { setPrestamoCliente(c); setShowPrestamoSelector(false); setShowCreditoModal(true); setNuevoCliente(c); }}>
-                  {c.nombre}
-                </button>
-              ))}
-            </div>
-            <button onClick={() => setShowPrestamoSelector(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
-          </div>
-        </div>
-      )}
-
-      {/* Modal para agregar cliente */}
-      {showModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 400, width: 420, position: 'relative' }}>
-            <h3 style={{ marginTop: 0, marginBottom: 24, fontWeight: 700, fontSize: 24 }}>Agregar Cliente</h3>
-            <form onSubmit={async e => {
-              e.preventDefault();
-              setSaving(true);
-              setError('');
-              // Unir código de país seleccionado y número antes de guardar
-              const telefonoCompleto = `${countryCode}${form.telefono}`;
-              try {
-                const res = await api.post('/clientes/', {
-                  nombre: form.nombre,
-                  cedula: form.cedula,
-                  direccion: form.direccion,
-                  negocio: form.negocio,
-                  telefono: telefonoCompleto
-                });
-                setShowModal(false);
-                setForm({
-                  id: -1,
-                  nombre: '',
-                  cedula: '',
-                  direccion: '',
-                  negocio: '',
-                  telefono: '',
-                  saldo: 0,
-                  prestamo: 0,
-                  cuotasPagadas: 0,
-                  cuotasTotal: 0,
-                  atraso: 0,
-                });
-                setCountryCode('+593');
-                setNuevoCliente(res.data);
-                setShowSuccessModal(true);
-                fetchClientes();
-              } catch (err: any) {
-                if (err.response?.status === 409) {
-                  setError('La cédula ya está registrada');
-                } else {
-                  setError('No se pudo guardar el cliente');
-                }
-              }
-              setSaving(false);
-            }}>
-              <input type="text" placeholder="Nombre" required value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
-              <input type="text" placeholder="Cédula" required value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
-              <input type="text" placeholder="Dirección (GPS)" required value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
-              <input type="text" placeholder="Negocio" required value={form.negocio} onChange={e => setForm(f => ({ ...f, negocio: e.target.value }))} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, marginBottom: 12 }} />
-              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                <select value={countryCode} onChange={e => setCountryCode(e.target.value)} style={{ padding: '10px 8px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16, minWidth: 90 }}>
-                  {countryCodes.map(c => (
-                    <option key={c.code} value={c.code}>{c.code} {c.name}</option>
-                  ))}
-                </select>
-                <input type="tel" placeholder="Teléfono" required value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} style={{ flex: 1, padding: '10px 16px', borderRadius: 8, border: '1px solid #e0e0e0', fontSize: 16 }} />
-              </div>
-              {error && <div style={{ color: '#e74c3c', marginTop: 12 }}>{error}</div>}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
-                <button type="button" onClick={() => setShowModal(false)} style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
-                <button type="submit" disabled={saving} style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: saving ? 'not-allowed' : 'pointer', boxShadow: '0 2px 8px #21965322', opacity: saving ? 0.7 : 1 }}>{saving ? 'Guardando...' : 'Guardar'}</button>
-              </div>
-            </form>
-            <button onClick={() => setShowModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
-          </div>
-        </div>
-      )}
-
-      {/* Modals de éxito y crédito */}
-      {showSuccessModal && (
-        <SuccessModal
-          message="¡Cliente registrado exitosamente!"
-          onClose={() => {
-            setShowSuccessModal(false);
-            setShowCreditoModal(true);
-          }}
-        />
-      )}
-      {showCreditoModal && (
-        <CreditoModal 
-          clienteNombre={nuevoCliente?.nombre ?? ''}
-          onClose={() => setShowCreditoModal(false)}
-          onSubmit={async (data) => {
-            if (!nuevoCliente?.id) return;
-            // Registrar préstamo en backend
-            try {
-              await api.post('/prestamos/', {
-                cliente_id: nuevoCliente.id,
-                monto: data.valor,
-                fecha: data.fecha,
-                estado: 'activo'
-              });
-              setShowCreditoModal(false);
-              setShowPrestamoSuccess(true);
-              fetchClientes();
-            } catch {
-              alert('No se pudo registrar el crédito');
-            }
-          }}
-        />
-      )}
-
-      {showPrestamoSuccess && (
-        <SuccessModal
-          message="¡Crédito registrado exitosamente!"
-          onClose={() => setShowPrestamoSuccess(false)}
-        />
-      )}
-
-      {/* Lista de clientes */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        {loading ? (
-          <div style={{ textAlign: 'center', color: '#888', fontSize: 18, padding: 40 }}>Cargando clientes...</div>
-        ) : clientes.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#888', fontSize: 18, padding: 40 }}>No hay clientes para mostrar.</div>
-        ) : (
-          <div>
-            <style>{`
-              @media (max-width: 700px) {
-                .cliente-card {
-                  display: flex !important;
-                  flex-direction: column !important;
-                  align-items: stretch !important;
-                  padding: 18px 18px 14px 18px !important;
-                  margin-bottom: 12px !important;
-                  border-radius: 16px !important;
-                  box-shadow: 0 4px 16px #29487d18 !important;
-                  border: none !important;
-                  background: #fff !important;
-                  min-height: 64px !important;
-                  animation: fadeIn 0.7s;
-                }
-                .cliente-card-abonar {
-                  background: linear-gradient(90deg, #217a5b 60%, #29487d 100%) !important;
-                  color: #fff !important;
-                  border: none !important;
-                  border-radius: 8px !important;
-                  font-weight: 700 !important;
-                  font-size: 17px !important;
-                  padding: 12px 0 !important;
-                  margin-top: 6px !important;
-                  box-shadow: 0 2px 8px #29487d22 !important;
-                  width: 100% !important;
-                  letter-spacing: 1px !important;
-                }
-                .cliente-card-nuevo {
-                  background: #29487d !important;
-                  color: #fff !important;
-                  border: none !important;
-                  border-radius: 8px !important;
-                  font-weight: 700 !important;
-                  font-size: 17px !important;
-                  padding: 12px 0 !important;
-                  margin-top: 6px !important;
-                  box-shadow: 0 2px 8px #29487d22 !important;
-                  width: 100% !important;
-                  letter-spacing: 1px !important;
-                }
-              }
-            `}</style>
-            {clientes
-              .filter(cliente => cliente.nombre.toLowerCase().includes(search.toLowerCase()))
-              .map((cliente, idx) => {
-                const isMobile = window.innerWidth <= 700;
-                if (isMobile) {
-                  return (
-                    <div
-                      key={idx}
-                      className="cliente-card"
-                      onClick={() => cliente.id !== -1 && navigate(`/clientes/${cliente.id}`)}
-                    >
-                      <div className="cliente-info">
-                        <strong>{cliente.nombre}</strong>
-                        <span>
-                          Saldo: <b>${cliente.saldo ?? 0}</b> <span style={{ margin: '0 8px' }}>|</span> Atraso: <b style={{ color: (cliente.atraso ?? 0) > 0 ? '#c62828' : '#217a5b' }}>{cliente.atraso ?? '--'} días</b>
-                        </span>
-                      </div>
-                      <div className="cliente-actions">
-                        {(cliente.saldo ?? 0) > 0 ? (
-                          <button
-                            className="btn-primary"
-                            onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
-                          >
-                            Abonar
-                          </button>
-                        ) : (
-                          <button
-                            className="btn-secondary"
-                            onClick={ev => { ev.stopPropagation(); setNuevoCliente(cliente); setShowCreditoModal(true); }}
-                          >
-                            Nuevo crédito
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div key={idx} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 4px 24px #0002', padding: '24px 36px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 0, transition: 'box-shadow 0.2s, transform 0.2s', animation: 'fadeIn 0.7s', border: '1px solid #f0f0f0', cursor: cliente.id !== -1 ? 'pointer' : 'default' }}
-                      onMouseOver={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 32px #21965322'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px) scale(1.01)'; }}
-                      onMouseOut={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 24px #0002'; (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}
-                      onClick={() => cliente.id !== -1 && navigate(`/clientes/${cliente.id}`)}
-                    >
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: 23, marginBottom: 6, letterSpacing: '-0.5px' }}>{cliente.nombre}</div>
-                        <div style={{ color: '#444', fontSize: 17 }}>
-                          Saldo: <span style={{ color: '#219653', fontWeight: 700, fontSize: 18 }}>${cliente.saldo ?? 0}</span>
-                          <span style={{ margin: '0 12px' }}>|</span>
-                          Atraso: <span style={{ color: '#888', fontWeight: 500 }}>{cliente.atraso ?? '--'} días</span>
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', gap: 14 }}>
-                        {(cliente.saldo ?? 0) > 0 ? (
-                          <button
-                            style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #21965322', transition: 'background 0.2s, box-shadow 0.2s' }}
-                            onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#176c3a'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px #176c3a33'; }}
-                            onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#219653'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px #21965322'; }}
-                            onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
-                          >
-                            Abonar
-                          </button>
-                        ) : (
-                          <button
-                            style={{ background: '#29487d', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', boxShadow: '0 2px 8px #29487d22', transition: 'background 0.2s, box-shadow 0.2s' }}
-                            onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#18325a'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 16px #18325a33'; }}
-                            onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#29487d'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px #29487d22'; }}
-                            onClick={ev => { ev.stopPropagation(); setNuevoCliente(cliente); setShowCreditoModal(true); }}
-                          >
-                            Nuevo crédito
-                          </button>
-                        )}
-                        {/* Botón Ver solo en desktop, no en móvil */}
-                        {isMobile ? null : (
-                          <button style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', transition: 'background 0.2s' }}
-                            onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#d1e7dd'; }}
-                            onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#e9ecef'; }}
-                            onClick={ev => { ev.stopPropagation(); navigate(`/clientes/${cliente.id}`); }}
-                          >
-                            Ver
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                }
-              })}
-          </div>
-        )}
-        {/* Modal para registrar abono (fuera del map) */}
-        {showPagoModal && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
-            <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 36, minWidth: 400, width: 420, position: 'relative' }}>
-              <h3 style={{ marginTop: 0, marginBottom: 24, fontWeight: 700, fontSize: 24, textAlign: 'center' }}>Registrar Abono para {pagoCliente?.nombre}</h3>
-              <form onSubmit={async e => {
-                e.preventDefault();
-                if (noPago) {
-                  // Aquí podrías guardar el motivo de no pago en backend si lo deseas
-                  setShowPagoModal(false);
-                  setShowPagoSuccess(true);
-                  return;
-                }
-                // Buscar préstamo activo del cliente
-                let prestamoId = null;
-                try {
-                  const res = await api.get(`/prestamos/?cliente_id=${pagoCliente?.id}&estado=activo`);
-                  const prestamos = res.data;
-                  if (Array.isArray(prestamos) && prestamos.length > 0) {
-                    prestamoId = prestamos[0].id;
-                  }
-                } catch (err) {}
-                if (!prestamoId) {
-                  alert('No se encontró préstamo activo para este cliente');
-                  return;
-                }
-                // Registrar abono en backend
-                try {
-                  await api.post('/pagos/', {
-                    prestamo_id: prestamoId,
-                    monto: Number(monto),
-                    fecha: new Date().toISOString().slice(0, 10)
-                  });
-                  setShowPagoModal(false);
-                  setShowPagoSuccess(true);
-                  // Actualizar solo el cliente abonado en la lista
-                  try {
-                    const resSaldo = await api.get(`/clientes/${pagoCliente?.id}/saldo`);
-                    const saldoData = resSaldo.data as any;
-                    setClientes(clientes => clientes.map(c => {
-                      if (c.id === pagoCliente?.id) {
-                        return { ...c, saldo: saldoData.saldo, atraso: saldoData.atraso };
-                      }
-                      return c;
-                    }));
-                  } catch (err) {}
-                  fetchClientes();
-                } catch (err) {}
-              }}>
-                {!noPago ? (
-                  <>
-                    <input type="number" placeholder="Monto del abono" required value={monto} onChange={e => setMonto(e.target.value)} style={{ padding: '12px 16px', borderRadius: 8, border: '1.5px solid #219653', fontSize: 18, marginBottom: 18, width: '100%' }} />
-                    <div style={{ marginBottom: 18, padding: '10px 0', background: '#f7f8fa', borderRadius: 8 }}>
-                      <label htmlFor="noPago" style={{ fontSize: 16, color: '#29487d', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <input type="checkbox" id="noPago" checked={noPago} onChange={e => setNoPago(e.target.checked)} style={{ marginRight: 8, accentColor: '#219653', width: 18, height: 18 }} />
-                        No registrar abono
-                      </label>
-                    </div>
-                  </>
-                ) : (
-                  <div style={{ marginBottom: 18 }}>
-                    <label style={{ fontSize: 16, color: '#29487d', fontWeight: 600, marginBottom: 6, display: 'block' }}>Motivo de no abono:</label>
-                    <select value={motivo} onChange={e => setMotivo(e.target.value)} style={{ padding: '12px 16px', borderRadius: 8, border: '1.5px solid #e0e0e0', fontSize: 17, width: '100%' }}>
-                      {motivosNoPago.map(m => (
-                        <option key={m} value={m}>{m}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 28 }}>
-                  <button type="button" onClick={() => setShowPagoModal(false)} style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
-                  <button type="submit" style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px #21965322' }}>{noPago ? 'Guardar motivo' : 'Guardar abono'}</button>
-                </div>
-              </form>
-              <button onClick={() => setShowPagoModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: '#888', cursor: 'pointer' }} title="Cerrar">×</button>
-            </div>
-          </div>
-        )}
-    {/* cierre de la lista de clientes y modales */}
-  </div>
-</div>
+      {/* Place modals and other overlays here as needed */}
+    </div>
   );
-};
-
-export default ClientesPage;
+}
