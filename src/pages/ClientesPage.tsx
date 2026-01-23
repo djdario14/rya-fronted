@@ -310,18 +310,20 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle }: { cliente: Client
       }}
     >
       <div style={{ flex: 1 }}>
-        <div className="cliente-nombre" style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>{cliente.nombre}</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontWeight: 700, color: '#2d7b5f', fontSize: 18, background: '#e6f4ef', borderRadius: 8, padding: '2px 10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+          <span style={{ fontWeight: 700, color: '#2d7b5f', fontSize: 20, background: '#e6f4ef', borderRadius: 8, padding: '2px 12px' }}>
             ${saldo.toFixed(2)}
           </span>
           <span style={{ color: '#888', fontSize: 14, fontWeight: 500 }}>Saldo</span>
-          {typeof atraso === 'number' && (
-            <span style={{ marginLeft: 8, color: '#b77b00', fontWeight: 600, fontSize: 15, background: '#fff7e6', borderRadius: 8, padding: '2px 10px' }}>
+        </div>
+        <div className="cliente-nombre" style={{ fontWeight: 700, fontSize: 17, marginBottom: 2 }}>{cliente.nombre}</div>
+        {typeof atraso === 'number' && (
+          <div style={{ marginTop: 2 }}>
+            <span style={{ color: '#b77b00', fontWeight: 600, fontSize: 15, background: '#fff7e6', borderRadius: 8, padding: '2px 10px' }}>
               {atraso} días atraso
             </span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
       <button
         className="btn-abonar"
