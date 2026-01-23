@@ -166,26 +166,53 @@ const ClientesPage: React.FC = () => {
           setShowOrdenarModal(false);
         }}
       />
-      <header className="mobile-header">
-        <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)}>
-          <span>&#9776;</span>
-        </button>
-        <input
-          type="text"
-          placeholder="Buscar cliente"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="search-input"
-        />
-        <span className="notif-icon" title="Notificaciones">🔔</span>
-        <div className="user-badge">
-          <span className="user-icon">👤</span>
-          Usuario
-          <span className="user-alert">1</span>
+      <header style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '0 0 10px 0', marginBottom: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 12px 0 12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', fontSize: 26, color: '#4e7fa6', marginRight: 2, cursor: 'pointer' }}>
+              <span>&#9776;</span>
+            </button>
+            <img src="/logo192.png" alt="Logo" style={{ width: 36, height: 36, borderRadius: 8, marginRight: 6, boxShadow: '0 1px 4px #0001' }} />
+            <div style={{ fontWeight: 700, fontSize: 18, color: '#2d7b5f', letterSpacing: 0.2 }}>RYA COBRANZA<br /><span style={{ fontWeight: 400, fontSize: 13, color: '#888' }}>Gestión de créditos</span></div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span className="notif-icon" title="Notificaciones" style={{ fontSize: 22, color: '#FFD600', marginRight: 2 }}>🔔</span>
+            <div style={{ background: '#f6f8fa', border: '1px solid #e0e0e0', borderRadius: 12, padding: '4px 12px', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, fontSize: 15 }}>
+              <span className="user-icon" style={{ fontSize: 18, marginRight: 2 }}>👤</span>
+              Usuario
+              <span className="user-alert" style={{ background: '#e53935', color: '#fff', borderRadius: 10, fontWeight: 700, fontSize: 13, padding: '1px 7px', marginLeft: 4 }}>1</span>
+            </div>
+          </div>
         </div>
-        <button className="btn-primary" onClick={() => setShowNuevoModal(true)}>
-          NUEVO
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, padding: '0 12px' }}>
+          <input
+            type="text"
+            placeholder="Buscar cliente"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ flex: 1, border: '1px solid #e0e0e0', borderRadius: 8, padding: '10px 14px', fontSize: 16, background: '#f6f8fa', outline: 'none', fontWeight: 500 }}
+          />
+          <button
+            style={{
+              background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              fontWeight: 700,
+              fontSize: 16,
+              padding: '10px 22px',
+              marginLeft: 2,
+              boxShadow: '0 2px 8px #0001',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
+            }}
+            onClick={() => setShowNuevoModal(true)}
+          >
+            NUEVO <span style={{ fontSize: 18, marginLeft: 2 }}>+</span>
+          </button>
+        </div>
       </header>
       <main className="mobile-content">
         <h2 className="clientes-title">Clientes</h2>
