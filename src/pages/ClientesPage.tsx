@@ -508,28 +508,29 @@ const ClientesPage: React.FC = () => {
                       key={idx}
                       className="cliente-card"
                       style={{
-                        borderRadius: 16,
+                        borderRadius: 14,
                         background: '#fff',
-                        boxShadow: '0 4px 16px #29487d18',
-                        padding: '18px 18px 14px 18px',
-                        marginBottom: 12,
+                        boxShadow: '0 2px 12px #29487d10',
+                        padding: '14px 16px',
+                        marginBottom: 10,
                         display: 'flex',
-                        flexDirection: 'column',
-                        gap: 8,
-                        minHeight: 64,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        minHeight: 54,
                         border: 'none',
-                        position: 'relative',
                         cursor: 'pointer',
                         transition: 'box-shadow 0.2s',
                       }}
                       onClick={() => cliente.id !== -1 && navigate(`/clientes/${cliente.id}`)}
                     >
-                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-                        <span style={{ fontWeight: 700, fontSize: 18, color: '#222', lineHeight: 1.1, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cliente.nombre}</span>
-                        <span style={{ color: '#217a5b', fontWeight: 700, fontSize: 16 }}>${cliente.saldo ?? 0}</span>
-                      </div>
-                      <div style={{ color: '#888', fontSize: 15, marginBottom: 2 }}>
-                        Atraso: <span style={{ color: (cliente.atraso ?? 0) > 0 ? '#c62828' : '#217a5b', fontWeight: 700 }}>{cliente.atraso ?? '--'} días</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
+                        <span style={{ fontWeight: 700, fontSize: 17, color: '#222', lineHeight: 1.1, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cliente.nombre}</span>
+                        <span style={{ color: '#888', fontSize: 15, marginTop: 2 }}>
+                          Saldo: <span style={{ color: '#217a5b', fontWeight: 700 }}>${cliente.saldo ?? 0}</span>
+                          <span style={{ margin: '0 8px' }}>|</span>
+                          Atraso: <span style={{ color: (cliente.atraso ?? 0) > 0 ? '#c62828' : '#217a5b', fontWeight: 700 }}>{cliente.atraso ?? '--'} días</span>
+                        </span>
                       </div>
                       {(cliente.saldo ?? 0) > 0 ? (
                         <button
@@ -539,12 +540,12 @@ const ClientesPage: React.FC = () => {
                             border: 'none',
                             borderRadius: 8,
                             fontWeight: 700,
-                            fontSize: 17,
-                            padding: '12px 0',
-                            marginTop: 6,
+                            fontSize: 15,
+                            padding: '8px 22px',
+                            marginLeft: 12,
                             boxShadow: '0 2px 8px #29487d22',
-                            width: '100%',
                             letterSpacing: 1,
+                            minWidth: 90,
                           }}
                           onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
                         >
@@ -558,12 +559,12 @@ const ClientesPage: React.FC = () => {
                             border: 'none',
                             borderRadius: 8,
                             fontWeight: 700,
-                            fontSize: 17,
-                            padding: '12px 0',
-                            marginTop: 6,
+                            fontSize: 15,
+                            padding: '8px 18px',
+                            marginLeft: 12,
                             boxShadow: '0 2px 8px #29487d22',
-                            width: '100%',
                             letterSpacing: 1,
+                            minWidth: 90,
                           }}
                           onClick={ev => { ev.stopPropagation(); setNuevoCliente(cliente); setShowCreditoModal(true); }}
                         >
