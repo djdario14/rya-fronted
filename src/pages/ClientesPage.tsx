@@ -211,9 +211,29 @@ const ClientesPage: React.FC = () => {
             <div className="clientes-vacio">No hay clientes para mostrar.</div>
           ) : (
             clientes.map(cliente => (
-              <div className="cliente-card" key={cliente.id}>
+              <div
+                className="cliente-card"
+                key={cliente.id}
+                style={{ cursor: 'pointer', position: 'relative' }}
+                onClick={e => {
+                  // Evitar que el click en el botón abonar dispare el navigate
+                  if ((e.target as HTMLElement).closest('.btn-abonar')) return;
+                  navigate(`/clientes/${cliente.id}`);
+                }}
+              >
                 <div className="cliente-nombre">{cliente.nombre}</div>
                 {/* Puedes agregar más datos aquí si lo deseas */}
+                <button
+                  className="btn-abonar"
+                  style={{ position: 'absolute', right: 16, top: 16 }}
+                  onClick={e => {
+                    e.stopPropagation();
+                    setPagoCliente(cliente);
+                    setShowPagoModal(true);
+                  }}
+                >
+                  Abonar
+                </button>
               </div>
             ))
           )}
