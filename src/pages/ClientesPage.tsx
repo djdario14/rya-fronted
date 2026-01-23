@@ -507,70 +507,31 @@ const ClientesPage: React.FC = () => {
                     <div
                       key={idx}
                       className="cliente-card"
-                      style={{
-                        borderRadius: 14,
-                        background: '#fff',
-                        boxShadow: '0 2px 12px #29487d10',
-                        padding: '14px 16px',
-                        marginBottom: 10,
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        minHeight: 54,
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'box-shadow 0.2s',
-                      }}
                       onClick={() => cliente.id !== -1 && navigate(`/clientes/${cliente.id}`)}
                     >
-                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1, minWidth: 0 }}>
-                        <span style={{ fontWeight: 700, fontSize: 17, color: '#222', lineHeight: 1.1, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cliente.nombre}</span>
-                        <span style={{ color: '#888', fontSize: 15, marginTop: 2 }}>
-                          Saldo: <span style={{ color: '#217a5b', fontWeight: 700 }}>${cliente.saldo ?? 0}</span>
-                          <span style={{ margin: '0 8px' }}>|</span>
-                          Atraso: <span style={{ color: (cliente.atraso ?? 0) > 0 ? '#c62828' : '#217a5b', fontWeight: 700 }}>{cliente.atraso ?? '--'} días</span>
+                      <div className="cliente-info">
+                        <strong>{cliente.nombre}</strong>
+                        <span>
+                          Saldo: <b>${cliente.saldo ?? 0}</b> <span style={{ margin: '0 8px' }}>|</span> Atraso: <b style={{ color: (cliente.atraso ?? 0) > 0 ? '#c62828' : '#217a5b' }}>{cliente.atraso ?? '--'} días</b>
                         </span>
                       </div>
-                      {(cliente.saldo ?? 0) > 0 ? (
-                        <button
-                          style={{
-                            background: 'linear-gradient(90deg, #217a5b 60%, #29487d 100%)',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 8,
-                            fontWeight: 700,
-                            fontSize: 15,
-                            padding: '8px 22px',
-                            marginLeft: 12,
-                            boxShadow: '0 2px 8px #29487d22',
-                            letterSpacing: 1,
-                            minWidth: 90,
-                          }}
-                          onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
-                        >
-                          Abonar
-                        </button>
-                      ) : (
-                        <button
-                          style={{
-                            background: '#29487d',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 8,
-                            fontWeight: 700,
-                            fontSize: 15,
-                            padding: '8px 18px',
-                            marginLeft: 12,
-                            boxShadow: '0 2px 8px #29487d22',
-                            letterSpacing: 1,
-                            minWidth: 90,
-                          }}
-                          onClick={ev => { ev.stopPropagation(); setNuevoCliente(cliente); setShowCreditoModal(true); }}
-                        >
-                          Nuevo crédito
-                        </button>
-                      )}
+                      <div className="cliente-actions">
+                        {(cliente.saldo ?? 0) > 0 ? (
+                          <button
+                            className="btn-primary"
+                            onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
+                          >
+                            Abonar
+                          </button>
+                        ) : (
+                          <button
+                            className="btn-secondary"
+                            onClick={ev => { ev.stopPropagation(); setNuevoCliente(cliente); setShowCreditoModal(true); }}
+                          >
+                            Nuevo crédito
+                          </button>
+                        )}
+                      </div>
                     </div>
                   );
                 } else {

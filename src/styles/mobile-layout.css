@@ -1,0 +1,116 @@
+/* Layout global */
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* MOBILE FIRST */
+
+@media (max-width: 768px) {
+    .app-layout {
+        flex-direction: column;
+    }
+    .sidebar {
+        display: none;
+    }
+    .content {
+        width: 100%;
+        padding: 12px;
+    }
+}
+
+
+/* DESKTOP */
+
+@media (min-width: 769px) {
+    .sidebar {
+        width: 240px;
+    }
+    .content {
+        flex: 1;
+        padding: 24px;
+    }
+}
+
+
+/* Card de cliente */
+
+.cliente-card {
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 2px 12px #29487d10;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 54px;
+    border: none;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+}
+
+.cliente-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+    min-width: 0;
+}
+
+.cliente-info strong {
+    font-weight: 700;
+    font-size: 17px;
+    color: #222;
+    line-height: 1.1;
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cliente-info span {
+    color: #888;
+    font-size: 15px;
+    margin-top: 2px;
+}
+
+.cliente-info b {
+    color: #217a5b;
+    font-weight: 700;
+}
+
+.cliente-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #217a5b 60%, #29487d 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 8px 22px;
+    box-shadow: 0 2px 8px #29487d22;
+    letter-spacing: 1px;
+    min-width: 90px;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: #e9ecef;
+    color: #444;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 8px 18px;
+    min-width: 90px;
+    cursor: pointer;
+}
