@@ -461,71 +461,40 @@ const ClientesPage: React.FC = () => {
                   display: flex !important;
                   flex-direction: column !important;
                   align-items: stretch !important;
-                  padding: 18px 12px !important;
-                  margin-bottom: 18px !important;
-                  border-radius: 18px !important;
-                  box-shadow: 0 2px 12px #0001 !important;
-                  border: 1.5px solid #e0e0e0 !important;
+                  padding: 18px 18px 14px 18px !important;
+                  margin-bottom: 12px !important;
+                  border-radius: 16px !important;
+                  box-shadow: 0 4px 16px #29487d18 !important;
+                  border: none !important;
                   background: #fff !important;
+                  min-height: 64px !important;
                   animation: fadeIn 0.7s;
                 }
-                .cliente-card-header {
-                  display: flex;
-                  flex-direction: row;
-                  align-items: center;
-                  justify-content: space-between;
-                  margin-bottom: 10px;
-                }
-                .cliente-card-nombre {
-                  font-size: 20px !important;
-                  font-weight: 700;
-                  margin-bottom: 0 !important;
-                }
-                .cliente-card-info {
-                  font-size: 15px !important;
-                  color: #444;
-                  margin-bottom: 10px;
-                }
-                .cliente-card-actions {
-                  display: flex;
-                  flex-direction: column;
-                  gap: 10px;
-                  margin-top: 8px;
-                }
                 .cliente-card-abonar {
-                  background: #219653;
-                  color: #fff;
-                  border: none;
-                  border-radius: 8px;
-                  padding: 13px 0;
-                  font-weight: 700;
-                  font-size: 17px;
-                  cursor: pointer;
-                  box-shadow: 0 2px 8px #21965322;
-                  width: 100%;
+                  background: linear-gradient(90deg, #217a5b 60%, #29487d 100%) !important;
+                  color: #fff !important;
+                  border: none !important;
+                  border-radius: 8px !important;
+                  font-weight: 700 !important;
+                  font-size: 17px !important;
+                  padding: 12px 0 !important;
+                  margin-top: 6px !important;
+                  box-shadow: 0 2px 8px #29487d22 !important;
+                  width: 100% !important;
+                  letter-spacing: 1px !important;
                 }
                 .cliente-card-nuevo {
-                  background: #29487d;
-                  color: #fff;
-                  border: none;
-                  border-radius: 8px;
-                  padding: 13px 0;
-                  font-weight: 700;
-                  font-size: 17px;
-                  cursor: pointer;
-                  box-shadow: 0 2px 8px #29487d22;
-                  width: 100%;
-                }
-                .cliente-card-ver {
-                  background: #e9ecef;
-                  color: #444;
-                  border: none;
-                  border-radius: 8px;
-                  padding: 12px 0;
-                  font-weight: 600;
-                  font-size: 16px;
-                  cursor: pointer;
-                  width: 100%;
+                  background: #29487d !important;
+                  color: #fff !important;
+                  border: none !important;
+                  border-radius: 8px !important;
+                  font-weight: 700 !important;
+                  font-size: 17px !important;
+                  padding: 12px 0 !important;
+                  margin-top: 6px !important;
+                  box-shadow: 0 2px 8px #29487d22 !important;
+                  width: 100% !important;
+                  letter-spacing: 1px !important;
                 }
               }
             `}</style>
@@ -535,37 +504,72 @@ const ClientesPage: React.FC = () => {
                 const isMobile = window.innerWidth <= 700;
                 if (isMobile) {
                   return (
-                    <div key={idx} className="cliente-card" onClick={() => cliente.id !== -1 && navigate(`/clientes/${cliente.id}`)}>
-                      <div className="cliente-card-header">
-                        <span className="cliente-card-nombre">{cliente.nombre}</span>
-                        <span style={{ color: '#219653', fontWeight: 700, fontSize: 16 }}>${cliente.saldo ?? 0}</span>
+                    <div
+                      key={idx}
+                      className="cliente-card"
+                      style={{
+                        borderRadius: 16,
+                        background: '#fff',
+                        boxShadow: '0 4px 16px #29487d18',
+                        padding: '18px 18px 14px 18px',
+                        marginBottom: 12,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 8,
+                        minHeight: 64,
+                        border: 'none',
+                        position: 'relative',
+                        cursor: 'pointer',
+                        transition: 'box-shadow 0.2s',
+                      }}
+                      onClick={() => cliente.id !== -1 && navigate(`/clientes/${cliente.id}`)}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
+                        <span style={{ fontWeight: 700, fontSize: 18, color: '#222', lineHeight: 1.1, maxWidth: 170, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cliente.nombre}</span>
+                        <span style={{ color: '#217a5b', fontWeight: 700, fontSize: 16 }}>${cliente.saldo ?? 0}</span>
                       </div>
-                      <div className="cliente-card-info">
-                        Atraso: <span style={{ color: '#888', fontWeight: 500 }}>{cliente.atraso ?? '--'} días</span>
+                      <div style={{ color: '#888', fontSize: 15, marginBottom: 2 }}>
+                        Atraso: <span style={{ color: (cliente.atraso ?? 0) > 0 ? '#c62828' : '#217a5b', fontWeight: 700 }}>{cliente.atraso ?? '--'} días</span>
                       </div>
-                      <div className="cliente-card-actions">
-                        {(cliente.saldo ?? 0) > 0 ? (
-                          <button
-                            className="cliente-card-abonar"
-                            onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
-                          >
-                            Abonar
-                          </button>
-                        ) : (
-                          <button
-                            className="cliente-card-nuevo"
-                            onClick={ev => { ev.stopPropagation(); setNuevoCliente(cliente); setShowCreditoModal(true); }}
-                          >
-                            Nuevo crédito
-                          </button>
-                        )}
+                      {(cliente.saldo ?? 0) > 0 ? (
                         <button
-                          className="cliente-card-ver"
-                          onClick={ev => { ev.stopPropagation(); navigate(`/clientes/${cliente.id}`); }}
+                          style={{
+                            background: 'linear-gradient(90deg, #217a5b 60%, #29487d 100%)',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 8,
+                            fontWeight: 700,
+                            fontSize: 17,
+                            padding: '12px 0',
+                            marginTop: 6,
+                            boxShadow: '0 2px 8px #29487d22',
+                            width: '100%',
+                            letterSpacing: 1,
+                          }}
+                          onClick={ev => { ev.stopPropagation(); setPagoCliente(cliente); setMonto(cliente.cuota ? String(cliente.cuota) : ''); setShowPagoModal(true); setNoPago(false); setMotivo(motivosNoPago[0]); }}
                         >
-                          Ver
+                          Abonar
                         </button>
-                      </div>
+                      ) : (
+                        <button
+                          style={{
+                            background: '#29487d',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: 8,
+                            fontWeight: 700,
+                            fontSize: 17,
+                            padding: '12px 0',
+                            marginTop: 6,
+                            boxShadow: '0 2px 8px #29487d22',
+                            width: '100%',
+                            letterSpacing: 1,
+                          }}
+                          onClick={ev => { ev.stopPropagation(); setNuevoCliente(cliente); setShowCreditoModal(true); }}
+                        >
+                          Nuevo crédito
+                        </button>
+                      )}
                     </div>
                   );
                 } else {
