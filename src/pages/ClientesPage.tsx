@@ -311,10 +311,15 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle }: { cliente: Client
     >
       <div style={{ flex: 1 }}>
         <div className="cliente-nombre" style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>{cliente.nombre}</div>
-        <div style={{ color: '#444', fontSize: 15 }}>
-          Saldo: <span style={{ fontWeight: 600, color: '#2d7b5f' }}>${saldo}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontWeight: 700, color: '#2d7b5f', fontSize: 18, background: '#e6f4ef', borderRadius: 8, padding: '2px 10px' }}>
+            ${saldo.toFixed(2)}
+          </span>
+          <span style={{ color: '#888', fontSize: 14, fontWeight: 500 }}>Saldo</span>
           {typeof atraso === 'number' && (
-            <span style={{ marginLeft: 12 }}>| Atraso: <span style={{ color: '#b77b00', fontWeight: 600 }}>{atraso} días</span></span>
+            <span style={{ marginLeft: 8, color: '#b77b00', fontWeight: 600, fontSize: 15, background: '#fff7e6', borderRadius: 8, padding: '2px 10px' }}>
+              {atraso} días atraso
+            </span>
           )}
         </div>
       </div>
