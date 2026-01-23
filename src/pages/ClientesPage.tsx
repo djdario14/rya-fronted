@@ -1,11 +1,5 @@
-// Motivos de no pago
-const motivosNoPago = [
-  'No tiene',
-  'No está',
-  'Dejó de trabajar',
-  'Mañana paga',
-  'Clavo',
-];
+
+
 
 import React, { useState, useEffect } from 'react';
 import api from '../api/client';
@@ -16,9 +10,14 @@ import { useNavigate } from 'react-router-dom';
 import SuccessModal from '../components/SuccessModal';
 import CreditoModal from '../components/CreditoModal';
 
+const motivosNoPago = [
+  'No tiene',
+  'No está',
+  'Dejó de trabajar',
+  'Mañana paga',
+  'Clavo',
+];
 
-
-// Lista básica de códigos de país
 const countryCodes = [
   { code: '+1', name: 'Estados Unidos', iso: 'US' },
   { code: '+52', name: 'México', iso: 'MX' },
@@ -31,10 +30,8 @@ const countryCodes = [
   { code: '+55', name: 'Brasil', iso: 'BR' },
   { code: '+591', name: 'Bolivia', iso: 'BO' },
   { code: '+502', name: 'Guatemala', iso: 'GT' },
-  // ...puedes agregar más
 ];
 
-// El backend devuelve solo nombres, pero puedes adaptar el modelo según la respuesta real
 type Cliente = {
   id: number;
   nombre: string;
@@ -51,7 +48,6 @@ type Cliente = {
 };
 
 const ClientesPage: React.FC = () => {
-    // ...existing hooks and functions...
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showOrdenarModal, setShowOrdenarModal] = useState(false);
   const navigate = useNavigate();
@@ -83,13 +79,17 @@ const ClientesPage: React.FC = () => {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [countryCode, setCountryCode] = useState('+593'); // Por defecto Ecuador
-  // Estados para los modals nuevos
+  const [countryCode, setCountryCode] = useState('+593');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCreditoModal, setShowCreditoModal] = useState(false);
   const [nuevoCliente, setNuevoCliente] = useState<any>(null);
   const [showPrestamoSuccess, setShowPrestamoSuccess] = useState(false);
   const [showPagoSuccess, setShowPagoSuccess] = useState(false);
+
+  // Cargar clientes al montar el componente
+  useEffect(() => {
+    fetchClientes();
+  }, []);
 
   // Detectar país por IP y setear código de país
   useEffect(() => {
@@ -135,7 +135,7 @@ const ClientesPage: React.FC = () => {
   }, []);
 
   // Función para refrescar clientes
-  const fetchClientes = async () => {
+  async function fetchClientes() {
     setLoading(true);
     try {
       const res = await api.get('/clientes/');
@@ -144,9 +144,8 @@ const ClientesPage: React.FC = () => {
       setError('No se pudo cargar la lista de clientes');
     }
     setLoading(false);
-  };
+  }
 
-  // Main return for ClientesPage
   return (
     <div className="mobile-page">
       <SidebarMenu
@@ -162,8 +161,8 @@ const ClientesPage: React.FC = () => {
         clientes={clientes.map(c => ({ id: c.id, nombre: c.nombre }))}
         onClose={() => setShowOrdenarModal(false)}
         onSave={orden => {
-          localStorage.setItem('orden_clientes', JSON.stringify(orden.map(o => o.id)));
-          setClientes(prev => orden.map(o => prev.find(c => c.id === o.id) || { id: o.id, nombre: o.nombre }));
+          localStorage.setItem('orden_clientes', JSON.stringify(orden.map((o: any) => o.id)));
+          setClientes(prev => orden.map((o: any) => prev.find((c: any) => c.id === o.id) || { id: o.id, nombre: o.nombre }));
           setShowOrdenarModal(false);
         }}
       />
