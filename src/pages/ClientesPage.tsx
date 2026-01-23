@@ -251,63 +251,95 @@ const ClientesPage: React.FC = () => {
             <div className="clientes-vacio">No hay clientes para mostrar.</div>
           ) : (
             clientes.map(cliente => (
-              <div
-                className="cliente-card"
+              <ClienteCardRealtime
                 key={cliente.id}
-                style={{
-                  cursor: 'pointer',
-                  position: 'relative',
-                  background: '#fff',
-                  borderRadius: 16,
-                  boxShadow: '0 2px 12px #0001',
-                  padding: '18px 16px 18px 18px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  minHeight: 60
+                cliente={cliente}
+                onAbonar={() => {
+                  setPagoCliente(cliente);
+                  setShowPagoModal(true);
                 }}
-                onClick={e => {
-                  if ((e.target as HTMLElement).closest('.btn-abonar')) return;
-                  navigate(`/clientes/${cliente.id}`);
-                }}
-              >
-                <div style={{ flex: 1 }}>
-                  <div className="cliente-nombre" style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>{cliente.nombre}</div>
-                  <div style={{ color: '#444', fontSize: 15 }}>
-                    Saldo: <span style={{ fontWeight: 600, color: '#2d7b5f' }}>${cliente.saldo ?? 0}</span>
-                    {typeof cliente.atraso === 'number' && (
-                      <span style={{ marginLeft: 12 }}>| Atraso: <span style={{ color: '#b77b00', fontWeight: 600 }}>{cliente.atraso} días</span></span>
-                    )}
-                  </div>
-                </div>
-                <button
-                  className="btn-abonar"
-                  style={{
-                    background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: 8,
-                    fontWeight: 700,
-                    fontSize: 16,
-                    padding: '8px 22px',
-                    marginLeft: 12,
-                    boxShadow: '0 2px 8px #0001',
-                    cursor: 'pointer',
-                    transition: 'background 0.2s'
-                  }}
-                  onClick={e => {
-                    e.stopPropagation();
-                    setPagoCliente(cliente);
-                    setShowPagoModal(true);
-                  }}
-                >
-                  Abonar
-                </button>
-              </div>
+                onDetalle={() => navigate(`/clientes/${cliente.id}`)}
+              />
             ))
           )}
         </div>
       </main>
       {/* Place modals and other overlays here as needed */}
+    </div>
+  );
+}
+
+// --- Componente ClienteCardRealtime ---
+function ClienteCardRealtime({ cliente, onAbonar, onDetalle }: { cliente: Cliente, onAbonar: () => void, onDetalle: () => void }) {
+  const [saldo, setSaldo] = React.useState(cliente.saldo ?? 0);
+  const [atraso, setAtraso] = React.useState(cliente.atraso);
+
+  React.useEffect(() => {
+    let mounted = true;
+    async function fetchSaldo() {
+      try {
+        const res = await api.get<{ saldo?: number; atraso?: number }>(`/clientes/${cliente.id}/saldo`);
+        if (mounted && res.data) {
+          setSaldo(res.data.saldo ?? 0);
+          if (typeof res.data.atraso !== 'undefined') setAtraso(res.data.atraso);
+        }
+      } catch {}
+    }
+    fetchSaldo();
+    const interval = setInterval(fetchSaldo, 5000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, [cliente.id]);
+
+  return (
+    <div
+      className="cliente-card"
+      style={{
+        cursor: 'pointer',
+        position: 'relative',
+        background: '#fff',
+        borderRadius: 16,
+        boxShadow: '0 2px 12px #0001',
+        padding: '18px 16px 18px 18px',
+        display: 'flex',
+        alignItems: 'center',
+        minHeight: 60
+      }}
+      onClick={e => {
+        if ((e.target as HTMLElement).closest('.btn-abonar')) return;
+        onDetalle();
+      }}
+    >
+      <div style={{ flex: 1 }}>
+        <div className="cliente-nombre" style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>{cliente.nombre}</div>
+        <div style={{ color: '#444', fontSize: 15 }}>
+          Saldo: <span style={{ fontWeight: 600, color: '#2d7b5f' }}>${saldo}</span>
+          {typeof atraso === 'number' && (
+            <span style={{ marginLeft: 12 }}>| Atraso: <span style={{ color: '#b77b00', fontWeight: 600 }}>{atraso} días</span></span>
+          )}
+        </div>
+      </div>
+      <button
+        className="btn-abonar"
+        style={{
+          background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 8,
+          fontWeight: 700,
+          fontSize: 16,
+          padding: '8px 22px',
+          marginLeft: 12,
+          boxShadow: '0 2px 8px #0001',
+          cursor: 'pointer',
+          transition: 'background 0.2s'
+        }}
+        onClick={e => {
+          e.stopPropagation();
+          onAbonar();
+        }}
+      >
+        Abonar
+      </button>
     </div>
   );
 }
