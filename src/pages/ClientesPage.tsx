@@ -172,8 +172,6 @@ const ClientesPage: React.FC = () => {
             <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', fontSize: 26, color: '#4e7fa6', marginRight: 2, cursor: 'pointer' }}>
               <span>&#9776;</span>
             </button>
-            <img src="/logo192.png" alt="Logo" style={{ width: 36, height: 36, borderRadius: 8, marginRight: 6, boxShadow: '0 1px 4px #0001' }} />
-            <div style={{ fontWeight: 700, fontSize: 18, color: '#2d7b5f', letterSpacing: 0.2 }}>RYA COBRANZA<br /><span style={{ fontWeight: 400, fontSize: 13, color: '#888' }}>Gestión de créditos</span></div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span className="notif-icon" title="Notificaciones" style={{ fontSize: 22, color: '#FFD600', marginRight: 2 }}>🔔</span>
