@@ -194,9 +194,9 @@ const ClientesPage: React.FC = () => {
   }, []);
 
   // --- RETURN PRINCIPAL REESTRUCTURADO ---
+
   return (
-    <div style={{ padding: 32, maxWidth: 900, margin: '0 auto' }}>
-      {/* Sidebar y barra superior */}
+    <div className="app-layout">
       <SidebarMenu
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -210,94 +210,50 @@ const ClientesPage: React.FC = () => {
         clientes={clientes.map(c => ({ id: c.id, nombre: c.nombre }))}
         onClose={() => setShowOrdenarModal(false)}
         onSave={orden => {
-          // Guardar el orden en localStorage
           localStorage.setItem('orden_clientes', JSON.stringify(orden.map(o => o.id)));
           setClientes(prev => orden.map(o => prev.find(c => c.id === o.id) || { id: o.id, nombre: o.nombre }));
           setShowOrdenarModal(false);
         }}
       />
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1 }}>
-          <button
-            style={{ background: 'none', border: 'none', fontSize: 28, cursor: 'pointer', color: '#444', marginRight: 8 }}
-            title="Menú"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Abrir menú lateral"
-          >
-            <span style={{ fontWeight: 700 }}>&#9776;</span>
+      <main className="content">
+        <header className="header">
+          <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)}>
+            <span>&#9776;</span>
           </button>
           <input
             type="text"
             placeholder="Buscar cliente"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{
-              flex: 1,
-              padding: '12px 20px',
-              borderRadius: 10,
-              border: '1px solid #e0e0e0',
-              fontSize: 18,
-              background: '#fafbfc',
-              outline: 'none',
-              marginRight: 16
-            }}
+            className="search-input"
           />
-          <span style={{ fontSize: 22, color: '#f1b900', marginRight: 18 }} title="Notificaciones">🔔</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#fff', borderRadius: 20, padding: '6px 16px', boxShadow: '0 1px 4px #0001', fontWeight: 600, fontSize: 16 }}>
-            <span style={{ fontSize: 22, color: '#6c63ff' }}>👤</span>
+          <span className="notif-icon" title="Notificaciones">🔔</span>
+          <div className="user-badge">
+            <span className="user-icon">👤</span>
             Usuario
-            <span style={{ background: '#e74c3c', color: '#fff', borderRadius: '50%', fontSize: 13, width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 4 }}>1</span>
+            <span className="user-alert">1</span>
           </div>
+          <button className="btn-primary" onClick={() => setShowNuevoModal(true)}>
+            NUEVO
+          </button>
+        </header>
+        <h2 className="clientes-title">Clientes</h2>
+        <div className="tabs-row">
+          <button
+            className={tab === 'pendientes' ? 'tab-btn active' : 'tab-btn'}
+            onClick={() => setTab('pendientes')}
+          >
+            Pendientes
+          </button>
+          <button
+            className={tab === 'todos' ? 'tab-btn active' : 'tab-btn'}
+            onClick={() => setTab('todos')}
+          >
+            Todos
+          </button>
         </div>
-        <button style={{ background: '#219653', color: '#fff', border: 'none', borderRadius: 10, padding: '13px 36px', fontWeight: 600, fontSize: 19, cursor: 'pointer', boxShadow: '0 2px 12px #21965322', transition: 'background 0.2s, box-shadow 0.2s', marginLeft: 24 }}
-          onMouseOver={e => { e.currentTarget.style.background = '#176c3a'; e.currentTarget.style.boxShadow = '0 4px 16px #176c3a33'; }}
-          onMouseOut={e => { e.currentTarget.style.background = '#219653'; e.currentTarget.style.boxShadow = '0 2px 12px #21965322'; }}
-          onClick={() => setShowNuevoModal(true)}
-        >
-          NUEVO
-        </button>
-      </div>
-
-      {/* Título y tabs */}
-      <h2 style={{ margin: '0 0 12px 0', fontSize: 34, fontWeight: 700, letterSpacing: '-1px' }}>Clientes</h2>
-      <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
-        <button
-          onClick={() => setTab('pendientes')}
-          style={{
-            background: tab === 'pendientes' ? '#219653' : '#e9ecef',
-            color: tab === 'pendientes' ? '#fff' : '#888',
-            fontWeight: 700,
-            fontSize: 17,
-            border: 'none',
-            borderRadius: 8,
-            padding: '10px 32px',
-            boxShadow: tab === 'pendientes' ? '0 2px 8px #21965322' : 'none',
-            cursor: 'pointer',
-            outline: 'none',
-            transition: 'all 0.2s',
-          }}
-        >
-          Pendientes
-        </button>
-        <button
-          onClick={() => setTab('todos')}
-          style={{
-            background: tab === 'todos' ? '#219653' : '#e9ecef',
-            color: tab === 'todos' ? '#fff' : '#888',
-            fontWeight: 700,
-            fontSize: 17,
-            border: 'none',
-            borderRadius: 8,
-            padding: '10px 32px',
-            boxShadow: tab === 'todos' ? '0 2px 8px #21965322' : 'none',
-            cursor: 'pointer',
-            outline: 'none',
-            transition: 'all 0.2s',
-          }}
-        >
-          Todos
-        </button>
-      </div>
+        {/* ...resto del contenido... */}
+      </main>
 
       {/* Modal selector NUEVO */}
       {showNuevoModal && (
