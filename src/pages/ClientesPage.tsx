@@ -203,7 +203,21 @@ const ClientesPage: React.FC = () => {
             Todos
           </button>
         </div>
-        {/* Modals, client list, and other content go here (as previously structured) */}
+        {/* Lista de clientes */}
+        <div className="clientes-list">
+          {loading ? (
+            <div className="clientes-loading">Cargando clientes...</div>
+          ) : clientes.length === 0 ? (
+            <div className="clientes-vacio">No hay clientes para mostrar.</div>
+          ) : (
+            clientes.map(cliente => (
+              <div className="cliente-card" key={cliente.id}>
+                <div className="cliente-nombre">{cliente.nombre}</div>
+                {/* Puedes agregar más datos aquí si lo deseas */}
+              </div>
+            ))
+          )}
+        </div>
       </main>
       {/* Place modals and other overlays here as needed */}
     </div>
