@@ -608,13 +608,16 @@ const ClientesPage: React.FC = () => {
                             Nuevo crédito
                           </button>
                         )}
-                        <button style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', transition: 'background 0.2s' }}
-                          onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#d1e7dd'; }}
-                          onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#e9ecef'; }}
-                          onClick={ev => { ev.stopPropagation(); navigate(`/clientes/${cliente.id}`); }}
-                        >
-                          Ver
-                        </button>
+                        {/* Botón Ver solo en desktop, no en móvil */}
+                        {isMobile ? null : (
+                          <button style={{ background: '#e9ecef', color: '#444', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 600, fontSize: 17, cursor: 'pointer', transition: 'background 0.2s' }}
+                            onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = '#d1e7dd'; }}
+                            onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = '#e9ecef'; }}
+                            onClick={ev => { ev.stopPropagation(); navigate(`/clientes/${cliente.id}`); }}
+                          >
+                            Ver
+                          </button>
+                        )}
                       </div>
                     </div>
                   );
