@@ -189,22 +189,37 @@ const ClientesPage: React.FC = () => {
       </header>
       <main className="mobile-content">
         <h2 className="clientes-title">Clientes</h2>
-        <div className="tabs-row">
+        <div className="tabs-row" style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
           <button
             className={tab === 'pendientes' ? 'tab-btn active' : 'tab-btn'}
+            style={{ position: 'relative', fontWeight: 600, fontSize: 16, padding: '8px 20px', borderRadius: 8 }}
             onClick={() => setTab('pendientes')}
           >
             Pendientes
+            {clientes.length > 0 && (
+              <span style={{
+                background: '#FFD600',
+                color: '#222',
+                borderRadius: 12,
+                fontWeight: 700,
+                fontSize: 13,
+                padding: '2px 8px',
+                marginLeft: 8,
+                verticalAlign: 'middle',
+                boxShadow: '0 1px 4px #0001'
+              }}>{clientes.length}</span>
+            )}
           </button>
           <button
             className={tab === 'todos' ? 'tab-btn active' : 'tab-btn'}
+            style={{ fontWeight: 600, fontSize: 16, padding: '8px 20px', borderRadius: 8 }}
             onClick={() => setTab('todos')}
           >
             Todos
           </button>
         </div>
         {/* Lista de clientes */}
-        <div className="clientes-list">
+        <div className="clientes-list" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {loading ? (
             <div className="clientes-loading">Cargando clientes...</div>
           ) : clientes.length === 0 ? (
@@ -214,18 +229,46 @@ const ClientesPage: React.FC = () => {
               <div
                 className="cliente-card"
                 key={cliente.id}
-                style={{ cursor: 'pointer', position: 'relative' }}
+                style={{
+                  cursor: 'pointer',
+                  position: 'relative',
+                  background: '#fff',
+                  borderRadius: 16,
+                  boxShadow: '0 2px 12px #0001',
+                  padding: '18px 16px 18px 18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  minHeight: 60
+                }}
                 onClick={e => {
-                  // Evitar que el click en el botón abonar dispare el navigate
                   if ((e.target as HTMLElement).closest('.btn-abonar')) return;
                   navigate(`/clientes/${cliente.id}`);
                 }}
               >
-                <div className="cliente-nombre">{cliente.nombre}</div>
-                {/* Puedes agregar más datos aquí si lo deseas */}
+                <div style={{ flex: 1 }}>
+                  <div className="cliente-nombre" style={{ fontWeight: 700, fontSize: 17, marginBottom: 4 }}>{cliente.nombre}</div>
+                  <div style={{ color: '#444', fontSize: 15 }}>
+                    Saldo: <span style={{ fontWeight: 600, color: '#2d7b5f' }}>${cliente.saldo ?? 0}</span>
+                    {typeof cliente.atraso === 'number' && (
+                      <span style={{ marginLeft: 12 }}>| Atraso: <span style={{ color: '#b77b00', fontWeight: 600 }}>{cliente.atraso} días</span></span>
+                    )}
+                  </div>
+                </div>
                 <button
                   className="btn-abonar"
-                  style={{ position: 'absolute', right: 16, top: 16 }}
+                  style={{
+                    background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    fontWeight: 700,
+                    fontSize: 16,
+                    padding: '8px 22px',
+                    marginLeft: 12,
+                    boxShadow: '0 2px 8px #0001',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
                   onClick={e => {
                     e.stopPropagation();
                     setPagoCliente(cliente);
