@@ -304,54 +304,57 @@ const ClientesPage: React.FC = () => {
               </div>
               <div style={{ marginBottom: 12, position: 'relative' }}>
                 <label>Ubicación</label>
-                <input
-                  type="text"
-                  value={form.direccion}
-                  onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))}
-                  style={{ width: '100%', padding: '8px 32px 8px 8px', borderRadius: 8, border: '1px solid #ccc', boxSizing: 'border-box' }}
-                  placeholder="lat,lng"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!navigator.geolocation) return;
-                    setGpsLoading(true);
-                    navigator.geolocation.getCurrentPosition(
-                      pos => {
-                        const coords = `${pos.coords.latitude},${pos.coords.longitude}`;
-                        setForm(f => ({ ...f, direccion: coords }));
-                        setGpsLoading(false);
-                      },
-                      () => setGpsLoading(false),
-                      { enableHighAccuracy: true, timeout: 10000 }
-                    );
-                  }}
-                  disabled={gpsLoading}
-                  style={{
-                    position: 'absolute',
-                    right: 14,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    padding: 0,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: 28,
-                    width: 28,
-                    opacity: gpsLoading ? 0.5 : 1,
-                    zIndex: 2
-                  }}
-                  title="Autocompletar ubicación con GPS"
-                >
-                  {/* Ícono de ubicación tipo pin/mapa */}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" fill="#2d7b5f"/>
-                    <circle cx="12" cy="9" r="2.5" fill="#e6f4ef"/>
-                  </svg>
-                </button>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    value={form.direccion}
+                    onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))}
+                    style={{ width: '100%', padding: '8px 38px 8px 8px', borderRadius: 8, border: '1px solid #ccc', boxSizing: 'border-box' }}
+                    placeholder="lat,lng"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!navigator.geolocation) return;
+                      setGpsLoading(true);
+                      navigator.geolocation.getCurrentPosition(
+                        pos => {
+                          const coords = `${pos.coords.latitude},${pos.coords.longitude}`;
+                          setForm(f => ({ ...f, direccion: coords }));
+                          setGpsLoading(false);
+                        },
+                        () => setGpsLoading(false),
+                        { enableHighAccuracy: true, timeout: 10000 }
+                      );
+                    }}
+                    disabled={gpsLoading}
+                    style={{
+                      position: 'absolute',
+                      right: 10,
+                      top: 0,
+                      bottom: 0,
+                      margin: 'auto',
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: 24,
+                      width: 24,
+                      opacity: gpsLoading ? 0.5 : 1,
+                      zIndex: 2
+                    }}
+                    title="Autocompletar ubicación con GPS"
+                  >
+                    {/* Ícono de ubicación tipo pin/mapa */}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" fill="#2d7b5f"/>
+                      <circle cx="12" cy="9" r="2.5" fill="#e6f4ef"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div style={{ marginBottom: 12 }}>
                 <label>Negocio</label>
