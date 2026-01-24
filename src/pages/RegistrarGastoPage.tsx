@@ -74,7 +74,7 @@ const RegistrarGastoPage: React.FC = () => {
 
   const [monto, setMonto] = useState('');
   const [descripcion, setDescripcion] = useState('');
-  const [fecha, setFecha] = useState(() => new Date().toISOString().slice(0, 10));
+  // Eliminar campo de fecha editable, siempre se usará la fecha actual
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [gastos, setGastos] = useState<Gasto[]>([]);
@@ -107,7 +107,7 @@ const RegistrarGastoPage: React.FC = () => {
       const payload: GastoCreate = {
         monto: Number(monto),
         descripcion,
-        fecha,
+        fecha: new Date().toISOString().slice(0, 10),
       };
       await api.post('/gastos/', payload);
       setSuccess(true);
@@ -134,10 +134,7 @@ const RegistrarGastoPage: React.FC = () => {
             <label style={labelStyle}>Descripción</label>
             <input type="text" value={descripcion} onChange={e => setDescripcion(e.target.value)} style={inputStyle} />
           </div>
-          <div style={{ marginBottom: 18 }}>
-            <label style={labelStyle}>Fecha</label>
-            <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} style={inputStyle} />
-          </div>
+          {/* El campo de fecha ha sido eliminado, la fecha se asigna automáticamente */}
           {error && <div style={errorStyle}>{error}</div>}
           {success && <div style={successStyle}>¡Gasto registrado!</div>}
           <button type="submit" style={buttonStyle}
