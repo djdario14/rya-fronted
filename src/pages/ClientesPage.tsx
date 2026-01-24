@@ -344,9 +344,55 @@ const ClientesPage: React.FC = () => {
                 <label>Negocio</label>
                 <input type="text" value={form.negocio} onChange={e => setForm(f => ({ ...f, negocio: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
               </div>
-              <div style={{ marginBottom: 18 }}>
+              {/* Campo Teléfono con código de país funcional */}
+              <div>
                 <label>Teléfono</label>
-                <input type="text" value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <select
+                    value={countryCode}
+                    onChange={e => {
+                      const newCode = e.target.value;
+                      // Al cambiar el código, mantener solo el número sin el código anterior
+                      const numero = form.telefono?.replace(countryCode, '') || '';
+                      setCountryCode(newCode);
+                      setForm(f => ({ ...f, telefono: newCode + numero }));
+                    }}
+                    style={{
+                      width: 80,
+                      padding: '8px 4px',
+                      borderRadius: 8,
+                      border: '1px solid #ccc',
+                      fontWeight: 700,
+                      color: '#4e7fa6',
+                      background: '#f6f8fa',
+                      fontSize: 15
+                    }}
+                    title="Seleccionar código de país"
+                  >
+                    {countryCodes.map(c => (
+                      <option key={c.code} value={c.code}>{c.code} {c.iso}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    value={form.telefono?.replace(countryCode, '') || ''}
+                    onChange={e => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      setForm(f => ({ ...f, telefono: countryCode + value }));
+                    }}
+                    style={{
+                      flex: 1,
+                      padding: '8px',
+                      borderRadius: 8,
+                      border: '1px solid #ccc',
+                      minWidth: 0
+                    }}
+                    placeholder="Número"
+                    maxLength={15}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                  />
+                </div>
               </div>
               {error && <div style={{ color: '#e53935', marginBottom: 10 }}>{error}</div>}
               <button type="submit" disabled={saving} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>
