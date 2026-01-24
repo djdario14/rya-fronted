@@ -329,7 +329,7 @@ const ClientesPage: React.FC = () => {
                   disabled={gpsLoading}
                   style={{
                     position: 'absolute',
-                    right: 10,
+                    right: 14,
                     top: '50%',
                     transform: 'translateY(-50%)',
                     background: 'none',
@@ -339,16 +339,17 @@ const ClientesPage: React.FC = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    height: 24,
-                    width: 24,
-                    opacity: gpsLoading ? 0.5 : 1
+                    height: 28,
+                    width: 28,
+                    opacity: gpsLoading ? 0.5 : 1,
+                    zIndex: 2
                   }}
                   title="Autocompletar ubicación con GPS"
                 >
-                  {/* Ícono de ubicación SVG */}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="4" stroke="#2d7b5f" strokeWidth="2" fill="#e6f4ef" />
-                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="#2d7b5f" strokeWidth="2" strokeLinecap="round" />
+                  {/* Ícono de ubicación tipo pin/mapa */}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z" fill="#2d7b5f"/>
+                    <circle cx="12" cy="9" r="2.5" fill="#e6f4ef"/>
                   </svg>
                 </button>
               </div>
