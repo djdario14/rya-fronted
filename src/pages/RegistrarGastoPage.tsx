@@ -81,6 +81,10 @@ const RegistrarGastoPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchGastosSemana = async () => {
+      // Cargar gastos de la semana al montar la página
+      useEffect(() => {
+        fetchGastosSemana();
+      }, []);
     setLoading(true);
     try {
       const res = await api.get<Gasto[]>('/gastos/semana');
