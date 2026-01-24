@@ -244,7 +244,7 @@ const ClientesPage: React.FC = () => {
   async function fetchClientes() {
     setLoading(true);
     try {
-      const res = await api.get('/clientes/');
+      const res = await api.get('/clientes/con-saldo');
       setClientes(res.data as Cliente[]);
     } catch (err) {
       setError('No se pudo cargar la lista de clientes');
