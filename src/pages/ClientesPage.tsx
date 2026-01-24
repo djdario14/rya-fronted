@@ -197,6 +197,8 @@ const ClientesPage: React.FC = () => {
   const [tab, setTab] = useState<'pendientes' | 'todos'>('pendientes');
   const [search, setSearch] = useState('');
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  // Nuevo: clientes con último pago
+  const [clientesUltimoPago, setClientesUltimoPago] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showNuevoModal, setShowNuevoModal] = useState(false);
@@ -348,10 +350,22 @@ const ClientesPage: React.FC = () => {
   const [showPagoSuccess, setShowPagoSuccess] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
 
-  // Cargar clientes al montar el componente
+
+  // Cargar clientes con último pago al montar el componente
   useEffect(() => {
-    fetchClientes();
+    fetchClientesUltimoPago();
   }, []);
+
+  async function fetchClientesUltimoPago() {
+    setLoading(true);
+    try {
+      const res = await api.get('/clientes/con-ultimo-pago');
+      setClientesUltimoPago(res.data);
+    } catch (err) {
+      setError('No se pudo cargar la lista de clientes');
+    }
+    setLoading(false);
+  }
 
   // Detectar país por IP y setear código de país
   useEffect(() => {
@@ -706,10 +720,13 @@ const ClientesPage: React.FC = () => {
         <div className="clientes-list" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {loading ? (
             <div className="clientes-loading">Cargando clientes...</div>
-          ) : clientes.length === 0 ? (
+          ) : clientesUltimoPago.length === 0 ? (
             <div className="clientes-vacio">No hay clientes para mostrar.</div>
           ) : (
-            clientes.map(cliente => (
+            (tab === 'pendientes'
+              ? clientesUltimoPago.filter(c => c.ultimo_pago !== new Date().toISOString().slice(0, 10))
+              : clientesUltimoPago
+            ).map(cliente => (
               <ClienteCardRealtime
                 key={cliente.id}
                 cliente={cliente}
