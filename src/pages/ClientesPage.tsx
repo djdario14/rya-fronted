@@ -3,6 +3,15 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
   const [monto, setMonto] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
+  React.useEffect(() => {
+    if (open && cliente && cliente.cuota) {
+      setMonto(cliente.cuota.toString());
+    } else if (open && cliente && cliente.valor_cuota) {
+      setMonto(cliente.valor_cuota.toString());
+    } else if (open && cliente) {
+      setMonto('');
+    }
+  }, [open, cliente]);
   if (!open || !cliente) return null;
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -26,7 +35,16 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
         }}>
           <div style={{ marginBottom: 14 }}>
             <label>Monto</label>
-            <input type="number" min={0} step="0.01" required value={monto} onChange={e => setMonto(e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+            <input
+              type="number"
+              min={0}
+              step="0.01"
+              required
+              value={monto}
+              onChange={e => setMonto(e.target.value)}
+              onFocus={e => setMonto('')}
+              style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }}
+            />
           </div>
           {error && <div style={{ color: '#e53935', marginBottom: 10 }}>{error}</div>}
           <button type="submit" disabled={loading} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>
@@ -74,6 +92,7 @@ type Cliente = {
   saldo?: number;
   atraso?: number;
   cuota?: number;
+  valor_cuota?: number;
   cedula?: string;
   direccion?: string;
   negocio?: string;
