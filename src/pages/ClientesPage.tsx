@@ -579,8 +579,7 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle }: { cliente: Client
       }
     }
     fetchSaldo();
-    const interval = setInterval(fetchSaldo, 5000);
-    return () => { mounted = false; clearInterval(interval); };
+    return () => { mounted = false; };
   }, [cliente.id]);
 
   return (
