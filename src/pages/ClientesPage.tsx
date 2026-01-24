@@ -546,23 +546,7 @@ const ClientesPage: React.FC = () => {
             ))
           )}
         </div>
-        <h3 style={{ marginTop: 32 }}>Lista de clientes</h3>
-        {loading ? (
-          <div>Cargando...</div>
-        ) : clientes.length === 0 ? (
-          <div>No hay clientes.</div>
-        ) : (
-          <ul style={{ padding: 0, listStyle: 'none' }}>
-            {clientes.map(cliente => (
-              <li key={cliente.id} style={{ marginBottom: 12, background: '#f6f8fa', borderRadius: 8, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontWeight: 600 }}>{cliente.nombre}</span>
-                <span style={{ color: '#2d7b5f', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                  {typeof cliente.saldo === 'number' ? `$${Number(cliente.saldo).toFixed(2)}` : 'Sin saldo'}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        {/* Se eliminó la lista de clientes con 'Sin saldo' */}
       </main>
       {/* Place modals and other overlays here as needed */}
     </div>
