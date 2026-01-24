@@ -302,8 +302,39 @@ const ClientesPage: React.FC = () => {
                 <label>Cédula</label>
                 <input type="text" value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
               </div>
-              <div style={{ marginBottom: 12 }}>
-                <label>Ubicación</label>
+              <div style={{ marginBottom: 12, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  Ubicación
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 15,
+                      padding: '2px 10px',
+                      borderRadius: 6,
+                      border: '1px solid #4e7fa6',
+                      background: '#f6f8fa',
+                      color: '#4e7fa6',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      marginLeft: 6
+                    }}
+                    title="Usar ubicación actual"
+                    onClick={() => {
+                      if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                          pos => {
+                            const coords = `${pos.coords.latitude},${pos.coords.longitude}`;
+                            setForm(f => ({ ...f, direccion: coords }));
+                          },
+                          () => {},
+                          { enableHighAccuracy: true, timeout: 10000 }
+                        );
+                      }
+                    }}
+                  >
+                    📍
+                  </button>
+                </label>
                 <input type="text" value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} placeholder="lat,lng" />
               </div>
               <div style={{ marginBottom: 12 }}>
@@ -312,7 +343,34 @@ const ClientesPage: React.FC = () => {
               </div>
               <div style={{ marginBottom: 18 }}>
                 <label>Teléfono</label>
-                <input type="text" value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <select
+                    value={countryCode}
+                    onChange={e => setCountryCode(e.target.value)}
+                    style={{
+                      padding: '8px 6px',
+                      borderRadius: 8,
+                      border: '1px solid #ccc',
+                      background: '#f6f8fa',
+                      fontWeight: 600,
+                      minWidth: 70
+                    }}
+                  >
+                    {countryCodes.map(c => (
+                      <option key={c.code} value={c.code}>{c.code} {c.iso}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    value={form.telefono?.replace(countryCode, '') || ''}
+                    onChange={e => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      setForm(f => ({ ...f, telefono: countryCode + value }));
+                    }}
+                    style={{ flex: 1, padding: 8, borderRadius: 8, border: '1px solid #ccc' }}
+                    placeholder="Número"
+                  />
+                </div>
               </div>
               {error && <div style={{ color: '#e53935', marginBottom: 10 }}>{error}</div>}
               <button type="submit" disabled={saving} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>
