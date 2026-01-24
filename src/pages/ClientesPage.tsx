@@ -565,8 +565,8 @@ const ClientesPage: React.FC = () => {
 
 // --- Componente ClienteCardRealtime ---
 function ClienteCardRealtime({ cliente, onAbonar, onDetalle }: { cliente: Cliente, onAbonar: () => void, onDetalle: () => void }) {
-  const [saldo, setSaldo] = React.useState(cliente.saldo ?? 0);
-  const [atraso, setAtraso] = React.useState(cliente.atraso);
+  const [saldo, setSaldo] = React.useState<number | null>(null);
+  const [atraso, setAtraso] = React.useState<number | undefined>(cliente.atraso);
 
   React.useEffect(() => {
     let mounted = true;
@@ -577,7 +577,9 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle }: { cliente: Client
           setSaldo(res.data.saldo ?? 0);
           if (typeof res.data.atraso !== 'undefined') setAtraso(res.data.atraso);
         }
-      } catch {}
+      } catch {
+        setSaldo(null); // Si falla, mostrar "Cargando..."
+      }
     }
     fetchSaldo();
     const interval = setInterval(fetchSaldo, 5000);
@@ -606,7 +608,7 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle }: { cliente: Client
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
           <span style={{ fontWeight: 700, color: '#2d7b5f', fontSize: 20, background: '#e6f4ef', borderRadius: 8, padding: '2px 12px' }}>
-            ${saldo.toFixed(2)}
+            {saldo === null ? 'Cargando...' : `$${saldo.toFixed(2)}`}
           </span>
           <span style={{ color: '#888', fontSize: 14, fontWeight: 500 }}>Saldo</span>
         </div>
