@@ -210,22 +210,7 @@ const ClientesPage: React.FC = () => {
     fetchCountryCode();
   }, []);
 
-  // Cuando se abre el modal, pedir ubicación GPS y autocompletar dirección
-  useEffect(() => {
-    if (showModal) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          pos => {
-            const coords = `${pos.coords.latitude},${pos.coords.longitude}`;
-            setForm(f => ({ ...f, direccion: coords }));
-          },
-          () => {},
-          { enableHighAccuracy: true, timeout: 10000 }
-        );
-      }
-    }
-    // eslint-disable-next-line
-  }, [showModal]);
+  // Ya no se autocompleta al abrir el modal, solo con el botón
 
   useEffect(() => {
     // Cargar fuente Inter de Google Fonts
@@ -317,9 +302,54 @@ const ClientesPage: React.FC = () => {
                 <label>Cédula</label>
                 <input type="text" value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
               </div>
-              <div style={{ marginBottom: 12 }}>
+              <div style={{ marginBottom: 12, position: 'relative' }}>
                 <label>Ubicación</label>
-                <input type="text" value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} placeholder="lat,lng" />
+                <input
+                  type="text"
+                  value={form.direccion}
+                  onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))}
+                  style={{ width: '100%', padding: '8px 38px 8px 8px', borderRadius: 8, border: '1px solid #ccc' }}
+                  placeholder="lat,lng"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!navigator.geolocation) return;
+                    setGpsLoading(true);
+                    navigator.geolocation.getCurrentPosition(
+                      pos => {
+                        const coords = `${pos.coords.latitude},${pos.coords.longitude}`;
+                        setForm(f => ({ ...f, direccion: coords }));
+                        setGpsLoading(false);
+                      },
+                      () => setGpsLoading(false),
+                      { enableHighAccuracy: true, timeout: 10000 }
+                    );
+                  }}
+                  disabled={gpsLoading}
+                  style={{
+                    position: 'absolute',
+                    right: 8,
+                    top: 32,
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: 24,
+                    width: 24,
+                    opacity: gpsLoading ? 0.5 : 1
+                  }}
+                  title="Autocompletar ubicación con GPS"
+                >
+                  {/* Ícono de ubicación SVG */}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="4" stroke="#2d7b5f" strokeWidth="2" fill="#e6f4ef" />
+                    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="#2d7b5f" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </button>
               </div>
               <div style={{ marginBottom: 12 }}>
                 <label>Negocio</label>
