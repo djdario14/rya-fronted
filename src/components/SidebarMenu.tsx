@@ -92,6 +92,9 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ open, onClose, onEnrutarClien
         <button onClick={() => { onClose(); navigate('/reportes'); }} style={menuBtnStyle}>
           <span style={{ fontSize: 22 }}>📊</span> Reportes
         </button>
+        <button onClick={() => { onClose(); navigate('/registrar-gasto'); }} style={menuBtnStyle}>
+          <span style={{ fontSize: 22 }}>💸</span> Registrar gasto
+        </button>
         <button onClick={() => { onClose(); navigate('/gps'); }} style={menuBtnStyle}>
           <span style={{ fontSize: 22 }}>🗺️</span> Rutas / GPS
         </button>
