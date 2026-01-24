@@ -724,7 +724,7 @@ const ClientesPage: React.FC = () => {
             <div className="clientes-vacio">No hay clientes para mostrar.</div>
           ) : (
             (tab === 'pendientes'
-              ? clientesUltimoPago.filter(c => c.ultimo_pago !== new Date().toISOString().slice(0, 10))
+              ? clientesUltimoPago.filter(c => !c.pago_hoy)
               : clientesUltimoPago
             ).map(cliente => (
               <ClienteCardRealtime
