@@ -62,7 +62,115 @@ const ClientesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showNuevoModal, setShowNuevoModal] = useState(false);
+  const [showNuevoSelector, setShowNuevoSelector] = useState(false);
   const [showPrestamoSelector, setShowPrestamoSelector] = useState(false);
+  const [clienteParaPrestamo, setClienteParaPrestamo] = useState<Cliente | null>(null);
+  // --- Formulario de préstamo ---
+  const formaPagoOpciones = [
+    { label: 'Diario', value: 'diario', cuotas: 30 },
+    { label: 'Semanal', value: 'semanal', cuotas: 4 },
+    { label: 'Quincenal', value: 'quincenal', cuotas: 2 },
+    { label: 'Mensual', value: 'mensual', cuotas: 1 },
+  ];
+
+  function PrestamoFormModal({ cliente, onClose }: { cliente: Cliente, onClose: () => void }) {
+    const [valor, setValor] = React.useState(0);
+    const [interes, setInteres] = React.useState(20);
+    const [formaPago, setFormaPago] = React.useState(formaPagoOpciones[0].value);
+    const [numCuotas, setNumCuotas] = React.useState(formaPagoOpciones[0].cuotas);
+    const [fecha, setFecha] = React.useState(() => {
+      const d = new Date();
+      return d.toISOString().slice(0, 10);
+    });
+    const [saving, setSaving] = React.useState(false);
+    const [error, setError] = React.useState('');
+    const [success, setSuccess] = React.useState(false);
+
+    React.useEffect(() => {
+      const found = formaPagoOpciones.find(f => f.value === formaPago);
+      if (found) setNumCuotas(found.cuotas);
+    }, [formaPago]);
+
+    const totalPagar = valor + (valor * interes / 100);
+    const valorCuota = numCuotas > 0 ? totalPagar / numCuotas : 0;
+
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setSaving(true);
+      setError('');
+      try {
+        await api.post('/prestamos/', {
+          cliente_id: cliente.id,
+          monto: valor,
+          fecha,
+          estado: 'activo',
+          interes,
+          total: totalPagar,
+          cuotas: numCuotas,
+          valor_cuota: valorCuota,
+          forma_pago: formaPagoOpciones.find(f => f.value === formaPago)?.label || '',
+        });
+        setSuccess(true);
+        setTimeout(() => {
+          setSuccess(false);
+          onClose();
+        }, 1200);
+      } catch (err: any) {
+        setError('No se pudo registrar el préstamo');
+      }
+      setSaving(false);
+    };
+
+    return (
+      <div style={{
+        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', zIndex: 2200,
+        display: 'flex', alignItems: 'center', justifyContent: 'center'
+      }}>
+        <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 28, minWidth: 320, width: 340, position: 'relative' }}>
+          <button onClick={onClose} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
+          <h3 style={{ marginTop: 0, marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Crear préstamo para {cliente.nombre}</h3>
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: 12 }}>
+              <label>Valor del préstamo</label>
+              <input type="number" min={0} required value={valor} onChange={e => setValor(Number(e.target.value))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>Intereses (%)</label>
+              <input type="number" min={0} required value={interes} onChange={e => setInteres(Number(e.target.value))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>Forma de Pago</label>
+              <select value={formaPago} onChange={e => setFormaPago(e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }}>
+                {formaPagoOpciones.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label} ({opt.cuotas} cuotas)</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>Número de cuotas</label>
+              <input type="number" min={1} required value={numCuotas} readOnly style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc', background: '#f6f8fa' }} />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>Valor de cuota</label>
+              <input type="number" value={valorCuota.toFixed(2)} readOnly style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc', background: '#f6f8fa', fontWeight: 700 }} />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>Fecha</label>
+              <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+            </div>
+            <div style={{ marginBottom: 18, fontWeight: 700, fontSize: 16, color: '#2d7b5f' }}>
+              Total a pagar: ${totalPagar.toFixed(2)}
+            </div>
+            {error && <div style={{ color: '#e53935', marginBottom: 10 }}>{error}</div>}
+            {success && <div style={{ color: '#2d7b5f', marginBottom: 10, fontWeight: 700 }}>¡Préstamo registrado!</div>}
+            <button type="submit" disabled={saving} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>
+              {saving ? 'Guardando...' : 'Guardar'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
   const [prestamoCliente, setPrestamoCliente] = useState<Cliente | null>(null);
   const [form, setForm] = useState<Cliente>({
     id: -1,
@@ -148,7 +256,22 @@ const ClientesPage: React.FC = () => {
 
   return (
     <div className="mobile-page">
-      {/* Modal para alta de nuevo cliente */}
+      {/* Modales globales */}
+      {showNuevoSelector && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', zIndex: 2100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 28, minWidth: 280, width: 300, position: 'relative' }}>
+            <button onClick={() => setShowNuevoSelector(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
+            <h3 style={{ marginTop: 0, marginBottom: 18, fontWeight: 700, fontSize: 20 }}>¿Qué deseas registrar?</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <button onClick={() => { setShowNuevoSelector(false); setShowNuevoModal(true); }} style={{ padding: '12px 0', borderRadius: 8, border: '1px solid #4e7fa6', background: '#f6f8fa', color: '#4e7fa6', fontWeight: 700, fontSize: 16, cursor: 'pointer' }}>Cliente</button>
+              <button onClick={() => { setShowNuevoSelector(false); setShowPrestamoSelector(true); }} style={{ padding: '12px 0', borderRadius: 8, border: '1px solid #5fa37a', background: '#f6f8fa', color: '#5fa37a', fontWeight: 700, fontSize: 16, cursor: 'pointer' }}>Préstamo</button>
+            </div>
+          </div>
+        </div>
+      )}
       {showNuevoModal && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', zIndex: 2000,
@@ -198,6 +321,29 @@ const ClientesPage: React.FC = () => {
             </form>
           </div>
         </div>
+      )}
+      {showPrestamoSelector && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', zIndex: 2100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 28, minWidth: 280, width: 320, position: 'relative', maxHeight: 420, overflowY: 'auto' }}>
+            <button onClick={() => setShowPrestamoSelector(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
+            <h3 style={{ marginTop: 0, marginBottom: 18, fontWeight: 700, fontSize: 20 }}>Selecciona un cliente</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {clientes.filter(c => (c.saldo ?? 0) === 0).length === 0 ? (
+                <div style={{ color: '#888', textAlign: 'center' }}>No hay clientes con saldo 0</div>
+              ) : (
+                clientes.filter(c => (c.saldo ?? 0) === 0).map(c => (
+                  <button key={c.id} onClick={() => { setShowPrestamoSelector(false); setClienteParaPrestamo(c); }} style={{ padding: '10px 0', borderRadius: 8, border: '1px solid #4e7fa6', background: '#f6f8fa', color: '#4e7fa6', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}>{c.nombre}</button>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {clienteParaPrestamo && (
+        <PrestamoFormModal cliente={clienteParaPrestamo} onClose={() => setClienteParaPrestamo(null)} />
       )}
       <SidebarMenu
         open={sidebarOpen}
@@ -257,7 +403,7 @@ const ClientesPage: React.FC = () => {
               alignItems: 'center',
               gap: 8
             }}
-            onClick={() => setShowNuevoModal(true)}
+            onClick={() => setShowNuevoSelector(true)}
           >
             NUEVO <span style={{ fontSize: 18, marginLeft: 2 }}>+</span>
           </button>
