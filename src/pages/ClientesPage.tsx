@@ -577,7 +577,8 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle }: { cliente: Client
           setSaldo(res.data.saldo ?? 0);
           if (typeof res.data.atraso !== 'undefined') setAtraso(res.data.atraso);
         }
-      } catch {
+      } catch (err) {
+        console.error('Error al obtener saldo:', err);
         setSaldo(null); // Si falla, mostrar "Cargando..."
       }
     }
