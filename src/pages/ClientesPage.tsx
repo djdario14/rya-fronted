@@ -1,3 +1,4 @@
+  const [showConfirm, setShowConfirm] = React.useState(false);
 // --- Modal para registrar pago ---
 type PrestamoActivo = {
   id: number;
@@ -114,24 +115,46 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
             {loading ? 'Guardando...' : (noPago ? 'Registrar motivo' : 'Registrar pago')}
           </button>
           <button type="button" disabled={loading || !prestamoId || saldoPendiente === null || saldoPendiente <= 0} style={{ width: '100%', background: 'linear-gradient(90deg, #ff9800 0%, #e53935 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: saldoPendiente && saldoPendiente > 0 ? 'pointer' : 'not-allowed', marginTop: 2, boxShadow: '0 2px 8px #e5393533' }}
-            onClick={async () => {
-              if (!prestamoId || saldoPendiente === null || saldoPendiente <= 0) return;
-              const ok = window.confirm(`¿Seguro que deseas cancelar la deuda total de $${saldoPendiente.toFixed(2)}?`);
-              if (!ok) return;
-              setLoading(true);
-              setError('');
-              try {
-                await api.post(`/pagos/`, { prestamo_id: prestamoId, monto: saldoPendiente, fecha: new Date().toISOString().slice(0, 10) });
-                setMonto('');
-                onSuccess();
-                onClose();
-              } catch (err) {
-                setError('No se pudo cancelar la deuda');
-              }
-              setLoading(false);
-            }}>
+            onClick={() => setShowConfirm(true)}>
             Cancelar deuda total {saldoPendiente !== null && saldoPendiente > 0 ? `($${saldoPendiente.toFixed(2)})` : ''}
           </button>
+
+          {/* Modal de confirmación personalizado */}
+          {showConfirm && (
+            <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', zIndex: 4000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 28, minWidth: 300, width: 340, position: 'relative', textAlign: 'center' }}>
+                <button onClick={() => setShowConfirm(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
+                <h3 style={{ marginTop: 0, marginBottom: 18, fontWeight: 700, fontSize: 20, color: '#e53935' }}>Confirmar cancelación</h3>
+                <div style={{ marginBottom: 18, fontSize: 17 }}>
+                  ¿Seguro que deseas cancelar la deuda total de <span style={{ color: '#e53935', fontWeight: 700 }}>${saldoPendiente?.toFixed(2)}</span>?
+                </div>
+                <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+                  <button onClick={() => setShowConfirm(false)} style={{ flex: 1, background: '#f6f8fa', color: '#444', border: '1px solid #ccc', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>Cancelar</button>
+                  <button
+                    onClick={async () => {
+                      if (!prestamoId || saldoPendiente === null || saldoPendiente <= 0) return;
+                      setLoading(true);
+                      setError('');
+                      try {
+                        await api.post(`/pagos/`, { prestamo_id: prestamoId, monto: saldoPendiente, fecha: new Date().toISOString().slice(0, 10) });
+                        setMonto('');
+                        setShowConfirm(false);
+                        onSuccess();
+                        onClose();
+                      } catch (err) {
+                        setError('No se pudo cancelar la deuda');
+                        setShowConfirm(false);
+                      }
+                      setLoading(false);
+                    }}
+                    style={{ flex: 1, background: 'linear-gradient(90deg, #ff9800 0%, #e53935 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}
+                  >
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </div>
