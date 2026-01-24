@@ -302,21 +302,32 @@ const ClientesPage: React.FC = () => {
                 <label>Cédula</label>
                 <input type="text" value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
               </div>
-              <div style={{ marginBottom: 12, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  Ubicación
+              <div style={{ marginBottom: 12 }}>
+                <label>Ubicación</label>
+                <div style={{ position: 'relative', width: '100%' }}>
+                  <input
+                    type="text"
+                    value={form.direccion}
+                    onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))}
+                    style={{ width: '100%', padding: '8px 36px 8px 8px', borderRadius: 8, border: '1px solid #ccc' }}
+                    placeholder="lat,lng"
+                  />
                   <button
                     type="button"
                     style={{
-                      fontSize: 15,
-                      padding: '2px 10px',
+                      position: 'absolute',
+                      right: 6,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      fontSize: 18,
+                      padding: '2px 8px',
                       borderRadius: 6,
-                      border: '1px solid #4e7fa6',
-                      background: '#f6f8fa',
-                      color: '#4e7fa6',
-                      fontWeight: 600,
+                      border: 'none',
+                      background: '#e6f4ef',
+                      color: '#2d7b5f',
+                      fontWeight: 700,
                       cursor: 'pointer',
-                      marginLeft: 6
+                      boxShadow: '0 1px 4px #0001'
                     }}
                     title="Usar ubicación actual"
                     onClick={() => {
@@ -334,8 +345,7 @@ const ClientesPage: React.FC = () => {
                   >
                     📍
                   </button>
-                </label>
-                <input type="text" value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} placeholder="lat,lng" />
+                </div>
               </div>
               <div style={{ marginBottom: 12 }}>
                 <label>Negocio</label>
@@ -343,33 +353,54 @@ const ClientesPage: React.FC = () => {
               </div>
               <div style={{ marginBottom: 18 }}>
                 <label>Teléfono</label>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <select
-                    value={countryCode}
-                    onChange={e => setCountryCode(e.target.value)}
-                    style={{
-                      padding: '8px 6px',
-                      borderRadius: 8,
-                      border: '1px solid #ccc',
-                      background: '#f6f8fa',
-                      fontWeight: 600,
-                      minWidth: 70
-                    }}
-                  >
-                    {countryCodes.map(c => (
-                      <option key={c.code} value={c.code}>{c.code} {c.iso}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    value={form.telefono?.replace(countryCode, '') || ''}
-                    onChange={e => {
-                      const value = e.target.value.replace(/\D/g, '');
-                      setForm(f => ({ ...f, telefono: countryCode + value }));
-                    }}
-                    style={{ flex: 1, padding: 8, borderRadius: 8, border: '1px solid #ccc' }}
-                    placeholder="Número"
-                  />
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <span style={{
+                      position: 'absolute',
+                      left: 10,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      fontWeight: 700,
+                      color: '#4e7fa6',
+                      fontSize: 16,
+                      letterSpacing: 1
+                    }}>{countryCode}</span>
+                    <select
+                      value={countryCode}
+                      onChange={e => setCountryCode(e.target.value)}
+                      style={{
+                        opacity: 0,
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        width: 60,
+                        height: '100%',
+                        cursor: 'pointer',
+                        zIndex: 2
+                      }}
+                      title="Seleccionar código de país"
+                    >
+                      {countryCodes.map(c => (
+                        <option key={c.code} value={c.code}>{c.code} {c.iso}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      value={form.telefono?.replace(countryCode, '') || ''}
+                      onChange={e => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        setForm(f => ({ ...f, telefono: countryCode + value }));
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: '8px 8px 8px 54px',
+                        borderRadius: 8,
+                        border: '1px solid #ccc',
+                        minWidth: 0
+                      }}
+                      placeholder="Número"
+                    />
+                  </div>
                 </div>
               </div>
               {error && <div style={{ color: '#e53935', marginBottom: 10 }}>{error}</div>}
