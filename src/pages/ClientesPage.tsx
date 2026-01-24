@@ -298,8 +298,10 @@ const ClientesPage: React.FC = () => {
               setSaving(true);
               setError('');
               try {
-                await api.post('/clientes/', form);
+                const res = await api.post('/clientes/', form);
+                setNuevoCliente(res.data); // Guarda el cliente recién creado
                 setShowNuevoModal(false);
+                setShowSuccessModal(true);
                 setForm({ id: -1, nombre: '', cedula: '', direccion: '', negocio: '', telefono: '', saldo: 0, prestamo: 0, cuotasPagadas: 0, cuotasTotal: 0, atraso: 0 });
                 fetchClientes();
               } catch (err: any) {
@@ -401,6 +403,16 @@ const ClientesPage: React.FC = () => {
             </form>
           </div>
         </div>
+      )}
+      {showSuccessModal && nuevoCliente && (
+        <SuccessModal
+          message="¡Cliente añadido exitosamente!"
+          onClose={() => {
+            setShowSuccessModal(false);
+            setClienteParaPrestamo(nuevoCliente); // Abre el formulario de préstamo
+            setNuevoCliente(null);
+          }}
+        />
       )}
       {showPrestamoSelector && (
         <div style={{
