@@ -308,7 +308,7 @@ const ClientesPage: React.FC = () => {
                   type="text"
                   value={form.direccion}
                   onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))}
-                  style={{ width: '100%', padding: '8px 38px 8px 8px', borderRadius: 8, border: '1px solid #ccc' }}
+                  style={{ width: '100%', padding: '8px 32px 8px 8px', borderRadius: 8, border: '1px solid #ccc', boxSizing: 'border-box' }}
                   placeholder="lat,lng"
                 />
                 <button
@@ -329,8 +329,9 @@ const ClientesPage: React.FC = () => {
                   disabled={gpsLoading}
                   style={{
                     position: 'absolute',
-                    right: 8,
-                    top: 32,
+                    right: 10,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
                     background: 'none',
                     border: 'none',
                     padding: 0,
@@ -345,7 +346,7 @@ const ClientesPage: React.FC = () => {
                   title="Autocompletar ubicación con GPS"
                 >
                   {/* Ícono de ubicación SVG */}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="4" stroke="#2d7b5f" strokeWidth="2" fill="#e6f4ef" />
                     <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="#2d7b5f" strokeWidth="2" strokeLinecap="round" />
                   </svg>
