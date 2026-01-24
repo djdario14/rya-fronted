@@ -320,27 +320,6 @@ const ClientesPage: React.FC = () => {
               <div style={{ marginBottom: 12 }}>
                 <label>Ubicación</label>
                 <input type="text" value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} placeholder="lat,lng" />
-                <button
-                  type="button"
-                  onClick={handleGetLocation}
-                  disabled={gpsLoading}
-                  style={{
-                    marginTop: 8,
-                    width: '100%',
-                    background: '#e6f4ef',
-                    color: '#2d7b5f',
-                    border: 'none',
-                    borderRadius: 8,
-                    fontWeight: 700,
-                    fontSize: 15,
-                    padding: '8px 0',
-                    cursor: 'pointer',
-                    boxShadow: '0 1px 4px #0001',
-                    display: 'block'
-                  }}
-                >
-                  {gpsLoading ? 'Obteniendo ubicación...' : 'Autocompletar ubicación con GPS'}
-                </button>
               </div>
               <div style={{ marginBottom: 12 }}>
                 <label>Negocio</label>
