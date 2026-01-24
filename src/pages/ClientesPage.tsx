@@ -27,6 +27,7 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
     'Clavo',
   ];
   const [prestamoId, setPrestamoId] = React.useState<number | null>(null);
+  const [saldoPendiente, setSaldoPendiente] = React.useState<number | null>(null);
   React.useEffect(() => {
     if (open && cliente) {
       api.get<PrestamoActivo | {}>(`/prestamos/activo/${cliente.id}`)
@@ -35,12 +36,20 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
           if (data && typeof data.valor_cuota !== 'undefined') {
             setMonto(data.valor_cuota.toString());
             setPrestamoId(data.id);
+            // Calcular saldo pendiente
+            if (typeof data.total === 'number' && typeof data.monto === 'number') {
+              // Si el backend ya calcula saldo, puedes usarlo aquí. Si no, usa total - pagos
+              api.get<{ saldo: number }>(`/clientes/${cliente.id}/saldo`).then(r => setSaldoPendiente(r.data.saldo)).catch(() => setSaldoPendiente(null));
+            } else {
+              setSaldoPendiente(null);
+            }
           } else {
             setMonto('');
             setPrestamoId(null);
+            setSaldoPendiente(null);
           }
         })
-        .catch(() => { setMonto(''); setPrestamoId(null); });
+        .catch(() => { setMonto(''); setPrestamoId(null); setSaldoPendiente(null); });
       setNoPago(false);
       setMotivo('');
     }
@@ -101,8 +110,27 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
             </div>
           )}
           {error && <div style={{ color: '#e53935', marginBottom: 10 }}>{error}</div>}
-          <button type="submit" disabled={loading || (noPago && !motivo)} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>
+          <button type="submit" disabled={loading || (noPago && !motivo)} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer', marginBottom: 8 }}>
             {loading ? 'Guardando...' : (noPago ? 'Registrar motivo' : 'Registrar pago')}
+          </button>
+          <button type="button" disabled={loading || !prestamoId || saldoPendiente === null || saldoPendiente <= 0} style={{ width: '100%', background: '#e53935', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: saldoPendiente && saldoPendiente > 0 ? 'pointer' : 'not-allowed', marginTop: 2 }}
+            onClick={async () => {
+              if (!prestamoId || saldoPendiente === null || saldoPendiente <= 0) return;
+              const ok = window.confirm(`¿Seguro que deseas cancelar la deuda total de $${saldoPendiente.toFixed(2)}?`);
+              if (!ok) return;
+              setLoading(true);
+              setError('');
+              try {
+                await api.post(`/pagos/`, { prestamo_id: prestamoId, monto: saldoPendiente, fecha: new Date().toISOString().slice(0, 10) });
+                setMonto('');
+                onSuccess();
+                onClose();
+              } catch (err) {
+                setError('No se pudo cancelar la deuda');
+              }
+              setLoading(false);
+            }}>
+            Cancelar deuda total {saldoPendiente !== null && saldoPendiente > 0 ? `($${saldoPendiente.toFixed(2)})` : ''}
           </button>
         </form>
       </div>
