@@ -16,6 +16,17 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
   const [monto, setMonto] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
+  const [noPago, setNoPago] = React.useState(false);
+  const [motivo, setMotivo] = React.useState('');
+  const motivos = [
+    'No esta',
+    'No tiene',
+    'Dejo de trabajar',
+    'Semanal',
+    'Paga mañana',
+    'Clavo',
+  ];
+  const [prestamoId, setPrestamoId] = React.useState<number | null>(null);
   React.useEffect(() => {
     if (open && cliente) {
       api.get<PrestamoActivo | {}>(`/prestamos/activo/${cliente.id}`)
@@ -23,11 +34,15 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
           const data = res.data as PrestamoActivo;
           if (data && typeof data.valor_cuota !== 'undefined') {
             setMonto(data.valor_cuota.toString());
+            setPrestamoId(data.id);
           } else {
             setMonto('');
+            setPrestamoId(null);
           }
         })
-        .catch(() => setMonto(''));
+        .catch(() => { setMonto(''); setPrestamoId(null); });
+      setNoPago(false);
+      setMotivo('');
     }
   }, [open, cliente]);
   if (!open || !cliente) return null;
@@ -42,7 +57,12 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
           setLoading(true);
           setError('');
           try {
-            await api.post(`/pagos/`, { cliente_id: cliente.id, monto: parseFloat(monto) });
+            if (!prestamoId) throw new Error('No se encontró préstamo activo');
+            if (noPago) {
+              await api.post(`/pagos/`, { prestamo_id: prestamoId, monto: 0, motivo_no_pago: motivo, fecha: new Date().toISOString().slice(0, 10) });
+            } else {
+              await api.post(`/pagos/`, { prestamo_id: prestamoId, monto: parseFloat(monto), fecha: new Date().toISOString().slice(0, 10) });
+            }
             setMonto('');
             onSuccess();
             onClose();
@@ -57,16 +77,32 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
               type="number"
               min={0}
               step="0.01"
-              required
+              required={!noPago}
+              disabled={noPago}
               value={monto}
               onChange={e => setMonto(e.target.value)}
               onFocus={e => setMonto('')}
-              style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }}
+              style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc', background: noPago ? '#f5f5f5' : undefined }}
             />
           </div>
+          <div style={{ marginBottom: 14 }}>
+            <label>
+              <input type="checkbox" checked={noPago} onChange={e => setNoPago(e.target.checked)} style={{ marginRight: 8 }} />
+              No pagó
+            </label>
+          </div>
+          {noPago && (
+            <div style={{ marginBottom: 14 }}>
+              <label>Motivo</label>
+              <select value={motivo} onChange={e => setMotivo(e.target.value)} required style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }}>
+                <option value="">Selecciona un motivo</option>
+                {motivos.map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </div>
+          )}
           {error && <div style={{ color: '#e53935', marginBottom: 10 }}>{error}</div>}
-          <button type="submit" disabled={loading} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>
-            {loading ? 'Guardando...' : 'Registrar pago'}
+          <button type="submit" disabled={loading || (noPago && !motivo)} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>
+            {loading ? 'Guardando...' : (noPago ? 'Registrar motivo' : 'Registrar pago')}
           </button>
         </form>
       </div>
