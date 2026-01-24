@@ -411,7 +411,7 @@ const ClientesPage: React.FC = () => {
                 </div>
               </div>
               {error && <div style={{ color: '#e53935', marginBottom: 10 }}>{error}</div>}
-              <button type="submit" disabled={saving} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>
+              <button type="submit" disabled={saving} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer', marginTop: 14 }}>
                 {saving ? 'Guardando...' : 'Registrar'}
               </button>
             </form>
