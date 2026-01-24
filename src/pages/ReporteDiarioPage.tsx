@@ -1,5 +1,5 @@
 import React from 'react';
-import './mobile-layout.css';
+import '../styles/mobile-layout.css';
 
 const metrics = [
   { title: 'Cobrado hoy', value: '$0', type: 'success' },
