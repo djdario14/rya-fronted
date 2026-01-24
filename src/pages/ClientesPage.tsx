@@ -211,7 +211,7 @@ const ClientesPage: React.FC = () => {
   ];
 
   function PrestamoFormModal({ cliente, onClose }: { cliente: Cliente, onClose: () => void }) {
-    const [valor, setValor] = React.useState(0);
+    const [valor, setValor] = React.useState<number | null>(0);
     const [interes, setInteres] = React.useState(20);
     const [formaPago, setFormaPago] = React.useState(formaPagoOpciones[0].value);
     const [numCuotas, setNumCuotas] = React.useState(formaPagoOpciones[0].cuotas);
@@ -228,14 +228,15 @@ const ClientesPage: React.FC = () => {
       if (found) setNumCuotas(found.cuotas);
     }, [formaPago]);
 
-    const totalPagar = valor + (valor * interes / 100);
-    const valorCuota = numCuotas > 0 ? totalPagar / numCuotas : 0;
+    const totalPagar = valor ? valor + (valor * interes / 100) : 0;
+    const valorCuota = valor && numCuotas > 0 ? totalPagar / numCuotas : 0;
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       setSaving(true);
       setError('');
       try {
+        if (valor === null || isNaN(valor)) throw new Error('El valor del préstamo es obligatorio');
         await api.post('/prestamos/', {
           cliente_id: cliente.id,
           monto: valor,
@@ -273,10 +274,14 @@ const ClientesPage: React.FC = () => {
                 type="number"
                 min={0}
                 required
-                value={valor}
-                onChange={e => setValor(Number(e.target.value))}
+                value={valor === null ? '' : valor}
+                onChange={e => {
+                  const v = e.target.value;
+                  if (v === '') setValor(null);
+                  else setValor(Number(v));
+                }}
                 onFocus={e => {
-                  if (valor === 0) setValor("");
+                  if (valor === 0) setValor(null);
                 }}
                 style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }}
               />
