@@ -1,15 +1,33 @@
 // --- Modal para registrar pago ---
+type PrestamoActivo = {
+  id: number;
+  cliente_id: number;
+  monto: number;
+  fecha: string;
+  estado: string;
+  interes: number;
+  total: number;
+  cuotas: number;
+  valor_cuota: number;
+  forma_pago: string;
+};
+
 function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, cliente: Cliente | null, onClose: () => void, onSuccess: () => void }) {
   const [monto, setMonto] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
   React.useEffect(() => {
-    if (open && cliente && cliente.cuota) {
-      setMonto(cliente.cuota.toString());
-    } else if (open && cliente && cliente.valor_cuota) {
-      setMonto(cliente.valor_cuota.toString());
-    } else if (open && cliente) {
-      setMonto('');
+    if (open && cliente) {
+      api.get<PrestamoActivo | {}>(`/prestamos/activo/${cliente.id}`)
+        .then(res => {
+          const data = res.data as PrestamoActivo;
+          if (data && typeof data.valor_cuota !== 'undefined') {
+            setMonto(data.valor_cuota.toString());
+          } else {
+            setMonto('');
+          }
+        })
+        .catch(() => setMonto(''));
     }
   }, [open, cliente]);
   if (!open || !cliente) return null;
