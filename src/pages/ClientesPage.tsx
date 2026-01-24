@@ -148,6 +148,57 @@ const ClientesPage: React.FC = () => {
 
   return (
     <div className="mobile-page">
+      {/* Modal para alta de nuevo cliente */}
+      {showNuevoModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', zIndex: 2000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 28, minWidth: 320, width: 340, position: 'relative' }}>
+            <button onClick={() => setShowNuevoModal(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
+            <h3 style={{ marginTop: 0, marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Registrar nuevo cliente</h3>
+            <form onSubmit={async e => {
+              e.preventDefault();
+              setSaving(true);
+              setError('');
+              try {
+                await api.post('/clientes/', form);
+                setShowNuevoModal(false);
+                setForm({ id: -1, nombre: '', cedula: '', direccion: '', negocio: '', telefono: '', saldo: 0, prestamo: 0, cuotasPagadas: 0, cuotasTotal: 0, atraso: 0 });
+                fetchClientes();
+              } catch (err: any) {
+                setError('No se pudo registrar el cliente');
+              }
+              setSaving(false);
+            }}>
+              <div style={{ marginBottom: 12 }}>
+                <label>Nombre</label>
+                <input type="text" required value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label>Cédula</label>
+                <input type="text" value={form.cedula} onChange={e => setForm(f => ({ ...f, cedula: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label>Ubicación</label>
+                <input type="text" value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} placeholder="lat,lng" />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label>Negocio</label>
+                <input type="text" value={form.negocio} onChange={e => setForm(f => ({ ...f, negocio: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+              </div>
+              <div style={{ marginBottom: 18 }}>
+                <label>Teléfono</label>
+                <input type="text" value={form.telefono} onChange={e => setForm(f => ({ ...f, telefono: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+              </div>
+              {error && <div style={{ color: '#e53935', marginBottom: 10 }}>{error}</div>}
+              <button type="submit" disabled={saving} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>
+                {saving ? 'Guardando...' : 'Registrar'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
       <SidebarMenu
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
