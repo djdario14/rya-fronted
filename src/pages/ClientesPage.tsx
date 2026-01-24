@@ -269,7 +269,17 @@ const ClientesPage: React.FC = () => {
           <form onSubmit={handleSubmit}>
             <div style={{ marginBottom: 12 }}>
               <label>Valor del préstamo</label>
-              <input type="number" min={0} required value={valor} onChange={e => setValor(Number(e.target.value))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+              <input
+                type="number"
+                min={0}
+                required
+                value={valor}
+                onChange={e => setValor(Number(e.target.value))}
+                onFocus={e => {
+                  if (valor === 0) setValor("");
+                }}
+                style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }}
+              />
             </div>
             <div style={{ marginBottom: 12 }}>
               <label>Intereses (%)</label>
