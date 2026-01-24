@@ -1,3 +1,12 @@
+import React, { useState, useEffect } from 'react';
+import api from '../api/client';
+import SidebarMenu from '../components/SidebarMenu';
+import OrdenarClientesModal from '../components/OrdenarClientesModal';
+import Select from 'react-select';
+import { useNavigate } from 'react-router-dom';
+import SuccessModal from '../components/SuccessModal';
+import CreditoModal from '../components/CreditoModal';
+
 // --- Modal para registrar pago ---
 type PrestamoActivo = {
   id: number;
@@ -19,7 +28,7 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
   const [noPago, setNoPago] = React.useState(false);
   const [motivo, setMotivo] = React.useState('');
   const motivos = [
-    'No esta',
+// Removed erroneous line
     'No tiene',
     'Dejo de trabajar',
     'Semanal',
@@ -137,14 +146,6 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
     </div>
   );
 }
-import React, { useState, useEffect } from 'react';
-import api from '../api/client';
-import SidebarMenu from '../components/SidebarMenu';
-import OrdenarClientesModal from '../components/OrdenarClientesModal';
-import Select from 'react-select';
-import { useNavigate } from 'react-router-dom';
-import SuccessModal from '../components/SuccessModal';
-import CreditoModal from '../components/CreditoModal';
 
 const motivosNoPago = [
   'No tiene',
