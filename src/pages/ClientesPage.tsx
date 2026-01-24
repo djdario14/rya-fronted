@@ -351,21 +351,11 @@ const ClientesPage: React.FC = () => {
   const [gpsLoading, setGpsLoading] = useState(false);
 
 
-  // Cargar clientes con último pago al montar el componente
-  useEffect(() => {
-    fetchClientesUltimoPago();
-  }, []);
 
-  async function fetchClientesUltimoPago() {
-    setLoading(true);
-    try {
-      const res = await api.get('/clientes/con-ultimo-pago');
-      setClientesUltimoPago(res.data);
-    } catch (err) {
-      setError('No se pudo cargar la lista de clientes');
-    }
-    setLoading(false);
-  }
+  // Cargar todos los clientes al montar el componente
+  useEffect(() => {
+    fetchClientes();
+  }, []);
 
   // Detectar país por IP y setear código de país
   useEffect(() => {
@@ -720,13 +710,10 @@ const ClientesPage: React.FC = () => {
         <div className="clientes-list" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {loading ? (
             <div className="clientes-loading">Cargando clientes...</div>
-          ) : clientesUltimoPago.length === 0 ? (
+          ) : clientes.length === 0 ? (
             <div className="clientes-vacio">No hay clientes para mostrar.</div>
           ) : (
-            (tab === 'pendientes'
-              ? clientesUltimoPago.filter(c => !c.pago_hoy)
-              : clientesUltimoPago
-            ).map(cliente => (
+            clientes.map(cliente => (
               <ClienteCardRealtime
                 key={cliente.id}
                 cliente={cliente}
