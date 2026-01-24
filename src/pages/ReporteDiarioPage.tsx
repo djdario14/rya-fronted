@@ -21,7 +21,7 @@ const ReporteDiarioPage: React.FC = () => {
     <div className="report-page">
       <header className="report-header">
         <button className="icon-btn" aria-label="Menú">☰</button>
-        <h1>Reporte Diario</h1>
+        <h1 className="report-title">Reporte Diario</h1>
         <div className="avatar" />
       </header>
       <div className="report-date">
