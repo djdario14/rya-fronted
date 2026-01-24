@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/client';
 import { Gasto, GastoCreate } from '../../../packages/types/gasto';
 
@@ -71,7 +72,7 @@ const gastosCardStyle: React.CSSProperties = {
 };
 
 const RegistrarGastoPage: React.FC = () => {
-
+  const navigate = useNavigate();
   const [monto, setMonto] = useState('');
   const [descripcion, setDescripcion] = useState('');
   // Eliminar campo de fecha editable, siempre se usará la fecha actual
@@ -81,10 +82,6 @@ const RegistrarGastoPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchGastosSemana = async () => {
-      // Cargar gastos de la semana al montar la página
-      useEffect(() => {
-        fetchGastosSemana();
-      }, []);
     setLoading(true);
     try {
       const res = await api.get<Gasto[]>('/gastos/semana');
@@ -95,6 +92,10 @@ const RegistrarGastoPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchGastosSemana();
+  }, []);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -127,6 +128,28 @@ const RegistrarGastoPage: React.FC = () => {
   };
   return (
     <div style={{ minHeight: '100vh', background: '#f7f8fa', padding: '32px 0' }}>
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          background: '#2e7d5a',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 10,
+          fontWeight: 700,
+          fontSize: 16,
+          padding: '7px 22px',
+          marginBottom: 18,
+          marginLeft: 'calc((100% - 440px) / 2)',
+          width: 120,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px #2e7d5a22',
+        }}
+      >
+        <span style={{ fontSize: 20 }}>←</span> Volver
+      </button>
       <div style={cardStyle}>
         <h2 style={sectionTitleStyle}>Registrar Gasto</h2>
         <form onSubmit={handleSubmit}>
