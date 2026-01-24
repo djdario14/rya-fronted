@@ -113,7 +113,7 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
           <button type="submit" disabled={loading || (noPago && !motivo)} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer', marginBottom: 8 }}>
             {loading ? 'Guardando...' : (noPago ? 'Registrar motivo' : 'Registrar pago')}
           </button>
-          <button type="button" disabled={loading || !prestamoId || saldoPendiente === null || saldoPendiente <= 0} style={{ width: '100%', background: '#e53935', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: saldoPendiente && saldoPendiente > 0 ? 'pointer' : 'not-allowed', marginTop: 2 }}
+          <button type="button" disabled={loading || !prestamoId || saldoPendiente === null || saldoPendiente <= 0} style={{ width: '100%', background: 'linear-gradient(90deg, #ff9800 0%, #e53935 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: saldoPendiente && saldoPendiente > 0 ? 'pointer' : 'not-allowed', marginTop: 2, boxShadow: '0 2px 8px #e5393533' }}
             onClick={async () => {
               if (!prestamoId || saldoPendiente === null || saldoPendiente <= 0) return;
               const ok = window.confirm(`¿Seguro que deseas cancelar la deuda total de $${saldoPendiente.toFixed(2)}?`);
