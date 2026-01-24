@@ -1,3 +1,42 @@
+// --- Modal para registrar pago ---
+function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, cliente: Cliente | null, onClose: () => void, onSuccess: () => void }) {
+  const [monto, setMonto] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
+  if (!open || !cliente) return null;
+  return (
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 28, minWidth: 320, width: 340, position: 'relative' }}>
+        <button onClick={onClose} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
+        <h3 style={{ marginTop: 0, marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Registrar pago</h3>
+        <div style={{ marginBottom: 10, fontWeight: 600 }}>{cliente.nombre}</div>
+        <form onSubmit={async e => {
+          e.preventDefault();
+          setLoading(true);
+          setError('');
+          try {
+            await api.post(`/pagos/`, { cliente_id: cliente.id, monto: parseFloat(monto) });
+            setMonto('');
+            onSuccess();
+            onClose();
+          } catch (err) {
+            setError('No se pudo registrar el pago');
+          }
+          setLoading(false);
+        }}>
+          <div style={{ marginBottom: 14 }}>
+            <label>Monto</label>
+            <input type="number" min={0} step="0.01" required value={monto} onChange={e => setMonto(e.target.value)} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+          </div>
+          {error && <div style={{ color: '#e53935', marginBottom: 10 }}>{error}</div>}
+          <button type="submit" disabled={loading} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>
+            {loading ? 'Guardando...' : 'Registrar pago'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
 import React, { useState, useEffect } from 'react';
 import api from '../api/client';
 import SidebarMenu from '../components/SidebarMenu';
@@ -568,7 +607,13 @@ const ClientesPage: React.FC = () => {
         </div>
         {/* Se eliminó la lista de clientes con 'Sin saldo' */}
       </main>
-      {/* Place modals and other overlays here as needed */}
+      {/* Modal para registrar pago */}
+      <PagoModal
+        open={showPagoModal}
+        cliente={pagoCliente}
+        onClose={() => setShowPagoModal(false)}
+        onSuccess={fetchClientes}
+      />
     </div>
   );
 }
