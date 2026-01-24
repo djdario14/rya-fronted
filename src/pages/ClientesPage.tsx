@@ -713,17 +713,28 @@ const ClientesPage: React.FC = () => {
           ) : clientes.length === 0 ? (
             <div className="clientes-vacio">No hay clientes para mostrar.</div>
           ) : (
-            clientes.map(cliente => (
-              <ClienteCardRealtime
-                key={cliente.id}
-                cliente={cliente}
-                onAbonar={() => {
-                  setPagoCliente(cliente);
-                  setShowPagoModal(true);
-                }}
-                onDetalle={() => navigate(`/clientes/${cliente.id}`)}
-              />
-            ))
+            clientes
+              .filter(cliente => {
+                const q = search.trim().toLowerCase();
+                if (!q) return true;
+                return (
+                  cliente.nombre?.toLowerCase().includes(q) ||
+                  cliente.cedula?.toLowerCase().includes(q) ||
+                  cliente.negocio?.toLowerCase().includes(q) ||
+                  cliente.telefono?.toLowerCase().includes(q)
+                );
+              })
+              .map(cliente => (
+                <ClienteCardRealtime
+                  key={cliente.id}
+                  cliente={cliente}
+                  onAbonar={() => {
+                    setPagoCliente(cliente);
+                    setShowPagoModal(true);
+                  }}
+                  onDetalle={() => navigate(`/clientes/${cliente.id}`)}
+                />
+              ))
           )}
         </div>
         {/* Se eliminó la lista de clientes con 'Sin saldo' */}
