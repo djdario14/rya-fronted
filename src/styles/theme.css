@@ -1,0 +1,17 @@
+:root {
+    --color-bg: #F5F7FA;
+    --color-card: #FFFFFF;
+    --color-green: #22C55E;
+    --color-blue: #2563EB;
+    --color-text-main: #111827;
+    --color-text-secondary: #6B7280;
+    --color-border: #E5E7EB;
+    --color-outline: #F9FAFB;
+    --font-main: 'Inter', 'SF Pro', 'Roboto', sans-serif;
+}
+
+body {
+    background: var(--color-bg);
+    font-family: var(--font-main);
+    color: var(--color-text-main);
+}
