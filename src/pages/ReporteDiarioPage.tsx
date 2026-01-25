@@ -71,6 +71,136 @@ const ReporteDiarioPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+
+      {/* Modal de pagos del día */}
+      {showPagosModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.18)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000
+        }}
+          onClick={() => setShowPagosModal(false)}
+        >
+          <div style={{
+            background: '#fff',
+            borderRadius: 16,
+            boxShadow: '0 8px 32px #0004',
+            padding: 32,
+            minWidth: 320,
+            maxWidth: 400,
+            width: '90%',
+            position: 'relative',
+            cursor: 'auto'
+          }}
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 700, fontSize: 22, color: '#22C55E' }}>Pagos registrados hoy</h3>
+            {pagosHoy.length === 0 ? (
+              <div style={{ color: '#888', fontSize: 16 }}>No hay pagos registrados hoy.</div>
+            ) : (
+              <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
+                {pagosHoy.map((p, i) => (
+                  <li key={i} style={{ marginBottom: 10, fontSize: 17, color: '#222', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>{p.cliente}</span>
+                    <span style={{ fontWeight: 600 }}>${p.monto}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button
+              style={{
+                marginTop: 18,
+                background: '#22C55E',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 10,
+                padding: '10px 32px',
+                fontWeight: 600,
+                fontSize: 16,
+                cursor: 'pointer',
+                boxShadow: '0 2px 12px #22C55E22',
+                transition: 'background 0.2s, box-shadow 0.2s'
+              }}
+              onClick={() => setShowPagosModal(false)}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de préstamos del día */}
+      {showPrestamosModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.18)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000
+        }}
+          onClick={() => setShowPrestamosModal(false)}
+        >
+          <div style={{
+            background: '#fff',
+            borderRadius: 16,
+            boxShadow: '0 8px 32px #0004',
+            padding: 32,
+            minWidth: 320,
+            maxWidth: 400,
+            width: '90%',
+            position: 'relative',
+            cursor: 'auto'
+          }}
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 700, fontSize: 22, color: '#3B82F6' }}>Préstamos registrados hoy</h3>
+            {prestamosHoy.length === 0 ? (
+              <div style={{ color: '#888', fontSize: 16 }}>No hay préstamos registrados hoy.</div>
+            ) : (
+              <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
+                {prestamosHoy.map((p, i) => (
+                  <li key={i} style={{ marginBottom: 10, fontSize: 17, color: '#222', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>{p.cliente || p.nombre || 'Cliente'}</span>
+                    <span style={{ fontWeight: 600 }}>${p.monto ?? p.valor ?? 0}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button
+              style={{
+                marginTop: 18,
+                background: '#3B82F6',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 10,
+                padding: '10px 32px',
+                fontWeight: 600,
+                fontSize: 16,
+                cursor: 'pointer',
+                boxShadow: '0 2px 12px #3B82F622',
+                transition: 'background 0.2s, box-shadow 0.2s'
+              }}
+              onClick={() => setShowPrestamosModal(false)}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Barra de navegación inferior (opcional) */}
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--color-card)', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-around', alignItems: 'center', height: 60, boxShadow: '0 -2px 12px #0001' }}>
         <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)' }}>
