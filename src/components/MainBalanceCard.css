@@ -1,26 +1,79 @@
-.main-balance-card {
-    background: var(--color-card, #fff);
+.main-balance-card.modern-balance-card {
+    position: relative;
+    background: #fff;
     border-radius: 18px;
     box-shadow: 0 4px 24px #0001;
-    padding: 20px;
-    margin: 16px 0;
-    text-align: center;
+    padding: 28px 32px 0 32px;
+    margin: 16px 0 24px 0;
+    min-height: 120px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
-.mb-label {
-    font-size: 13px;
-    color: var(--color-text-secondary, #6B7280);
+.mbc-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
 }
 
-.mb-amount {
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--color-text-main, #111827);
-    margin: 8px 0;
-}
-
-.mb-today {
-    font-size: 15px;
-    color: var(--color-green, #22C55E);
+.mbc-label {
+    font-size: 18px;
+    color: #222;
     font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.mbc-amount {
+    font-size: 44px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 8px;
+}
+
+.mbc-today {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    color: #22C55E;
+    font-weight: 600;
+    background: #eafaf2;
+    border-radius: 12px;
+    padding: 2px 12px 2px 8px;
+    margin-bottom: 8px;
+    margin-top: 2px;
+    gap: 4px;
+}
+
+.mbc-today-icon {
+    font-size: 20px;
+    color: #22C55E;
+    font-weight: 700;
+}
+
+.mbc-today-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #22C55E;
+}
+
+.mbc-today-text {
+    font-size: 15px;
+    color: #22C55E;
+    font-weight: 500;
+}
+
+.mbc-bg {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 70px;
+    pointer-events: none;
+    z-index: 1;
 }
