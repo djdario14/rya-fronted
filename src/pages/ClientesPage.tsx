@@ -85,8 +85,20 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
             setMonto('');
             onSuccess();
             onClose();
-          } catch (err) {
-            setError('No se pudo registrar el pago');
+          } catch (err: any) {
+            // Si el error viene de una API de traducción, forzar el mensaje original
+            let mensaje = 'No se pudo registrar el pago';
+            if (err && err.response && err.response.data) {
+              // Si el backend devuelve un mensaje, usarlo solo si está en español y no contiene "registrador"
+              const data = err.response.data;
+              if (typeof data === 'string' && data.includes('No se pudo registrar')) {
+                mensaje = data;
+              } else if (typeof data === 'object' && data.sourceText && Array.isArray(data.sourceText)) {
+                // Si es una respuesta de traducción, usar el sourceText
+                mensaje = data.sourceText[0] || mensaje;
+              }
+            }
+            setError(mensaje);
           }
           setLoading(false);
         }}>
