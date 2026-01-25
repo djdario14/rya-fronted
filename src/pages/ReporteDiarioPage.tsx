@@ -96,7 +96,7 @@ const ReporteDiarioPage: React.FC = () => {
               <div className="progress">
                 <span style={{ width: `${abonoPercent}%` }} />
               </div>
-              <div style={{ fontSize: 13, color: "#888", marginTop: 2, textAlign: "right" }}>{abonoPercent}%</div>
+              <div className="progress-label">{abonoPercent}%</div>
             </div>
             <div className="resumen-card negativo">
               <div className="card-header">
