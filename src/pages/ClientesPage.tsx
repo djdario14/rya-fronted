@@ -637,8 +637,8 @@ const ClientesPage: React.FC = () => {
       <header style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '0 0 10px 0', marginBottom: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 12px 0 12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', fontSize: 26, color: '#4e7fa6', marginRight: 2, cursor: 'pointer', padding: 0 }}>
-              <RyaMenuIcon size={40} />
+            <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', fontSize: 26, color: '#4e7fa6', marginRight: 2, cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', height: 44 }}>
+              <RyaMenuIcon size={32} />
             </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
