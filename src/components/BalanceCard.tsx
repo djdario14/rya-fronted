@@ -1,28 +1,38 @@
 import React from "react";
 import "./BalanceCard.css";
 
-export default function BalanceCard({ balance, loan, installments, delayDays }: {
+export default function BalanceCard({ balance, loan, installments, delayDays, date }: {
   balance: string;
   loan: string;
   installments: string;
   delayDays: string;
+  date?: string;
 }) {
   return (
-    <div className="balance-card">
-      <div className="balance-label">Saldo pendiente</div>
-      <div className="balance-amount">{balance}</div>
-      <div className="balance-metrics">
-        <div>
-          <span className="metric-label">Préstamo</span>
-          <div className="metric-value">{loan}</div>
+    <div className="balance-card modern-balance-info-card">
+      <div className="bc-row bc-row-top">
+        <div className="bc-col bc-col-left">
+          <div className="bc-label">SALDO PENDIENTE:</div>
+          <div className="bc-balance">{balance}</div>
         </div>
-        <div>
-          <span className="metric-label">Cuotas</span>
-          <div className="metric-value">{installments}</div>
+        <div className="bc-col bc-col-right">
+          <div className="bc-label bc-label-right">PRESTAMO REGISTRADO:</div>
+          <div className="bc-date">{date}</div>
         </div>
-        <div>
-          <span className="metric-label">Atraso</span>
-          <div className="metric-value delay">{delayDays}</div>
+      </div>
+      <div className="bc-divider" />
+      <div className="bc-row bc-row-bottom">
+        <div className="bc-metric">
+          <div className="bc-metric-label">Préstamo</div>
+          <div className="bc-metric-value">{loan}</div>
+        </div>
+        <div className="bc-metric">
+          <div className="bc-metric-label">Cuotas</div>
+          <div className="bc-metric-value">{installments}</div>
+        </div>
+        <div className="bc-metric">
+          <div className="bc-metric-label">Atraso</div>
+          <div className="bc-metric-value bc-delay">{delayDays}</div>
         </div>
       </div>
     </div>
