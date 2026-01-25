@@ -2,9 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/mobile-layout.css';
 import api from '../api/client';
+import PagosHoyModal from '../components/PagosHoyModal';
 
-const MetricCard = ({ title, value, type }: { title: string; value: string; type?: string }) => (
-  <div className={`metric-card${type ? ' ' + type : ''}`}>
+
+const MetricCard = ({ title, value, type, onClick }: { title: string; value: string; type?: string; onClick?: () => void }) => (
+  <div className={`metric-card${type ? ' ' + type : ''}`} onClick={onClick} style={onClick ? { cursor: 'pointer' } : {}}>
     <span>{title}</span>
     <strong>{value}</strong>
   </div>
@@ -13,7 +15,8 @@ const MetricCard = ({ title, value, type }: { title: string; value: string; type
 
 const ReporteDiarioPage: React.FC = () => {
   const [cobradoHoy, setCobradoHoy] = useState<string>('$0');
-  // Puedes agregar más estados para otras métricas si lo necesitas
+  const [showPagosModal, setShowPagosModal] = useState(false);
+  const [pagosHoy, setPagosHoy] = useState<{ cliente: string; monto: number }[]>([]);
 
   useEffect(() => {
     api.get<{ total: number }>('/pagos/suma-hoy')
@@ -23,8 +26,19 @@ const ReporteDiarioPage: React.FC = () => {
       .catch(() => setCobradoHoy('$0'));
   }, []);
 
+  const handleCobradoHoyClick = async () => {
+    try {
+      const res = await api.get<{ cliente: string; monto: number }[]>('/pagos/hoy-detalle');
+      setPagosHoy(res.data);
+      setShowPagosModal(true);
+    } catch {
+      setPagosHoy([]);
+      setShowPagosModal(true);
+    }
+  };
+
   const metrics = [
-    { title: 'Cobrado hoy', value: cobradoHoy, type: 'success' },
+    { title: 'Cobrado hoy', value: cobradoHoy, type: 'success', onClick: handleCobradoHoyClick },
     { title: 'Prestado hoy', value: '$0', type: 'info' },
     { title: 'Clientes con abono', value: '0 de 3 (0%)', type: '' },
     { title: 'Total por cobrar', value: '$11', type: '' },
@@ -47,9 +61,10 @@ const ReporteDiarioPage: React.FC = () => {
       </section>
       <section className="metrics">
         {metrics.map((m) => (
-          <MetricCard key={m.title} title={m.title} value={m.value} type={m.type} />
+          <MetricCard key={m.title} title={m.title} value={m.value} type={m.type} onClick={m.onClick} />
         ))}
       </section>
+      <PagosHoyModal open={showPagosModal} pagos={pagosHoy} onClose={() => setShowPagosModal(false)} />
     </div>
   );
 }
