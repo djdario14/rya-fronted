@@ -1,7 +1,4 @@
-
-
-import React from "react";
-import "../styles/cliente-detalle.css";
+import "./cliente-detalle.css";
 
 export default function ClienteDetallePage() {
   return (
@@ -14,9 +11,9 @@ export default function ClienteDetallePage() {
           <div className="avatar">👤</div>
 
           <div className="cliente-text">
-            <h2>Orrala</h2>
-            <p>Cédula: 24512265</p>
-            <p>Tel: 213551147</p>
+            <h2>Mariuxi Martínez</h2>
+            <p>Cédula: 0954681322</p>
+            <p>Tel: 0994823848</p>
           </div>
         </div>
 
@@ -25,21 +22,21 @@ export default function ClienteDetallePage() {
 
       {/* Card principal */}
       <section className="saldo-card">
-        <span className="label">Saldo</span>
-        <h1>$155.00</h1>
+        <span className="label">Saldo Pendiente</span>
+        <h1>$360.00</h1>
 
         <div className="stats">
           <div>
             <span>Préstamo</span>
-            <strong>$150</strong>
+            <strong>$300</strong>
           </div>
           <div>
             <span>Cuotas</span>
-            <strong>5 / 30</strong>
+            <strong>6 / 12</strong>
           </div>
           <div>
             <span>Atraso</span>
-            <strong>$0</strong>
+            <strong>45 días</strong>
           </div>
         </div>
       </section>
@@ -49,6 +46,13 @@ export default function ClienteDetallePage() {
         <button className="btn primary">＋ ABONAR</button>
         <button className="btn secondary">📅 AGENDAR VISITA</button>
         <button className="btn outline">💬 ENVIAR MENSAJE</button>
+        <button className="btn outline">📝 Nuevo Crédito</button>
+      </section>
+
+      {/* Dirección */}
+      <section className="saldo-card" style={{marginTop: 20}}>
+        <span className="label">Dirección</span>
+        <div style={{fontSize: 15, marginTop: 6}}>Calle 14 y Av. la Garzota, Guayaquil</div>
       </section>
     </div>
   );

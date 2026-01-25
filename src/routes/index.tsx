@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ClientesPage from '../pages/ClientesPage';
 import RegistrarGastoPage from '../pages/RegistrarGastoPage';
 import ReporteDiarioPage from '../pages/ReporteDiarioPage';
+import ClienteDetallePage from '../pages/ClienteDetallePage';
 
 const AppRoutes: React.FC = () => (
   <BrowserRouter>
@@ -10,6 +11,8 @@ const AppRoutes: React.FC = () => (
       <Route path="/" element={<ClientesPage />} />
       <Route path="/registrar-gasto" element={<RegistrarGastoPage />} />
       <Route path="/reportes" element={<ReporteDiarioPage />} />
+      <Route path="/cliente/:id" element={<ClienteDetallePage />} />
+      <Route path="/clientes/:id" element={<ClienteDetallePage />} />
     </Routes>
   </BrowserRouter>
 );
