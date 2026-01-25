@@ -76,13 +76,10 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
           setError('');
           try {
             if (!prestamoId) throw new Error('No se encontró préstamo activo');
-             if (noPago) {
+            if (noPago) {
               await api.post(`/pagos/`, { prestamo_id: prestamoId, monto: 0, motivo_no_pago: motivo, fecha: new Date().toISOString().slice(0, 10) });
             } else {
               await api.post(`/pagos/`, { prestamo_id: prestamoId, monto: parseFloat(monto), fecha: new Date().toISOString().slice(0, 10) });
-            }
-            } catch (err) {
-              setError('No se pudo registrar el pago');
             }
             setMonto('');
             onSuccess();
