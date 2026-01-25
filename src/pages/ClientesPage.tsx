@@ -240,10 +240,14 @@ const ClientesPage: React.FC = () => {
       setError('');
       try {
         if (valor === null || isNaN(valor)) throw new Error('El valor del préstamo es obligatorio');
+        // Fecha y hora local actual en formato ISO (date-time)
+        const d = new Date();
+        const tzOffset = d.getTimezoneOffset() * 60000;
+        const localISOTime = new Date(d.getTime() - tzOffset).toISOString().slice(0, 19);
         await api.post('/prestamos/', {
           cliente_id: cliente.id,
           monto: valor,
-          fecha,
+          fecha: localISOTime,
           estado: 'activo',
           interes,
           total: totalPagar,
