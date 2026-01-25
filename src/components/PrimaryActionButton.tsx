@@ -2,7 +2,7 @@ import React from "react";
 import "./PrimaryActionButton.css";
 
 export default function PrimaryActionButton({ label, color, icon, onPress }: {
-  label: string;
+  label: React.ReactNode;
   color: string;
   icon?: React.ReactNode;
   onPress?: () => void;
