@@ -358,17 +358,17 @@ const ClientesPage: React.FC = () => {
   }, []);
 
   // Detectar país por IP y setear código de país
-  useEffect(() => {
-    const fetchCountryCode = async () => {
-      try {
-        const res = await fetch('https://ipapi.co/json/');
-        const data = await res.json();
-        const found = countryCodes.find(c => c.iso === data.country_code);
-        if (found) setCountryCode(found.code);
-      } catch {}
-    };
-    fetchCountryCode();
-  }, []);
+  // useEffect(() => {
+  //   const fetchCountryCode = async () => {
+  //     try {
+  //       const res = await fetch('https://ipapi.co/json/');
+  //       const data = await res.json();
+  //       const found = countryCodes.find(c => c.iso === data.country_code);
+  //       if (found) setCountryCode(found.code);
+  //     } catch {}
+  //   };
+  //   fetchCountryCode();
+  // }, []);
 
   // Ya no se autocompleta al abrir el modal, solo con el botón
 
