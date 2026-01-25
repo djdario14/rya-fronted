@@ -1,3 +1,26 @@
+  if (title === "Gastos del día") {
+    return (
+      <div className="summary-card gastos-dia-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
+        <div className="gastos-dia-header">
+          <span className="gastos-dia-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="12" fill="#FEECEC"/>
+              <path d="M12 7V17" stroke="#EF4444" strokeWidth="2.2" strokeLinecap="round"/>
+              <path d="M7 12L12 17L17 12" stroke="#EF4444" strokeWidth="2.2" strokeLinecap="round"/>
+            </svg>
+          </span>
+          <span className="gastos-dia-title">Gastos del día</span>
+        </div>
+        <div className="gastos-dia-value">{value}</div>
+        <div className="gastos-dia-bg">
+          <svg width="100%" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 35 Q 50 38 100 32 T 200 35 V40 H0Z" fill="#EF444411" />
+            <path d="M0 38 Q 50 40 100 36 T 200 38" stroke="#EF444422" strokeWidth="2" fill="none" />
+          </svg>
+        </div>
+      </div>
+    );
+  }
 import React from "react";
 import "./SummaryCard.css";
 
