@@ -32,6 +32,30 @@ export default function SummaryCard({
       </div>
     );
   }
+
+  if (title === "Prestado hoy") {
+    return (
+      <div className="summary-card prestado-hoy-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
+        <div className="prestado-hoy-header">
+          <span className="prestado-hoy-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="12" fill="#E6F4FF"/>
+              <path d="M7 15L15 7" stroke="#3B82F6" strokeWidth="2.2" strokeLinecap="round"/>
+              <path d="M9.5 7H15V12.5" stroke="#3B82F6" strokeWidth="2.2" strokeLinecap="round"/>
+            </svg>
+          </span>
+          <span className="prestado-hoy-title">Prestado hoy</span>
+        </div>
+        <div className="prestado-hoy-value">{value}</div>
+        <div className="prestado-hoy-bg">
+          <svg width="100%" height="40" viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 30 Q 50 20 100 30 T 200 30 V40 H0Z" fill="#3B82F611" />
+            <path d="M0 35 Q 50 28 100 35 T 200 35" stroke="#3B82F622" strokeWidth="2" fill="none" />
+          </svg>
+        </div>
+      </div>
+    );
+  }
   // Card genérico
   return (
     <div
