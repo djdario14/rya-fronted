@@ -48,12 +48,12 @@ export default function ClienteDetallePage() {
           installments={`${saldo.cuotasPagadas} / ${saldo.cuotasTotal}`}
           delayDays={`${saldo.atraso} días`}
         />
-        <PrimaryActionButton label="Historial crediticio" color="#22C55E" icon={<span>📄</span>} onPress={() => alert('Historial crediticio')} />
-        <PrimaryActionButton label="📅 Agendar Visita" color="#2563EB" icon={<span>📅</span>} onPress={() => alert('Agendar visita')} />
+        <PrimaryActionButton label="Historial crediticio" color="#22C55E" icon={<img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/svg/1f4c4.svg" alt="Historial" style={{ width: 22, height: 22 }} />} onPress={() => alert('Historial crediticio')} />
+        <PrimaryActionButton label="Agendar Visita" color="#2563EB" icon={<img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/svg/1f4c5.svg" alt="Calendario" style={{ width: 22, height: 22 }} />} onPress={() => alert('Agendar visita')} />
         <button style={{ width: '100%', height: 52, borderRadius: 16, fontSize: 16, fontWeight: 600, color: '#111827', background: '#fff', border: '1.5px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12, boxShadow: '0 2px 12px #0001', cursor: 'pointer' }}
           onClick={() => window.open(`https://wa.me/${cliente.telefono.replace(/[^\d]/g, '')}`, '_blank')}
         >
-          <span style={{ fontSize: 20, color: '#25D366' }}>🟢</span> WhatsApp
+          <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" style={{ width: 24, height: 24 }} /> Enviar mensaje
         </button>
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 16, marginTop: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#22C55E', fontWeight: 600, fontSize: 15 }}>
