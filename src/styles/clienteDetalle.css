@@ -1,0 +1,99 @@
+.client-page {
+    padding: 16px;
+    background: #f3f4f6;
+    min-height: 100vh;
+}
+
+
+/* HEADER */
+
+.client-header {
+    background: linear-gradient(180deg, #334155, #1e293b);
+    color: white;
+    padding: 16px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+}
+
+.client-info {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+}
+
+.map-btn {
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+
+/* SALDO */
+
+.balance-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.amount {
+    font-size: 32px;
+    color: #166534;
+    margin: 4px 0 12px;
+}
+
+.balance-stats {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.balance-stats span {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+
+/* BOTONES */
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 14px;
+    background: #334155;
+    color: white;
+    border-radius: 14px;
+    border: none;
+    margin-bottom: 10px;
+}
+
+.btn-outline {
+    width: 100%;
+    padding: 14px;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+}
