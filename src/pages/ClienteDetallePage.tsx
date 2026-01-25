@@ -1,36 +1,55 @@
+
 import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../styles/clienteDetalle.css";
 
+// Recibe datos por location.state o por props (ajustar según tu router)
 export default function ClienteDetallePage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  // Puedes recibir el cliente por location.state o simular uno aquí:
+  const cliente = location.state?.cliente || {
+    nombre: "orrala",
+    cedula: "24512265",
+    telefono: "213551147",
+    saldo: 155.0,
+    prestamo: 150,
+    cuotasPagadas: 5,
+    cuotasTotal: 30,
+    atraso: 0,
+  };
+
   return (
     <div className="client-page">
       <header className="client-header">
-        <button className="back-btn">←</button>
+        <button className="back-btn" onClick={() => navigate(-1)}>
+          ← Volver
+        </button>
         <div className="client-info">
           <div className="avatar">👤</div>
           <div>
-            <h2>orrala</h2>
-            <p>Cédula: 24512265</p>
-            <p>Tel: 213551147</p>
+            <h2>{cliente.nombre}</h2>
+            <p>Cédula: <b>{cliente.cedula}</b></p>
+            <p>Tel: <b>{cliente.telefono}</b></p>
           </div>
         </div>
         <button className="map-btn">📍 Ver mapa</button>
       </header>
       <section className="balance-card">
         <p className="label">Saldo</p>
-        <h1 className="amount">$155.00</h1>
+        <h1 className="amount">${cliente.saldo?.toFixed(2)}</h1>
         <div className="balance-stats">
           <div>
             <span>Préstamo</span>
-            <strong>$150</strong>
+            <strong>${cliente.prestamo}</strong>
           </div>
           <div>
             <span>Cuotas</span>
-            <strong>5 / 30</strong>
+            <strong>{cliente.cuotasPagadas} / {cliente.cuotasTotal}</strong>
           </div>
           <div>
             <span>Atraso</span>
-            <strong>$0</strong>
+            <strong>${cliente.atraso}</strong>
           </div>
         </div>
       </section>
