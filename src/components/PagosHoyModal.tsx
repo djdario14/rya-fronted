@@ -19,8 +19,8 @@ const PagosHoyModal: React.FC<PagosHoyModalProps> = ({ open, pagos, onClose }) =
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: 6 }}>Cliente</th>
-              <th style={{ textAlign: 'right', padding: 6 }}>Monto</th>
+              <th style={{ textAlign: 'left', padding: 6, color: '#222', fontWeight: 700, minWidth: 120 }}>Cliente</th>
+              <th style={{ textAlign: 'right', padding: 6, color: '#222', fontWeight: 700, minWidth: 80 }}>Monto</th>
             </tr>
           </thead>
           <tbody>
@@ -28,8 +28,10 @@ const PagosHoyModal: React.FC<PagosHoyModalProps> = ({ open, pagos, onClose }) =
               <tr><td colSpan={2} style={{ textAlign: 'center', color: '#888', padding: 16 }}>No hay pagos registrados hoy.</td></tr>
             ) : pagos.map((p, i) => (
               <tr key={i}>
-                <td style={{ padding: 6 }}>{p.cliente}</td>
-                <td style={{ padding: 6, textAlign: 'right', color: '#219653', fontWeight: 600 }}>${p.monto.toFixed(2)}</td>
+                <td style={{ padding: 6, color: '#222', fontWeight: 500, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.cliente}</td>
+                <td style={{ padding: 6, textAlign: 'right', color: '#219653', fontWeight: 700, minWidth: 80 }}>
+                  ${p.monto.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </td>
               </tr>
             ))}
           </tbody>
