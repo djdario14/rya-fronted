@@ -1,39 +1,65 @@
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import api from '../api/client';
 import ClientHeaderCard from '../components/ClientHeaderCard';
 import BalanceCard from '../components/BalanceCard';
 import PrimaryActionButton from '../components/PrimaryActionButton';
 import '../styles/theme.css';
 
 export default function ClienteDetallePage() {
-  // Datos de ejemplo, reemplaza por datos reales
-  const cliente = {
-    name: 'Mariuxi Martínez',
-    id: '0954681322',
-    phone: '0994823848',
-    balance: '$360.00',
-    loan: '$300',
-    installments: '6 / 12',
-    delayDays: '45 días',
-    address: 'Calle 14 y Av. la Garzota, Guayaquil',
-  };
+  const { id } = useParams<{ id: string }>();
+  const [cliente, setCliente] = useState<any>(null);
+  const [saldo, setSaldo] = useState<any>(null);
+
+  useEffect(() => {
+    if (id) {
+      api.get(`/clientes/${id}`).then(res => setCliente(res.data));
+      api.get(`/clientes/${id}/saldo`).then(res => setSaldo(res.data));
+    }
+  }, [id]);
+
+  if (!cliente || !saldo) return <div style={{ padding: 32 }}>Cargando...</div>;
+
+  // Ubicación GPS (extraída de dirección si es formato "lat,lng" o muestra dirección textual)
+  let gps = null;
+  if (cliente.direccion && cliente.direccion.includes(',')) {
+    const [lat, lng] = cliente.direccion.split(',');
+    gps = { lat: lat.trim(), lng: lng.trim() };
+  }
 
   return (
     <div style={{ background: 'var(--color-bg)', minHeight: '100vh', paddingBottom: 32 }}>
       <div style={{ maxWidth: 430, margin: '0 auto', padding: '16px 0' }}>
-        <ClientHeaderCard name={cliente.name} id={cliente.id} phone={cliente.phone} onMapTap={() => alert('Ver mapa')} />
-        <BalanceCard balance={cliente.balance} loan={cliente.loan} installments={cliente.installments} delayDays={cliente.delayDays} />
-        <PrimaryActionButton label="＋ Abonar" color="#22C55E" icon={<span>💵</span>} onPress={() => alert('Abonar')} />
+        <ClientHeaderCard
+          name={cliente.nombre}
+          id={cliente.cedula}
+          phone={cliente.telefono}
+          onMapTap={() => {
+            if (gps) {
+              window.open(`https://www.google.com/maps/search/?api=1&query=${gps.lat},${gps.lng}`, '_blank');
+            } else {
+              alert(cliente.direccion);
+            }
+          }}
+        />
+        <BalanceCard
+          balance={`$${saldo.saldo}`}
+          loan={`$${saldo.prestamo}`}
+          installments={`${saldo.cuotasPagadas} / ${saldo.cuotasTotal}`}
+          delayDays={`${saldo.atraso} días`}
+        />
+        <PrimaryActionButton label="Historial crediticio" color="#22C55E" icon={<span>📄</span>} onPress={() => alert('Historial crediticio')} />
         <PrimaryActionButton label="📅 Agendar Visita" color="#2563EB" icon={<span>📅</span>} onPress={() => alert('Agendar visita')} />
-        <button style={{ width: '100%', height: 52, borderRadius: 16, fontSize: 16, fontWeight: 600, color: '#111827', background: '#fff', border: '1.5px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12, boxShadow: '0 2px 12px #0001', cursor: 'pointer' }}>
-          <span style={{ fontSize: 20 }}>💬</span> Enviar Mensaje
-        </button>
-        <button style={{ width: '100%', height: 52, borderRadius: 16, fontSize: 16, fontWeight: 600, color: '#111827', background: '#fff', border: '1.5px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12, boxShadow: '0 2px 12px #0001', cursor: 'pointer' }}>
-          <span style={{ fontSize: 20 }}>📝</span> Nuevo Crédito
+        <button style={{ width: '100%', height: 52, borderRadius: 16, fontSize: 16, fontWeight: 600, color: '#111827', background: '#fff', border: '1.5px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12, boxShadow: '0 2px 12px #0001', cursor: 'pointer' }}
+          onClick={() => window.open(`https://wa.me/${cliente.telefono.replace(/[^\d]/g, '')}`, '_blank')}
+        >
+          <span style={{ fontSize: 20, color: '#25D366' }}>🟢</span> WhatsApp
         </button>
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 16, marginTop: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#22C55E', fontWeight: 600, fontSize: 15 }}>
             <span style={{ fontSize: 20 }}>📍</span> Dirección
           </div>
-          <div style={{ color: '#111827', fontSize: 15, marginTop: 6 }}>{cliente.address}</div>
+          <div style={{ color: '#111827', fontSize: 15, marginTop: 6 }}>{cliente.direccion}</div>
         </div>
       </div>
     </div>
