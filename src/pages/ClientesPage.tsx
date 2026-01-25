@@ -6,6 +6,7 @@ import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import SuccessModal from '../components/SuccessModal';
 import CreditoModal from '../components/CreditoModal';
+import RyaMenuIcon from '../components/RyaMenuIcon';
 
 // --- Modal para registrar pago ---
 type PrestamoActivo = {
@@ -28,7 +29,6 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
   const [noPago, setNoPago] = React.useState(false);
   const [motivo, setMotivo] = React.useState('');
   const motivos = [
-// Removed erroneous line
     'No tiene',
     'Dejo de trabajar',
     'Semanal',
@@ -637,8 +637,8 @@ const ClientesPage: React.FC = () => {
       <header style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '0 0 10px 0', marginBottom: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 12px 0 12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', fontSize: 26, color: '#4e7fa6', marginRight: 2, cursor: 'pointer' }}>
-              <span>&#9776;</span>
+            <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', fontSize: 26, color: '#4e7fa6', marginRight: 2, cursor: 'pointer', padding: 0 }}>
+              <RyaMenuIcon size={32} />
             </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
