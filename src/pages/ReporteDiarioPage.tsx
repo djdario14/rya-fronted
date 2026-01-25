@@ -68,14 +68,19 @@ const ReporteDiarioPage: React.FC = () => {
       <AppHeader title="Reporte Diario" date="25 de Enero de 2026" avatar={<span role="img" aria-label="avatar">👤</span>} />
       <div style={{ maxWidth: 430, margin: '0 auto', padding: '16px 0' }}>
         <MainBalanceCard label="Caja Real" amount={cajaReal} today={hoyExtra} />
-        <div style={{ marginTop: 18, background: 'var(--color-card)', borderRadius: 18, boxShadow: '0 2px 16px #0001', padding: 18 }}>
-          <div style={{ fontWeight: 600, fontSize: 17, color: 'var(--color-text-main)', marginBottom: 10 }}>Resumen del día</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div style={{ marginTop: 18, background: 'var(--color-card)', borderRadius: 18, boxShadow: '0 4px 24px #0002', padding: 18 }}>
+          <div style={{ fontWeight: 600, fontSize: 18, color: 'var(--color-text-main)', marginBottom: 16 }}>Resumen del día</div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 18,
+            marginBottom: 10
+          }}>
             <SummaryCard
               title="Cobrado hoy"
               value={cobradoHoy}
               accentColor="#22C55E"
-              icon={<span>✔️</span>}
+              icon={<span style={{fontSize:18}}>✔️</span>}
               onClick={handleCobradoHoyClick}
               backgroundSvg={greenWave}
             />
@@ -83,7 +88,7 @@ const ReporteDiarioPage: React.FC = () => {
               title="Prestado hoy"
               value={prestadoHoy}
               accentColor="#3B82F6"
-              icon={<span>📘</span>}
+              icon={<span style={{fontSize:18}}>📈</span>}
               onClick={handlePrestadoHoyClick}
               backgroundSvg={blueWave}
             />
@@ -91,12 +96,12 @@ const ReporteDiarioPage: React.FC = () => {
               title="Clientes con abono"
               value={clientesConAbono}
               accentColor="#22C55E"
-              icon={<span>👥</span>}
+              icon={<span style={{fontSize:18}}>👥</span>}
               backgroundSvg={grayWave}
             >
-              <div style={{ marginTop: 8, width: "100%" }}>
+              <div style={{ marginTop: 10, width: "100%" }}>
                 <div style={{
-                  height: 6,
+                  height: 7,
                   borderRadius: 4,
                   background: "#e5e7eb",
                   overflow: "hidden"
@@ -108,19 +113,25 @@ const ReporteDiarioPage: React.FC = () => {
                     transition: "width 0.3s"
                   }} />
                 </div>
-                <div style={{ fontSize: 12, color: "#888", marginTop: 2, textAlign: "right" }}>{abonoPercent}%</div>
+                <div style={{ fontSize: 13, color: "#888", marginTop: 2, textAlign: "right" }}>{abonoPercent}%</div>
               </div>
             </SummaryCard>
             <SummaryCard
               title="Gastos del día"
               value={gastosDelDia}
               accentColor="#EF4444"
-              icon={<span>🔴</span>}
+              icon={<span style={{fontSize:18}}>🔻</span>}
               backgroundSvg={redWave}
             />
           </div>
-          <div style={{ marginTop: 18 }}>
-            <SummaryCard title="Total por cobrar" value={totalPorCobrar} accentColor="#4CAF7A" icon={<span>💰</span>} />
+          <div style={{ marginTop: 10 }}>
+            <SummaryCard
+              title="Total por cobrar"
+              value={totalPorCobrar}
+              accentColor="#4CAF7A"
+              icon={<span style={{fontSize:18}}>💰</span>}
+              backgroundSvg={greenWave}
+            />
           </div>
         </div>
       </div>
