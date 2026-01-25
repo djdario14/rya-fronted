@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import '../styles/mobile-layout.css';
 import api from '../api/client';
 import PagosHoyModal from '../components/PagosHoyModal';
+import PrestamosHoyModal from '../components/PrestamosHoyModal';
 
 
 const MetricCard = ({ title, value, type, onClick }: { title: string; value: string; type?: string; onClick?: () => void }) => (
@@ -18,6 +19,8 @@ const ReporteDiarioPage: React.FC = () => {
   const [showPagosModal, setShowPagosModal] = useState(false);
   const [pagosHoy, setPagosHoy] = useState<{ cliente: string; monto: number }[]>([]);
   const [prestadoHoy, setPrestadoHoy] = useState<string>('$0');
+  const [showPrestamosModal, setShowPrestamosModal] = useState(false);
+  const [prestamosHoy, setPrestamosHoy] = useState<any[]>([]);
 
   useEffect(() => {
     api.get<{ total: number }>('/pagos/suma-hoy')
@@ -43,9 +46,20 @@ const ReporteDiarioPage: React.FC = () => {
     }
   };
 
+  const handlePrestadoHoyClick = async () => {
+    try {
+      const res = await api.get<any[]>('/prestamos/hoy-detalle');
+      setPrestamosHoy(res.data);
+      setShowPrestamosModal(true);
+    } catch {
+      setPrestamosHoy([]);
+      setShowPrestamosModal(true);
+    }
+  };
+
   const metrics = [
     { title: 'Cobrado hoy', value: cobradoHoy, type: 'success', onClick: handleCobradoHoyClick },
-    { title: 'Prestado hoy', value: prestadoHoy, type: 'info' },
+    { title: 'Prestado hoy', value: prestadoHoy, type: 'info', onClick: handlePrestadoHoyClick },
     { title: 'Clientes con abono', value: '0 de 3 (0%)', type: '' },
     { title: 'Total por cobrar', value: '$11', type: '' },
     { title: 'Gastos del día', value: '$25', type: 'danger' },
@@ -76,6 +90,7 @@ const ReporteDiarioPage: React.FC = () => {
         ))}
       </section>
       <PagosHoyModal open={showPagosModal} pagos={pagosHoy} onClose={() => setShowPagosModal(false)} />
+      <PrestamosHoyModal open={showPrestamosModal} prestamos={prestamosHoy} onClose={() => setShowPrestamosModal(false)} />
     </div>
   );
 }
