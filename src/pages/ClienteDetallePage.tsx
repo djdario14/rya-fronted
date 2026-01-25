@@ -9,16 +9,28 @@ import '../styles/theme.css';
 export default function ClienteDetallePage() {
   const { id } = useParams<{ id: string }>();
   const [cliente, setCliente] = useState<any>(null);
-  const [saldo, setSaldo] = useState<any>(null);
+  type SaldoResponse = {
+    saldo: number;
+    prestamo: number;
+    cuotasTotal: number;
+    cuotasPagadas: number;
+    atraso: number;
+    fecha?: string;
+  };
+  const [saldo, setSaldo] = useState<SaldoResponse | null>(null);
     const [fechaCredito, setFechaCredito] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
         api.get(`/clientes/${id}`).then(res => setCliente(res.data));
         api.get(`/clientes/${id}/saldo`).then(res => {
-          setSaldo(res.data);
-          if (res.data && res.data.fecha) {
-            setFechaCredito(res.data.fecha);
+          const data = res.data as SaldoResponse;
+          setSaldo(data);
+          // Solo asigna si existe la propiedad fecha
+          if ('fecha' in data && data.fecha) {
+            setFechaCredito(data.fecha);
+          } else {
+            setFechaCredito(null);
           }
         });
     }
