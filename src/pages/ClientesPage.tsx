@@ -220,7 +220,11 @@ const ClientesPage: React.FC = () => {
     const [numCuotas, setNumCuotas] = React.useState(formaPagoOpciones[0].cuotas);
     const [fecha, setFecha] = React.useState(() => {
       const d = new Date();
-      return d.toISOString().slice(0, 10);
+      // Formato YYYY-MM-DD local
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     });
     const [saving, setSaving] = React.useState(false);
     const [error, setError] = React.useState('');
@@ -240,14 +244,11 @@ const ClientesPage: React.FC = () => {
       setError('');
       try {
         if (valor === null || isNaN(valor)) throw new Error('El valor del préstamo es obligatorio');
-        // Fecha y hora local actual en formato ISO (date-time)
-        const d = new Date();
-        const tzOffset = d.getTimezoneOffset() * 60000;
-        const localISOTime = new Date(d.getTime() - tzOffset).toISOString().slice(0, 19);
+        // Usar la fecha seleccionada (solo YYYY-MM-DD)
         await api.post('/prestamos/', {
           cliente_id: cliente.id,
           monto: valor,
-          fecha: localISOTime,
+          fecha,
           estado: 'activo',
           interes,
           total: totalPagar,
