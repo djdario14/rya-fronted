@@ -32,12 +32,8 @@
     align-items: flex-start;
 }
 
-.bc-col-right {
-    align-items: flex-end;
-}
-
 .bc-label {
-    font-size: 22px;
+    font-size: 18px;
     color: #6B7280;
     font-family: 'Inter', sans-serif;
     font-weight: 400;
@@ -52,6 +48,14 @@
     font-size: 54px;
     font-weight: 700;
     color: #22C55E;
+    font-family: 'Inter', sans-serif;
+    margin-top: 2px;
+}
+
+.bc-date {
+    font-size: 22px;
+    font-weight: 700;
+    color: #444;
     font-family: 'Inter', sans-serif;
     margin-top: 2px;
 }
