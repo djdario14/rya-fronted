@@ -17,7 +17,7 @@ export default function SummaryCard({
   // Card especial para "Cobrado hoy"
   if (title === "Cobrado hoy") {
     return (
-      <div className="summary-card cobrador-hoy-card">
+      <div className="summary-card cobrador-hoy-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
         <div className="cobrado-hoy-header">
           <span className="cobrado-hoy-icon">✔️</span>
           <span className="cobrado-hoy-title">Cobrado hoy</span>
