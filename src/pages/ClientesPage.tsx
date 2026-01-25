@@ -28,6 +28,7 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
   const [error, setError] = React.useState('');
   const [noPago, setNoPago] = React.useState(false);
   const [motivo, setMotivo] = React.useState('');
+  // Motivos de no pago (sin cambios, solo para forzar commit)
   const motivos = [
     'No tiene',
     'Dejo de trabajar',
