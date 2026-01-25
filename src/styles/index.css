@@ -1,3 +1,109 @@
+/* --- Resumen Diario Premium Cards --- */
+
+.resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.resumen-card {
+    position: relative;
+    background: #fff;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 90px;
+}
+
+.resumen-card:active {
+    transform: scale(0.97);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #475569;
+}
+
+.icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 14px;
+}
+
+.value {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 6px;
+}
+
+.resumen-card.positivo .icon,
+.resumen-card.positivo .value {
+    color: #16a34a;
+}
+
+.resumen-card.info .icon,
+.resumen-card.info .value {
+    color: #2563eb;
+}
+
+.resumen-card.negativo .icon,
+.resumen-card.negativo .value {
+    color: #dc2626;
+}
+
+.resumen-card.neutral .icon,
+.resumen-card.neutral .value {
+    color: #64748b;
+}
+
+.mini-chart {
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(34, 197, 94, 0.25), rgba(34, 197, 94, 0.05));
+    border-radius: 50% 50% 0 0;
+    opacity: 0.6;
+    z-index: 0;
+}
+
+.resumen-card.negativo .mini-chart {
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.25), rgba(239, 68, 68, 0.05));
+}
+
+.resumen-card.info .mini-chart {
+    background: linear-gradient(180deg, rgba(37, 99, 235, 0.25), rgba(37, 99, 235, 0.05));
+}
+
+.progress {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 6px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.progress span {
+    height: 100%;
+    display: block;
+    background: #22c55e;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+
 /* --- Caja Real Premium Card --- */
 
 .caja-card {
