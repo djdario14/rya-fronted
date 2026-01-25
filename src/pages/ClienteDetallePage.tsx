@@ -1,19 +1,20 @@
 
 
 import React from "react";
-import "../styles/clienteDetalle.css";
+import "../styles/cliente-detalle.css";
 
 export default function ClienteDetallePage() {
   return (
-    <div className="client-page">
-      <header className="client-header">
+    <div className="cliente-page">
+      {/* Header */}
+      <header className="cliente-header">
         <button className="back-btn">←</button>
 
-        <div className="client-info">
+        <div className="cliente-header-info">
           <div className="avatar">👤</div>
 
-          <div>
-            <h2>orrala</h2>
+          <div className="cliente-text">
+            <h2>Orrala</h2>
             <p>Cédula: 24512265</p>
             <p>Tel: 213551147</p>
           </div>
@@ -22,11 +23,12 @@ export default function ClienteDetallePage() {
         <button className="map-btn">📍 Ver mapa</button>
       </header>
 
-      <section className="balance-card">
-        <p className="label">Saldo</p>
-        <h1 className="amount">$155.00</h1>
+      {/* Card principal */}
+      <section className="saldo-card">
+        <span className="label">Saldo</span>
+        <h1>$155.00</h1>
 
-        <div className="balance-stats">
+        <div className="stats">
           <div>
             <span>Préstamo</span>
             <strong>$150</strong>
@@ -42,10 +44,12 @@ export default function ClienteDetallePage() {
         </div>
       </section>
 
-      <button className="btn-primary">＋ ABONAR</button>
-      <button className="btn-secondary">📅 AGENDAR VISITA</button>
-      <button className="btn-outline">💬 ENVIAR MENSAJE</button>
-
+      {/* Acciones */}
+      <section className="acciones">
+        <button className="btn primary">＋ ABONAR</button>
+        <button className="btn secondary">📅 AGENDAR VISITA</button>
+        <button className="btn outline">💬 ENVIAR MENSAJE</button>
+      </section>
     </div>
   );
 }
