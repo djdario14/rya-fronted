@@ -1,3 +1,19 @@
+import React from "react";
+import "./SummaryCard.css";
+
+export default function SummaryCard({
+  title,
+  value,
+  accentColor,
+  icon,
+  onClick,
+}: {
+  title: string;
+  value: string;
+  accentColor: string;
+  icon?: React.ReactNode;
+  onClick?: () => void;
+}) {
   if (title === "Gastos del día") {
     return (
       <div className="summary-card gastos-dia-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
@@ -21,22 +37,6 @@
       </div>
     );
   }
-import React from "react";
-import "./SummaryCard.css";
-
-export default function SummaryCard({
-  title,
-  value,
-  accentColor,
-  icon,
-  onClick,
-}: {
-  title: string;
-  value: string;
-  accentColor: string;
-  icon?: React.ReactNode;
-  onClick?: () => void;
-}) {
   // Card especial para "Cobrado hoy"
   if (title === "Cobrado hoy") {
     return (
