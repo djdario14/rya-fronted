@@ -1,0 +1,40 @@
+.balance-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 2px 16px #0001;
+    padding: 20px;
+    margin-bottom: 18px;
+}
+
+.balance-label {
+    font-size: 13px;
+    color: #6B7280;
+}
+
+.balance-amount {
+    font-size: 32px;
+    font-weight: 700;
+    color: #22C55E;
+    margin: 8px 0 16px 0;
+}
+
+.balance-metrics {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.metric-label {
+    font-size: 13px;
+    color: #6B7280;
+}
+
+.metric-value {
+    font-size: 15px;
+    font-weight: 500;
+    color: #111827;
+}
+
+.metric-value.delay {
+    color: #b45309;
+}
