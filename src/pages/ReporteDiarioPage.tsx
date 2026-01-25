@@ -53,68 +53,21 @@ const ReporteDiarioPage: React.FC = () => {
     }
   };
 
-  // SVGs para fondo de cards
-  const greenWave = `<svg viewBox='0 0 120 40' xmlns='http://www.w3.org/2000/svg'><path d='M0 30 Q30 10 60 25 T120 20' stroke='%2322C55E' stroke-width='4' fill='none'/></svg>`;
-  const blueWave = `<svg viewBox='0 0 120 40' xmlns='http://www.w3.org/2000/svg'><path d='M0 30 Q30 20 60 30 T120 25' stroke='%233B82F6' stroke-width='4' fill='none'/></svg>`;
-  const redWave = `<svg viewBox='0 0 120 40' xmlns='http://www.w3.org/2000/svg'><path d='M0 35 Q30 38 60 30 T120 38' stroke='%23EF4444' stroke-width='4' fill='none'/></svg>`;
-  const grayWave = `<svg viewBox='0 0 120 40' xmlns='http://www.w3.org/2000/svg'><path d='M0 35 Q30 30 60 35 T120 32' stroke='%23E5E7EB' stroke-width='4' fill='none'/></svg>`;
-
-  // Ejemplo de barra de progreso para clientes con abono
-  const abonoMatch = clientesConAbono.match(/(\d+) de (\d+)/);
-  const abonoPercent = abonoMatch ? Math.round((parseInt(abonoMatch[1]) / Math.max(1, parseInt(abonoMatch[2]))) * 100) : 0;
-
   return (
     <div style={{ background: 'var(--color-bg)', minHeight: '100vh', paddingBottom: 80 }}>
       <AppHeader title="Reporte Diario" date="25 de Enero de 2026" avatar={<span role="img" aria-label="avatar">👤</span>} />
       <div style={{ maxWidth: 430, margin: '0 auto', padding: '16px 0' }}>
         <MainBalanceCard label="Caja Real" amount={cajaReal} today={hoyExtra} />
-        <div style={{ marginTop: 18, background: 'var(--color-card)', borderRadius: 18, boxShadow: '0 4px 24px #0002', padding: 18 }}>
-          <div style={{ fontWeight: 600, fontSize: 18, color: 'var(--color-text-main)', marginBottom: 16 }}>Resumen del día</div>
-          <div className="resumen-grid">
-            <div className="resumen-card positivo" onClick={handleCobradoHoyClick}>
-              <div className="card-header">
-                <span className="icon">✔</span>
-                <span className="title">Cobrado hoy</span>
-              </div>
-              <div className="value">{cobradoHoy}</div>
-              <div className="mini-chart" />
-            </div>
-            <div className="resumen-card info" onClick={handlePrestadoHoyClick}>
-              <div className="card-header">
-                <span className="icon">↗</span>
-                <span className="title">Prestado hoy</span>
-              </div>
-              <div className="value">{prestadoHoy}</div>
-              <div className="mini-chart" />
-            </div>
-            <div className="resumen-card neutral">
-              <div className="card-header">
-                <span className="icon">👥</span>
-                <span className="title">Clientes con abono</span>
-              </div>
-              <div className="value">{clientesConAbono.replace(/\s*\(.*\)/, '')}</div>
-              <div className="progress">
-                <span style={{ width: `${abonoPercent}%` }} />
-              </div>
-              <div className="progress-label">{abonoPercent}%</div>
-            </div>
-            <div className="resumen-card negativo">
-              <div className="card-header">
-                <span className="icon">⬇</span>
-                <span className="title">Gastos del día</span>
-              </div>
-              <div className="value">{gastosDelDia}</div>
-              <div className="mini-chart" />
-            </div>
+        <div style={{ marginTop: 18, background: 'var(--color-card)', borderRadius: 18, boxShadow: '0 2px 16px #0001', padding: 18 }}>
+          <div style={{ fontWeight: 600, fontSize: 17, color: 'var(--color-text-main)', marginBottom: 10 }}>Resumen del día</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <SummaryCard title="Cobrado hoy" value={cobradoHoy} accentColor="#22C55E" icon={<span>✔️</span>} onClick={handleCobradoHoyClick} />
+            <SummaryCard title="Prestado hoy" value={prestadoHoy} accentColor="#3B82F6" icon={<span>📘</span>} onClick={handlePrestadoHoyClick} />
+            <SummaryCard title="Clientes con abono" value={clientesConAbono} accentColor="#E5E7EB" icon={<span>👥</span>} />
+            <SummaryCard title="Gastos del día" value={gastosDelDia} accentColor="#EF4444" icon={<span>🔴</span>} />
           </div>
-          <div style={{ marginTop: 10 }}>
-            <div className="resumen-card positivo">
-              <div className="card-header">
-                <span className="icon">💰</span>
-                <span className="title">Total por cobrar</span>
-              </div>
-              <div className="value">{totalPorCobrar}</div>
-            </div>
+          <div style={{ marginTop: 18 }}>
+            <SummaryCard title="Total por cobrar" value={totalPorCobrar} accentColor="#4CAF7A" icon={<span>💰</span>} />
           </div>
         </div>
       </div>

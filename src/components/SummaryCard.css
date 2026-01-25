@@ -1,35 +1,22 @@
-.summary-card.premium {
-    background: #fff;
+.summary-card {
+    background: var(--color-card, #fff);
     border-radius: 16px;
     padding: 16px;
     margin-bottom: 12px;
-    box-shadow: 0 8px 32px #0002;
+    box-shadow: 0 2px 8px #0001;
     display: flex;
     flex-direction: column;
     min-height: 70px;
-    position: relative;
-    overflow: hidden;
-    transition: box-shadow 0.2s;
 }
 
-.summary-card.premium:hover {
-    box-shadow: 0 12px 40px #22c55e22;
+.sc-label {
+    font-size: 13px;
+    color: var(--color-text-secondary, #6B7280);
+    font-weight: 500;
 }
 
-.summary-card-bg {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 120%;
-    height: 70%;
-    background-repeat: no-repeat;
-    background-position: right bottom;
-    background-size: cover;
-    opacity: 0.35;
-    pointer-events: none;
-    z-index: 0;
-    filter: blur(0.5px);
+.sc-value {
+    font-size: 22px;
+    font-weight: 600;
+    margin-top: 6px;
 }
-
-
-/* Eliminar llave extra */
