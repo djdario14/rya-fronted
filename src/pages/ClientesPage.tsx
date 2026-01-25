@@ -724,6 +724,7 @@ const ClientesPage: React.FC = () => {
           ) : (
             clientes
               .filter(cliente => {
+                // Filtro por búsqueda
                 const q = search.trim().toLowerCase();
                 if (!q) return true;
                 return (
@@ -732,6 +733,15 @@ const ClientesPage: React.FC = () => {
                   cliente.negocio?.toLowerCase().includes(q) ||
                   cliente.telefono?.toLowerCase().includes(q)
                 );
+              })
+              .filter(cliente => {
+                // Filtro por tab
+                if (tab === 'pendientes') {
+                  // Mostrar solo clientes con saldo pendiente mayor a 0
+                  return (cliente.saldo ?? 0) > 0;
+                }
+                // Si es 'todos', mostrar todos
+                return true;
               })
               .map(cliente => (
                 <ClienteCardRealtime
