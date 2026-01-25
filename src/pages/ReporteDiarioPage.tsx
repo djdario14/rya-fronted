@@ -1,18 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
-import '../styles/mobile-layout.css';
+import '../styles/theme.css';
+import AppHeader from '../components/AppHeader';
+import MainBalanceCard from '../components/MainBalanceCard';
+import SummaryCard from '../components/SummaryCard';
 import api from '../api/client';
-import PagosHoyModal from '../components/PagosHoyModal';
-import PrestamosHoyModal from '../components/PrestamosHoyModal';
-
-
-const MetricCard = ({ title, value, type, onClick }: { title: string; value: string; type?: string; onClick?: () => void }) => (
-  <div className={`metric-card${type ? ' ' + type : ''}`} onClick={onClick} style={onClick ? { cursor: 'pointer' } : {}}>
-    <span>{title}</span>
-    <strong>{value}</strong>
-  </div>
-);
-
 
 const ReporteDiarioPage: React.FC = () => {
   const [cobradoHoy, setCobradoHoy] = useState<string>('$0');
@@ -21,6 +12,11 @@ const ReporteDiarioPage: React.FC = () => {
   const [prestadoHoy, setPrestadoHoy] = useState<string>('$0');
   const [showPrestamosModal, setShowPrestamosModal] = useState(false);
   const [prestamosHoy, setPrestamosHoy] = useState<any[]>([]);
+  const [cajaReal, setCajaReal] = useState<string>('$4,124');
+  const [hoyExtra, setHoyExtra] = useState<string>('$312');
+  const [clientesConAbono, setClientesConAbono] = useState<string>('0 de 3 (0%)');
+  const [totalPorCobrar, setTotalPorCobrar] = useState<string>('$11');
+  const [gastosDelDia, setGastosDelDia] = useState<string>('$25');
 
   useEffect(() => {
     api.get<{ total: number }>('/pagos/suma-hoy')
@@ -57,42 +53,41 @@ const ReporteDiarioPage: React.FC = () => {
     }
   };
 
-  const metrics = [
-    { title: 'Cobrado hoy', value: cobradoHoy, type: 'success', onClick: handleCobradoHoyClick },
-    { title: 'Prestado hoy', value: prestadoHoy, type: 'info', onClick: handlePrestadoHoyClick },
-    { title: 'Clientes con abono', value: '0 de 3 (0%)', type: '' },
-    { title: 'Total por cobrar', value: '$11', type: '' },
-    { title: 'Gastos del día', value: '$25', type: 'danger' },
-  ];
-
-  // Obtener la fecha actual del sistema y formatearla en español
-  const fechaActual = new Date();
-  const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-  const fechaFormateada = `${fechaActual.getDate()} de ${meses[fechaActual.getMonth()]} de ${fechaActual.getFullYear()}`;
-
   return (
-    <div className="report-page">
-      <header className="report-header">
-        <button className="icon-btn" aria-label="Menú">☰</button>
-        <h1 className="report-title">Reporte Diario</h1>
-        <div className="avatar" />
-      </header>
-      <div className="report-date">
-        <span role="img" aria-label="calendario">📅</span> {fechaFormateada}
+    <div style={{ background: 'var(--color-bg)', minHeight: '100vh', paddingBottom: 80 }}>
+      <AppHeader title="Reporte Diario" date="25 de Enero de 2026" avatar={<span role="img" aria-label="avatar">👤</span>} />
+      <div style={{ maxWidth: 430, margin: '0 auto', padding: '16px 0' }}>
+        <MainBalanceCard label="Caja Real" amount={cajaReal} today={hoyExtra} />
+        <div style={{ marginTop: 18, background: 'var(--color-card)', borderRadius: 18, boxShadow: '0 2px 16px #0001', padding: 18 }}>
+          <div style={{ fontWeight: 600, fontSize: 17, color: 'var(--color-text-main)', marginBottom: 10 }}>Resumen del día</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+            <SummaryCard title="Cobrado hoy" value={cobradoHoy} accentColor="#22C55E" icon={<span>✔️</span>} onClick={handleCobradoHoyClick} />
+            <SummaryCard title="Prestado hoy" value={prestadoHoy} accentColor="#3B82F6" icon={<span>📘</span>} onClick={handlePrestadoHoyClick} />
+            <SummaryCard title="Clientes con abono" value={clientesConAbono} accentColor="#E5E7EB" icon={<span>👥</span>} />
+            <SummaryCard title="Gastos del día" value={gastosDelDia} accentColor="#EF4444" icon={<span>🔴</span>} />
+          </div>
+          <div style={{ marginTop: 18 }}>
+            <SummaryCard title="Total por cobrar" value={totalPorCobrar} accentColor="#4CAF7A" icon={<span>💰</span>} />
+          </div>
+        </div>
       </div>
-      <section className="cash-card">
-        <span>Caja Real</span>
-        <strong>$4,124</strong>
-      </section>
-      <section className="metrics">
-        {metrics.map((m) => (
-          <MetricCard key={m.title} title={m.title} value={m.value} type={m.type} onClick={m.onClick} />
-        ))}
-      </section>
-      <PagosHoyModal open={showPagosModal} pagos={pagosHoy} onClose={() => setShowPagosModal(false)} />
-      <PrestamosHoyModal open={showPrestamosModal} prestamos={prestamosHoy} onClose={() => setShowPrestamosModal(false)} />
+      {/* Barra de navegación inferior (opcional) */}
+      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--color-card)', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-around', alignItems: 'center', height: 60, boxShadow: '0 -2px 12px #0001' }}>
+        <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)' }}>
+          <span style={{ fontSize: 22 }}>🏠</span>
+          <div style={{ fontSize: 13 }}>Inicio</div>
+        </div>
+        <div style={{ textAlign: 'center', color: 'var(--color-primary)' }}>
+          <span style={{ fontSize: 22 }}>📊</span>
+          <div style={{ fontSize: 13, fontWeight: 600 }}>Reporte</div>
+        </div>
+        <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)' }}>
+          <span style={{ fontSize: 22 }}>💬</span>
+          <div style={{ fontSize: 13 }}>Mensajes</div>
+        </div>
+      </nav>
     </div>
   );
-}
+};
 
 export default ReporteDiarioPage;

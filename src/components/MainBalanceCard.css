@@ -1,0 +1,26 @@
+.main-balance-card {
+    background: var(--color-card, #fff);
+    border-radius: 18px;
+    box-shadow: 0 4px 24px #0001;
+    padding: 20px;
+    margin: 16px 0;
+    text-align: center;
+}
+
+.mb-label {
+    font-size: 13px;
+    color: var(--color-text-secondary, #6B7280);
+}
+
+.mb-amount {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--color-text-main, #111827);
+    margin: 8px 0;
+}
+
+.mb-today {
+    font-size: 15px;
+    color: var(--color-green, #22C55E);
+    font-weight: 500;
+}

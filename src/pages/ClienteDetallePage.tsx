@@ -57,9 +57,9 @@ export default function ClienteDetallePage() {
         </button>
         <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 16, marginTop: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#22C55E', fontWeight: 600, fontSize: 15 }}>
-            <span style={{ fontSize: 20 }}>📍</span> Dirección
+            <span style={{ fontSize: 20 }}>�</span> Pagos registrados
           </div>
-          <div style={{ color: '#111827', fontSize: 15, marginTop: 6 }}>{cliente.direccion}</div>
+          <div style={{ color: '#888', fontSize: 14, marginTop: 6 }}>No hay pagos registrados</div>
         </div>
       </div>
     </div>
