@@ -67,7 +67,7 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 28, minWidth: 320, width: 340, position: 'relative' }}>
-        <button onClick={onClose} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
+        <button onClick={onClose} style={{ position: 'absolute', top:10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
         <h3 style={{ marginTop: 0, marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Registrar pago</h3>
         <div style={{ marginBottom: 10, fontWeight: 600 }}>{cliente.nombre}</div>
         <form onSubmit={async e => {
@@ -638,7 +638,7 @@ const ClientesPage: React.FC = () => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 12px 0 12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', fontSize: 26, color: '#4e7fa6', marginRight: 2, cursor: 'pointer', padding: 0 }}>
-              <RyaMenuIcon size={32} />
+              <RyaMenuIcon size={40} />
             </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
