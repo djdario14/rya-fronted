@@ -65,6 +65,7 @@ const ReporteDiarioPage: React.FC = () => {
             <SummaryCard title="Prestado hoy" value={prestadoHoy} accentColor="#3B82F6" icon={<span>📘</span>} onClick={handlePrestadoHoyClick} />
             <SummaryCard title="Clientes con abono" value={clientesConAbono} accentColor="#E5E7EB" icon={<span>👥</span>} />
             <SummaryCard title="Gastos del día" value={gastosDelDia} accentColor="#EF4444" icon={<span>🔴</span>} />
+            <SummaryCard title="Clientes nuevos" value={""} accentColor="#6366F1" icon={<span>🆕</span>} onClick={() => alert('Ver clientes nuevos')} />
           </div>
           <div style={{ marginTop: 18 }}>
             <SummaryCard title="Total por cobrar" value={totalPorCobrar} accentColor="#4CAF7A" icon={<span>💰</span>} />
