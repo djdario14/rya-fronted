@@ -31,13 +31,39 @@
     font-size: 19px;
     font-weight: 600;
     color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
+.edit-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.edit-btn svg {
+    color: #6366F1;
+    stroke: #6366F1;
+    transition: stroke 0.2s;
+}
+
+.edit-btn:hover svg {
+    color: #4338CA;
+    stroke: #4338CA;
+}
+
+
+}
 .client-meta {
     font-size: 13px;
     color: #6B7280;
 }
-
 .map-btn {
     background: #F9FAFB;
     color: #2563EB;
