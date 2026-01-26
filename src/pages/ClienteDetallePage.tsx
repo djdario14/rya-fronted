@@ -1,10 +1,20 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../api/client';
 import ClientHeaderCard from '../components/ClientHeaderCard';
 import BalanceCard from '../components/BalanceCard';
 import PrimaryActionButton from '../components/PrimaryActionButton';
+import EditClienteModal from '../components/EditClienteModal';
+
+type Cliente = {
+  id: number;
+  nombre: string;
+  cedula: string;
+  telefono: string;
+  direccion: string;
+  negocio: string;
+  // Agrega otros campos si es necesario
+};
 import '../styles/theme.css';
 
 export default function ClienteDetallePage() {
@@ -16,7 +26,7 @@ export default function ClienteDetallePage() {
   };
   const [pagos, setPagos] = useState<Pago[]>([]);
   const { id } = useParams<{ id: string }>();
-  const [cliente, setCliente] = useState<any>(null);
+  const [cliente, setCliente] = useState<Cliente | null>(null);
   type SaldoResponse = {
     saldo: number;
     prestamo: number;
@@ -30,10 +40,11 @@ export default function ClienteDetallePage() {
   };
   const [saldo, setSaldo] = useState<SaldoResponse | null>(null);
   const [fechaCredito, setFechaCredito] = useState<string | null>(null);
+  const [showEditCliente, setShowEditCliente] = useState(false);
 
   useEffect(() => {
     if (id) {
-      api.get(`/clientes/${id}`).then(res => setCliente(res.data));
+      api.get(`/clientes/${id}`).then(res => setCliente(res.data as Cliente));
       api.get(`/clientes/${id}/saldo`).then(res => {
         const data = res.data as SaldoResponse;
         setSaldo(data);
@@ -70,6 +81,7 @@ export default function ClienteDetallePage() {
               alert(cliente.direccion);
             }
           }}
+          onEdit={() => setShowEditCliente(true)}
         />
         {/* Calcular cuotas pagadas según fórmula: (total_credito - saldo) / valor_cuota */}
         {(() => {
@@ -110,6 +122,19 @@ export default function ClienteDetallePage() {
           )}
         </div>
       </div>
+      {showEditCliente && (
+        <EditClienteModal
+          cliente={cliente}
+          onClose={() => setShowEditCliente(false)}
+          onSave={async (data: Partial<Cliente>) => {
+            await api.put(`/clientes/${cliente.id}`, data);
+            setShowEditCliente(false);
+            // Recargar datos del cliente
+            const res = await api.get(`/clientes/${cliente.id}`);
+            setCliente(res.data as Cliente);
+          }}
+        />
+      )}
     </div>
   );
 }
