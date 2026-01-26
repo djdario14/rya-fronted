@@ -5,6 +5,7 @@ import ClientHeaderCard from '../components/ClientHeaderCard';
 import BalanceCard from '../components/BalanceCard';
 import PrimaryActionButton from '../components/PrimaryActionButton';
 import EditClienteModal from '../components/EditClienteModal';
+import NuevoCreditoButton from '../components/NuevoCreditoButton';
 
 type Cliente = {
   id: number;
@@ -41,6 +42,8 @@ export default function ClienteDetallePage() {
   const [saldo, setSaldo] = useState<SaldoResponse | null>(null);
   const [fechaCredito, setFechaCredito] = useState<string | null>(null);
   const [showEditCliente, setShowEditCliente] = useState(false);
+  // Para refrescar datos tras registrar crédito
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (id) {
@@ -56,7 +59,7 @@ export default function ClienteDetallePage() {
       });
       api.get(`/clientes/${id}/pagos`).then(res => setPagos(res.data as Pago[]));
     }
-  }, [id]);
+  }, [id, refreshKey]);
 
   if (!cliente || !saldo) return <div style={{ padding: 32 }}>Cargando...</div>;
 
@@ -98,6 +101,11 @@ export default function ClienteDetallePage() {
         })()}
         <PrimaryActionButton label={<><span style={{display:'inline-flex',alignItems:'center',gap:6}}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{verticalAlign:'middle'}}><rect x="3" y="4" width="18" height="16" rx="2" stroke="#fff" strokeWidth="2"/><path d="M8 2v4M16 2v4" stroke="#fff" strokeWidth="2" strokeLinecap="round"/><circle cx="12" cy="14" r="3" fill="#fff"/></svg> Historial crediticio</span></>} color="#22C55E" onPress={() => alert('Historial crediticio')} />
         <PrimaryActionButton label={<><span style={{display:'inline-flex',alignItems:'center',gap:6}}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{verticalAlign:'middle'}}><rect x="3" y="4" width="18" height="16" rx="2" stroke="#fff" strokeWidth="2"/><path d="M8 2v4M16 2v4" stroke="#fff" strokeWidth="2" strokeLinecap="round"/><rect x="7" y="10" width="10" height="2" rx="1" fill="#fff"/></svg> Agendar visita</span></>} color="#2563EB" onPress={() => alert('Agendar visita')} />
+        {/* Botón para registrar nuevo crédito */}
+        <NuevoCreditoButton
+          cliente={{ id: cliente.id, nombre: cliente.nombre }}
+          onCreditoRegistrado={() => setRefreshKey(k => k + 1)}
+        />
         <button style={{ width: '100%', height: 52, borderRadius: 16, fontSize: 16, fontWeight: 600, color: '#111827', background: '#fff', border: '1.5px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12, boxShadow: '0 2px 12px #0001', cursor: 'pointer' }}
           onClick={() => window.open(`https://wa.me/${cliente.telefono.replace(/[^\d]/g, '')}`, '_blank')}
         >
