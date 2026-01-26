@@ -791,6 +791,20 @@ const ClientesPage: React.FC = () => {
         onClose={() => setShowPagoModal(false)}
         onSuccess={fetchClientes}
       />
+      {/* Modal para registrar nuevo crédito */}
+      {showCreditoModal && nuevoCliente && (
+        <CreditoModal
+          clienteNombre={nuevoCliente.nombre}
+          onClose={() => setShowCreditoModal(false)}
+          onSubmit={async (data) => {
+            // Aquí deberías llamar a tu API para registrar el nuevo préstamo
+            // y luego refrescar la lista de clientes
+            setShowCreditoModal(false);
+            setNuevoCliente(null);
+            fetchClientes();
+          }}
+        />
+      )}
     </div>
   );
 }
