@@ -1,76 +1,68 @@
-.client-header-card {
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 2px 16px #0001;
-    padding: 16px;
-    margin-bottom: 16px;
-}
-
-.client-header-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.client-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: #F5F7FA;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-}
-
-.client-header-info {
-    flex: 1;
-}
-
-.client-name {
-    font-size: 19px;
-    font-weight: 600;
-    color: #111827;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.edit-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: color 0.2s;
-}
-
-.edit-btn svg {
-    color: #6366F1;
-    stroke: #6366F1;
-    transition: stroke 0.2s;
-}
-
-.edit-btn:hover svg {
-    color: #4338CA;
-    stroke: #4338CA;
-}
-
-
-}
-.client-meta {
-    font-size: 13px;
-    color: #6B7280;
-}
-.map-btn {
-    background: #F9FAFB;
-    color: #2563EB;
-    border: 1px solid #2563EB;
-    border-radius: 10px;
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-}
+        .client-header-card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 2px 16px #0001;
+            padding: 16px;
+            margin-bottom: 16px;
+            .client-header-row {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+            .client-avatar {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                background: #F5F7FA;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 28px;
+            }
+            .client-header-info {
+                flex: 1;
+            }
+            .client-name {
+                font-size: 19px;
+                font-weight: 600;
+                color: #111827;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .edit-btn {
+                background: none;
+                border: none;
+                padding: 0;
+                margin: 0;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                transition: color 0.2s;
+            }
+            .edit-btn svg {
+                color: #6366F1;
+                stroke: #6366F1;
+                transition: stroke 0.2s;
+            }
+            .edit-btn:hover svg {
+                color: #4338CA;
+                stroke: #4338CA;
+            }
+        }
+        
+        .client-meta {
+            font-size: 13px;
+            color: #6B7280;
+        }
+        
+        .map-btn {
+            background: #F9FAFB;
+            color: #2563EB;
+            border: 1px solid #2563EB;
+            border-radius: 10px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+        }
