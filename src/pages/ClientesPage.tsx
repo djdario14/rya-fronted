@@ -205,6 +205,7 @@ type Cliente = {
   cuotasPagadas?: number;
   cuotasTotal?: number;
   estado?: string; // <-- Agregado para evitar error TS
+  ultimo_pago?: string; // Fecha YYYY-MM-DD del último pago
 };
 
 const ClientesPage: React.FC = () => {
@@ -759,8 +760,16 @@ const ClientesPage: React.FC = () => {
               .filter(cliente => {
                 // Filtro por tab
                 if (tab === 'pendientes') {
-                  // Mostrar solo clientes con saldo pendiente mayor a 0
-                  return (cliente.saldo ?? 0) > 0;
+                  // Mostrar solo clientes que NO han pagado hoy y tienen saldo > 0 o préstamo activo
+                  // Suponemos que cliente tiene campos: saldo, estado, y un campo 'ultimo_pago' (fecha string) opcional
+                  const hoy = new Date().toISOString().slice(0, 10);
+                  // Si el cliente tiene saldo > 0 o estado 'activo', y no ha pagado hoy
+                  // Si existe cliente.ultimo_pago, comparar con hoy
+                  // Si no existe, consideramos que no ha pagado hoy
+                  const saldoPositivo = (cliente.saldo ?? 0) > 0;
+                  const prestamoActivo = cliente.estado === 'activo';
+                  const pagoHoy = cliente.ultimo_pago === hoy;
+                  return (saldoPositivo || prestamoActivo) && !pagoHoy;
                 }
                 // Si es 'todos', mostrar todos
                 return true;
