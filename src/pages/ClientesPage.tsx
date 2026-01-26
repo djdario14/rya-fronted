@@ -843,8 +843,8 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle, onNuevoCredito }: {
     return () => { mounted = false; };
   }, [cliente.id]);
 
-  // Mostrar botón solo si saldo === 0, estado === 'pagado' y tiene un préstamo anterior pagado (ultimo_pago no null, no undefined, no vacío)
-  const mostrarNuevoCredito = (saldo === 0 && (estado === 'pagado' || estado === 'PAGADO') && cliente.ultimo_pago && cliente.ultimo_pago !== '');
+  // Mostrar botón solo si saldo === 0 y tiene un préstamo anterior pagado (ultimo_pago no null, no undefined, no vacío)
+  const mostrarNuevoCredito = (saldo === 0 && cliente.ultimo_pago && cliente.ultimo_pago !== '');
 
   return (
     <div
