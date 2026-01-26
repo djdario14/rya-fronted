@@ -18,14 +18,14 @@ const CreditoModal: React.FC<CreditoModalProps> = ({ clienteNombre, onClose, onS
   const [valor, setValor] = useState(0);
   const [interes, setInteres] = useState(20);
   const [formaPago, setFormaPago] = useState(formasPago[0].label);
-  // Fecha y hora local actual en formato ISO (date-time) usando offset global
+  // Fecha editable, solo YYYY-MM-DD
   const offset = useTimezoneOffset();
-  const [fecha] = useState(() => {
+  const [fecha, setFecha] = useState(() => {
     const d = new Date();
     // offset en milisegundos
     const tzOffsetMs = offset * 60000;
-    const localISOTime = new Date(d.getTime() + tzOffsetMs).toISOString().slice(0, 19);
-    return localISOTime;
+    const localISODate = new Date(d.getTime() + tzOffsetMs).toISOString().slice(0, 10);
+    return localISODate;
   });
 
   const cuotas = formasPago.find(f => f.label === formaPago)?.cuotas || 1;
@@ -88,8 +88,8 @@ const CreditoModal: React.FC<CreditoModalProps> = ({ clienteNombre, onClose, onS
             <input type="number" value={valorCuota} readOnly style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc", background: "#f7f7f7" }} />
           </div>
           <div style={{ marginBottom: 16 }}>
-            <label>Fecha y hora del crédito</label>
-            <input type="text" value={fecha.replace('T', ' ')} readOnly style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc", background: "#f7f7f7" }} />
+            <label>Fecha del crédito</label>
+            <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
             <button type="button" onClick={onClose} style={{ background: "#eee", color: "#333", border: "none", borderRadius: 10, padding: "10px 24px", fontWeight: 600, fontSize: 16, cursor: "pointer" }}>Cancelar</button>
