@@ -845,6 +845,7 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle, onNuevoCredito }: {
 
   // Mostrar botón solo si saldo === 0 y tiene un préstamo anterior pagado (ultimo_pago no null, no undefined, no vacío)
   const mostrarNuevoCredito = (saldo === 0 && cliente.ultimo_pago && cliente.ultimo_pago !== '');
+  const mostrarAbonar = (saldo !== null && saldo > 0 && estado === 'activo');
 
   return (
     <div
@@ -881,7 +882,7 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle, onNuevoCredito }: {
           </div>
         )}
       </div>
-      {mostrarNuevoCredito ? (
+      {mostrarNuevoCredito && (
         <button
           className="btn-nuevo-credito"
           style={{
@@ -904,7 +905,8 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle, onNuevoCredito }: {
         >
           Nuevo crédito
         </button>
-      ) : (
+      )}
+      {mostrarAbonar && (
         <button
           className="btn-abonar"
           style={{
