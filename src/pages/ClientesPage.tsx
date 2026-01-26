@@ -625,10 +625,10 @@ const ClientesPage: React.FC = () => {
             <button onClick={() => setShowPrestamoSelector(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
             <h3 style={{ marginTop: 0, marginBottom: 18, fontWeight: 700, fontSize: 20 }}>Selecciona un cliente</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {clientes.filter(c => (c.saldo ?? 0) === 0).length === 0 ? (
+              {clientes.filter(c => Math.abs(c.saldo ?? 0) < 0.01).length === 0 ? (
                 <div style={{ color: '#888', textAlign: 'center' }}>No hay clientes elegibles para préstamo</div>
               ) : (
-                clientes.filter(c => (c.saldo ?? 0) === 0).map(c => (
+                clientes.filter(c => Math.abs(c.saldo ?? 0) < 0.01).map(c => (
                   <button key={c.id} onClick={() => { setShowPrestamoSelector(false); setClienteParaPrestamo(c); }} style={{ padding: '10px 0', borderRadius: 8, border: '1px solid #4e7fa6', background: '#f6f8fa', color: '#4e7fa6', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}>{c.nombre}</button>
                 ))
               )}
