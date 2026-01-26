@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTimezoneOffset } from '../context/TimezoneContext';
 
 const formasPago = [
   { label: "Diario", cuotas: 30 },
@@ -17,12 +18,13 @@ const CreditoModal: React.FC<CreditoModalProps> = ({ clienteNombre, onClose, onS
   const [valor, setValor] = useState(0);
   const [interes, setInteres] = useState(20);
   const [formaPago, setFormaPago] = useState(formasPago[0].label);
-  // Fecha y hora local actual en formato ISO (date-time)
+  // Fecha y hora local actual en formato ISO (date-time) usando offset global
+  const offset = useTimezoneOffset();
   const [fecha] = useState(() => {
     const d = new Date();
-    // Formato completo ISO local (YYYY-MM-DDTHH:mm:ss)
-    const tzOffset = d.getTimezoneOffset() * 60000;
-    const localISOTime = new Date(d.getTime() - tzOffset).toISOString().slice(0, 19);
+    // offset en milisegundos
+    const tzOffsetMs = offset * 60000;
+    const localISOTime = new Date(d.getTime() + tzOffsetMs).toISOString().slice(0, 19);
     return localISOTime;
   });
 

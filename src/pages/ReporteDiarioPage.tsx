@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTimezoneOffset } from '../context/TimezoneContext';
 import '../styles/theme.css';
 import AppHeader from '../components/AppHeader';
 import MainBalanceCard from '../components/MainBalanceCard';
@@ -16,7 +17,9 @@ const ReporteDiarioPage: React.FC = () => {
   const [hoyExtra, setHoyExtra] = useState<string>('$312');
   const [clientesConAbono, setClientesConAbono] = useState<string>('0 de 3 (0%)');
   const [totalPorCobrar, setTotalPorCobrar] = useState<string>('$11');
-  const [gastosDelDia, setGastosDelDia] = useState<string>('$25');
+  const [gastosDelDia, setGastosDelDia] = useState<string>('$0');
+
+  const offset = useTimezoneOffset();
 
   useEffect(() => {
     api.get<{ total: number }>('/pagos/suma-hoy')
@@ -29,6 +32,14 @@ const ReporteDiarioPage: React.FC = () => {
         setPrestadoHoy(`$${res.data.total ?? 0}`);
       })
       .catch(() => setPrestadoHoy('$0'));
+
+    // Obtener gastos del día según zona horaria global
+    api.get<any[]>(`/gastos/del-dia?offset=${offset}`)
+      .then(res => {
+        const total = res.data.reduce((acc, gasto) => acc + (gasto.monto || 0), 0);
+        setGastosDelDia(`$${total}`);
+      })
+      .catch(() => setGastosDelDia('$0'));
   }, []);
 
   const handleCobradoHoyClick = async () => {
@@ -63,11 +74,9 @@ const ReporteDiarioPage: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <SummaryCard title="Cobrado hoy" value={cobradoHoy} accentColor="#22C55E" icon={<span>✔️</span>} onClick={handleCobradoHoyClick} />
             <SummaryCard title="Prestado hoy" value={prestadoHoy} accentColor="#3B82F6" icon={<span>📘</span>} onClick={handlePrestadoHoyClick} />
-            <SummaryCard title="Clientes con abono" value={clientesConAbono} accentColor="#E5E7EB" icon={<span>👥</span>} />
-            <SummaryCard title="Gastos del día" value={gastosDelDia} accentColor="#EF4444" icon={<span>🔴</span>} />
             <SummaryCard title="Clientes nuevos" value={""} accentColor="#6366F1" icon={<span>🆕</span>} onClick={() => alert('Ver clientes nuevos')} />
-          </div>
-          <div style={{ marginTop: 18 }}>
+            <SummaryCard title="Gastos del día" value={gastosDelDia} accentColor="#EF4444" icon={<span>🔴</span>} />
+            <SummaryCard title="Clientes con abono" value={clientesConAbono} accentColor="#E5E7EB" icon={<span>👥</span>} />
             <SummaryCard title="Total por cobrar" value={totalPorCobrar} accentColor="#4CAF7A" icon={<span>💰</span>} />
           </div>
         </div>

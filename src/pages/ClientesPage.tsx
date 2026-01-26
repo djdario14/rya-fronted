@@ -111,7 +111,15 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
               required={!noPago}
               disabled={noPago}
               value={monto}
-              onChange={e => setMonto(e.target.value)}
+              max={saldoPendiente !== null ? saldoPendiente : undefined}
+              onChange={e => {
+                const val = e.target.value;
+                if (saldoPendiente !== null && parseFloat(val) > saldoPendiente) {
+                  setMonto(saldoPendiente.toString());
+                } else {
+                  setMonto(val);
+                }
+              }}
               onFocus={e => setMonto('')}
               style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc', background: noPago ? '#f5f5f5' : undefined }}
             />
