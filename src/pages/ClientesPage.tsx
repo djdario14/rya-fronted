@@ -204,6 +204,7 @@ type Cliente = {
   prestamo?: number;
   cuotasPagadas?: number;
   cuotasTotal?: number;
+  estado?: string; // <-- Agregado para evitar error TS
 };
 
 const ClientesPage: React.FC = () => {
@@ -773,6 +774,10 @@ const ClientesPage: React.FC = () => {
                     setShowPagoModal(true);
                   }}
                   onDetalle={() => navigate(`/clientes/${cliente.id}`)}
+                  onNuevoCredito={() => {
+                    setNuevoCliente(cliente);
+                    setShowCreditoModal(true);
+                  }}
                 />
               ))
           )}
@@ -791,27 +796,31 @@ const ClientesPage: React.FC = () => {
 }
 
 // --- Componente ClienteCardRealtime ---
-function ClienteCardRealtime({ cliente, onAbonar, onDetalle }: { cliente: Cliente, onAbonar: () => void, onDetalle: () => void }) {
+function ClienteCardRealtime({ cliente, onAbonar, onDetalle, onNuevoCredito }: { cliente: Cliente, onAbonar: () => void, onDetalle: () => void, onNuevoCredito: () => void }) {
   const [saldo, setSaldo] = React.useState<number | null>(null);
   const [atraso, setAtraso] = React.useState<number | undefined>(cliente.atraso);
+  const [estado, setEstado] = React.useState<string | undefined>(cliente.estado);
 
   React.useEffect(() => {
     let mounted = true;
     async function fetchSaldo() {
       try {
-        const res = await api.get<{ saldo?: number; atraso?: number }>(`/clientes/${cliente.id}/saldo`);
+        const res = await api.get<{ saldo?: number; atraso?: number; estado?: string }>(`/clientes/${cliente.id}/saldo`);
         if (mounted && res.data) {
           setSaldo(res.data.saldo ?? 0);
           if (typeof res.data.atraso !== 'undefined') setAtraso(res.data.atraso);
+          if (typeof res.data.estado !== 'undefined') setEstado(res.data.estado);
         }
       } catch (err) {
         console.error('Error al obtener saldo:', err);
-        setSaldo(null); // Si falla, mostrar "Cargando..."
+        setSaldo(null);
       }
     }
     fetchSaldo();
     return () => { mounted = false; };
   }, [cliente.id]);
+
+  const mostrarNuevoCredito = (saldo === 0 || estado === 'pagado');
 
   return (
     <div
@@ -828,7 +837,7 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle }: { cliente: Client
         minHeight: 60
       }}
       onClick={e => {
-        if ((e.target as HTMLElement).closest('.btn-abonar')) return;
+        if ((e.target as HTMLElement).closest('.btn-abonar') || (e.target as HTMLElement).closest('.btn-nuevo-credito')) return;
         onDetalle();
       }}
     >
@@ -848,28 +857,53 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle }: { cliente: Client
           </div>
         )}
       </div>
-      <button
-        className="btn-abonar"
-        style={{
-          background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 8,
-          fontWeight: 700,
-          fontSize: 16,
-          padding: '8px 22px',
-          marginLeft: 12,
-          boxShadow: '0 2px 8px #0001',
-          cursor: 'pointer',
-          transition: 'background 0.2s'
-        }}
-        onClick={e => {
-          e.stopPropagation();
-          onAbonar();
-        }}
-      >
-        Abonar
-      </button>
+      {mostrarNuevoCredito ? (
+        <button
+          className="btn-nuevo-credito"
+          style={{
+            background: 'linear-gradient(90deg, #43a047 0%, #1976d2 100%)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            fontWeight: 700,
+            fontSize: 16,
+            padding: '8px 22px',
+            marginLeft: 12,
+            boxShadow: '0 2px 8px #0001',
+            cursor: 'pointer',
+            transition: 'background 0.2s'
+          }}
+          onClick={e => {
+            e.stopPropagation();
+            onNuevoCredito();
+          }}
+        >
+          Nuevo crédito
+        </button>
+      ) : (
+        <button
+          className="btn-abonar"
+          style={{
+            background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            fontWeight: 700,
+            fontSize: 16,
+            padding: '8px 22px',
+            marginLeft: 12,
+            boxShadow: '0 2px 8px #0001',
+            cursor: 'pointer',
+            transition: 'background 0.2s'
+          }}
+          onClick={e => {
+            e.stopPropagation();
+            onAbonar();
+          }}
+        >
+          Abonar
+        </button>
+      )}
     </div>
   );
 }
