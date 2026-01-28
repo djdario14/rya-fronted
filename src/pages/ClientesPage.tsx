@@ -816,8 +816,8 @@ const ClientesPage: React.FC = () => {
 
 // --- Componente ClienteCardRealtime ---
 function ClienteCardRealtime({ cliente, onAbonar, onDetalle, onNuevoCredito }: { cliente: Cliente, onAbonar: () => void, onDetalle: () => void, onNuevoCredito: () => void }) {
-  // SOLO PARA PRUEBA: Forzar saldo 0 a un cliente específico (por ejemplo, id === 1)
-  const [saldo, setSaldo] = React.useState<number | null>(cliente.id === 1 ? 0 : null);
+  // SOLO PARA PRUEBA: Forzar saldo 0 a un cliente específico (por ejemplo, id === 109)
+  const [saldo, setSaldo] = React.useState<number | null>(cliente.id === 109 ? 0 : null);
   const [atraso, setAtraso] = React.useState<number | undefined>(cliente.atraso);
   const [estado, setEstado] = React.useState<string | undefined>(cliente.estado);
 
@@ -825,7 +825,7 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle, onNuevoCredito }: {
     let mounted = true;
     async function fetchSaldo() {
       try {
-        if (cliente.id === 1) {
+        if (cliente.id === 109) {
           setSaldo(0); // Forzar saldo 0 solo para pruebas
         } else {
           const res = await api.get<{ saldo?: number; atraso?: number; estado?: string }>(`/clientes/${cliente.id}/saldo`);
