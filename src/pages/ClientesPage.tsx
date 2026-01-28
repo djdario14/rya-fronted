@@ -358,7 +358,7 @@ const ClientesPage: React.FC = () => {
   const [form, setForm] = useState<Cliente>({
     id: -1,
     nombre: '',
-    cedula: '',
+         cedula: '',
     direccion: '',
     negocio: '',
     telefono: '',
@@ -484,7 +484,18 @@ const ClientesPage: React.FC = () => {
             }}>
               <div style={{ marginBottom: 12 }}>
                 <label>Nombre</label>
-                <input type="text" required value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+                <input
+                  type="text"
+                  required
+                  value={form.nombre}
+                  onChange={e => {
+                    const value = e.target.value;
+                    // Capitaliza la primera letra de cada palabra
+                    const capitalized = value.replace(/\b\w/g, l => l.toUpperCase());
+                    setForm(f => ({ ...f, nombre: capitalized }));
+                  }}
+                  style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }}
+                />
               </div>
               <div style={{ marginBottom: 12 }}>
                 <label>Cédula</label>
