@@ -13,7 +13,7 @@ const ReporteDiarioPage: React.FC = () => {
   const [prestadoHoy, setPrestadoHoy] = useState<string>('$0');
   const [showPrestamosModal, setShowPrestamosModal] = useState(false);
   const [prestamosHoy, setPrestamosHoy] = useState<any[]>([]);
-  const [cajaReal, setCajaReal] = useState<string>('$4,124');
+  const [cajaReal, setCajaReal] = useState<string>('$0');
   const [hoyExtra, setHoyExtra] = useState<string>('$312');
   const [clientesConAbono, setClientesConAbono] = useState<string>('0 de 3 (0%)');
   const [totalPorCobrar, setTotalPorCobrar] = useState<string>('$11');
