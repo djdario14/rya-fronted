@@ -36,7 +36,7 @@ export default function ClienteDetallePage() {
     cuotasTotal: number;
     cuotasPagadas: number;
     atraso: number;
-    fecha?: string;
+    creado_en?: string;
   };
   const [saldo, setSaldo] = useState<SaldoResponse | null>(null);
   const [fechaCredito, setFechaCredito] = useState<string | null>(null);
@@ -50,8 +50,8 @@ export default function ClienteDetallePage() {
       api.get(`/clientes/${id}/saldo`).then(res => {
         const data = res.data as SaldoResponse;
         setSaldo(data);
-        if ('fecha' in data && data.fecha) {
-          setFechaCredito(data.fecha);
+        if ('creado_en' in data && data.creado_en) {
+          setFechaCredito(data.creado_en);
         } else {
           setFechaCredito(null);
         }

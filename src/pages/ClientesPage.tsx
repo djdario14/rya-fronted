@@ -13,7 +13,7 @@ type PrestamoActivo = {
   id: number;
   cliente_id: number;
   monto: number;
-  fecha: string;
+  creado_en?: string;
   estado: string;
   interes: number;
   total: number;
