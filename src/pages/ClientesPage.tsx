@@ -816,8 +816,7 @@ const ClientesPage: React.FC = () => {
 
 // --- Componente ClienteCardRealtime ---
 function ClienteCardRealtime({ cliente, onAbonar, onDetalle, onNuevoCredito }: { cliente: Cliente, onAbonar: () => void, onDetalle: () => void, onNuevoCredito: () => void }) {
-  // SOLO PARA PRUEBA: Forzar saldo 0 a un cliente específico (por ejemplo, id === 109)
-  const [saldo, setSaldo] = React.useState<number | null>(cliente.id === 109 ? 0 : null);
+  const [saldo, setSaldo] = React.useState<number | null>(null);
   const [atraso, setAtraso] = React.useState<number | undefined>(cliente.atraso);
   const [estado, setEstado] = React.useState<string | undefined>(cliente.estado);
 
@@ -825,15 +824,11 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle, onNuevoCredito }: {
     let mounted = true;
     async function fetchSaldo() {
       try {
-        if (cliente.id === 109) {
-          setSaldo(0); // Forzar saldo 0 solo para pruebas
-        } else {
-          const res = await api.get<{ saldo?: number; atraso?: number; estado?: string }>(`/clientes/${cliente.id}/saldo`);
-          if (mounted && res.data) {
-            setSaldo(res.data.saldo ?? 0);
-            if (typeof res.data.atraso !== 'undefined') setAtraso(res.data.atraso);
-            if (typeof res.data.estado !== 'undefined') setEstado(res.data.estado);
-          }
+        const res = await api.get<{ saldo?: number; atraso?: number; estado?: string }>(`/clientes/${cliente.id}/saldo`);
+        if (mounted && res.data) {
+          setSaldo(res.data.saldo ?? 0);
+          if (typeof res.data.atraso !== 'undefined') setAtraso(res.data.atraso);
+          if (typeof res.data.estado !== 'undefined') setEstado(res.data.estado);
         }
       } catch (err) {
         console.error('Error al obtener saldo:', err);
