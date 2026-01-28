@@ -14,6 +14,10 @@ const ReporteDiarioPage: React.FC = () => {
   const [showPrestamosModal, setShowPrestamosModal] = useState(false);
   const [prestamosHoy, setPrestamosHoy] = useState<any[]>([]);
   const [cajaReal, setCajaReal] = useState<string>('$0');
+  // Estados numéricos para la lógica de caja
+  const [cobradoHoyNum, setCobradoHoyNum] = useState(0);
+  const [prestadoHoyNum, setPrestadoHoyNum] = useState(0);
+  const [gastosDelDiaNum, setGastosDelDiaNum] = useState(0);
   const [hoyExtra, setHoyExtra] = useState<string>('$312');
   const [clientesConAbono, setClientesConAbono] = useState<string>('0 de 3 (0%)');
   const [totalPorCobrar, setTotalPorCobrar] = useState<string>('$11');
@@ -24,22 +28,35 @@ const ReporteDiarioPage: React.FC = () => {
   useEffect(() => {
     api.get<{ total: number }>('/pagos/suma-hoy')
       .then(res => {
-        setCobradoHoy(`$${res.data.total ?? 0}`);
+        const total = res.data.total ?? 0;
+        setCobradoHoy(`$${total}`);
+        setCobradoHoyNum(total);
       })
-      .catch(() => setCobradoHoy('$0'));
+      .catch(() => {
+        setCobradoHoy('$0');
+        setCobradoHoyNum(0);
+      });
     api.get<{ total: number }>('/prestamos/suma-hoy')
       .then(res => {
-        setPrestadoHoy(`$${res.data.total ?? 0}`);
+        const total = res.data.total ?? 0;
+        setPrestadoHoy(`$${total}`);
+        setPrestadoHoyNum(total);
       })
-      .catch(() => setPrestadoHoy('$0'));
-
+      .catch(() => {
+        setPrestadoHoy('$0');
+        setPrestadoHoyNum(0);
+      });
     // Obtener gastos del día según zona horaria global
     api.get<any[]>(`/gastos/del-dia?offset=${offset}`)
       .then(res => {
         const total = res.data.reduce((acc, gasto) => acc + (gasto.monto || 0), 0);
         setGastosDelDia(`$${total}`);
+        setGastosDelDiaNum(total);
       })
-      .catch(() => setGastosDelDia('$0'));
+      .catch(() => {
+        setGastosDelDia('$0');
+        setGastosDelDiaNum(0);
+      });
   }, []);
 
   const handleCobradoHoyClick = async () => {
@@ -63,6 +80,12 @@ const ReporteDiarioPage: React.FC = () => {
       setShowPrestamosModal(true);
     }
   };
+
+  // Calcular caja real
+  useEffect(() => {
+    const caja = cobradoHoyNum - prestadoHoyNum - gastosDelDiaNum;
+    setCajaReal(`$${caja}`);
+  }, [cobradoHoyNum, prestadoHoyNum, gastosDelDiaNum]);
 
   return (
     <div style={{ background: 'var(--color-bg)', minHeight: '100vh', paddingBottom: 80 }}>
