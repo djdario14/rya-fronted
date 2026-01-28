@@ -1,11 +1,6 @@
-import React from 'react';
 
-interface Cliente {
-  id: number;
-  nombre: string;
-  creado_en: string;
-  // Agrega otros campos relevantes si es necesario
-}
+import React from 'react';
+import { Cliente } from '../types/cliente';
 
 interface NuevoClientesModalProps {
   isOpen: boolean;
@@ -26,9 +21,14 @@ const NuevoClientesModal: React.FC<NuevoClientesModalProps> = ({ isOpen, onClose
             <li>No hay clientes nuevos hoy.</li>
           ) : (
             clientes.map(cliente => (
-              <li key={cliente.id}>
-                <strong>{cliente.nombre}</strong> (ID: {cliente.id})<br />
-                Registrado: {new Date(cliente.creado_en).toLocaleString()}
+              <li key={cliente.id} style={{marginBottom: '1em'}}>
+                <div><strong>Nombre:</strong> {cliente.nombre}</div>
+                <div><strong>ID:</strong> {cliente.id}</div>
+                {cliente.cedula && <div><strong>Cédula:</strong> {cliente.cedula}</div>}
+                {cliente.direccion && <div><strong>Dirección:</strong> {cliente.direccion}</div>}
+                {cliente.negocio && <div><strong>Negocio:</strong> {cliente.negocio}</div>}
+                {cliente.telefono && <div><strong>Teléfono:</strong> {cliente.telefono}</div>}
+                <div><strong>Registrado:</strong> {new Date(cliente.creado_en).toLocaleString()}</div>
               </li>
             ))
           )}
