@@ -50,7 +50,28 @@ export default function EditClienteModal({ cliente, onClose, onSave }: EditClien
           </div>
           <div style={{ marginBottom: 14 }}>
             <label>Dirección</label>
-            <input type="text" value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input type="text" value={form.direccion} onChange={e => setForm(f => ({ ...f, direccion: e.target.value }))} style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }} />
+              <button
+                type="button"
+                title="Usar ubicación actual"
+                style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #4e7fa6', background: '#f6f8fa', color: '#4e7fa6', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}
+                onClick={() => {
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      pos => {
+                        const coords = `${pos.coords.latitude},${pos.coords.longitude}`;
+                        setForm(f => ({ ...f, direccion: coords }));
+                      },
+                      () => alert('No se pudo obtener la ubicación'),
+                      { enableHighAccuracy: true, timeout: 10000 }
+                    );
+                  } else {
+                    alert('Geolocalización no soportada');
+                  }
+                }}
+              >📍</button>
+            </div>
           </div>
           <div style={{ marginBottom: 14 }}>
             <label>Negocio</label>
