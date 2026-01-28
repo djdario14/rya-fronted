@@ -7,6 +7,7 @@ import SummaryCard from '../components/SummaryCard';
 import api from '../api/client';
 
 const ReporteDiarioPage: React.FC = () => {
+    const [clientesNuevos, setClientesNuevos] = useState<number>(0);
   const [cobradoHoy, setCobradoHoy] = useState<string>('$0');
   const [showPagosModal, setShowPagosModal] = useState(false);
   const [pagosHoy, setPagosHoy] = useState<{ cliente: string; monto: number }[]>([]);
@@ -26,6 +27,10 @@ const ReporteDiarioPage: React.FC = () => {
   const offset = useTimezoneOffset();
 
   useEffect(() => {
+        // Obtener clientes nuevos del día
+        api.get<any[]>(`/clientes/nuevos-hoy`).then(res => {
+          setClientesNuevos(res.data.length);
+        }).catch(() => setClientesNuevos(0));
     api.get<{ total: number }>('/pagos/suma-hoy')
       .then(res => {
         const total = res.data.total ?? 0;
@@ -97,7 +102,7 @@ const ReporteDiarioPage: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <SummaryCard title="Cobrado hoy" value={cobradoHoy} accentColor="#22C55E" icon={<span>✔️</span>} onClick={handleCobradoHoyClick} />
             <SummaryCard title="Prestado hoy" value={prestadoHoy} accentColor="#3B82F6" icon={<span>📘</span>} onClick={handlePrestadoHoyClick} />
-            <SummaryCard title="Clientes nuevos" value={""} accentColor="#6366F1" icon={<span>🆕</span>} onClick={() => alert('Ver clientes nuevos')} />
+            <SummaryCard title="Clientes nuevos" value={clientesNuevos.toString()} accentColor="#6366F1" icon={<span>🆕</span>} onClick={() => alert('Ver clientes nuevos')} />
             <SummaryCard title="Gastos del día" value={gastosDelDia} accentColor="#EF4444" icon={<span>🔴</span>} />
             <SummaryCard title="Clientes con abono" value={clientesConAbono} accentColor="#E5E7EB" icon={<span>👥</span>} />
             <SummaryCard title="Total por cobrar" value={totalPorCobrar} accentColor="#4CAF7A" icon={<span>💰</span>} />
