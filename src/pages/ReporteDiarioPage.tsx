@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import NuevoClientesModal from '../components/NuevoClientesModal';
+import GastosDelDiaModal from '../components/GastosDelDiaModal';
 import { Cliente } from '../types/cliente';
+import { Gasto } from '../types/gasto';
 import { useTimezoneOffset } from '../context/TimezoneContext';
 import '../styles/theme.css';
 import AppHeader from '../components/AppHeader';
@@ -24,9 +26,11 @@ const ReporteDiarioPage: React.FC = () => {
   const [prestadoHoyNum, setPrestadoHoyNum] = useState(0);
   const [gastosDelDiaNum, setGastosDelDiaNum] = useState(0);
   const [hoyExtra, setHoyExtra] = useState<string>('$312');
-  const [clientesConAbono, setClientesConAbono] = useState<string>('0 de 3 (0%)');
+  const [clientesConAbono, setClientesConAbono] = useState<string>('0 de 0 (0%)');
   const [totalPorCobrar, setTotalPorCobrar] = useState<string>('$11');
   const [gastosDelDia, setGastosDelDia] = useState<string>('$0');
+  const [gastosDelDiaList, setGastosDelDiaList] = useState<Gasto[]>([]);
+  const [showGastosDelDiaModal, setShowGastosDelDiaModal] = useState(false);
 
   const offset = useTimezoneOffset();
 
@@ -49,6 +53,16 @@ const ReporteDiarioPage: React.FC = () => {
         setCobradoHoy('$0');
         setCobradoHoyNum(0);
       });
+
+    // Obtener clientes con abono hoy y total de clientes
+    Promise.all([
+      api.get<{ cliente: string; monto: number }[]>('/pagos/hoy-detalle'),
+      api.get<Cliente[]>('/clientes/con-saldo')
+    ]).then(([pagosRes, clientesRes]) => {
+      const clientesUnicos = new Set(pagosRes.data.map(p => p.cliente));
+      const totalClientes = clientesRes.data.length;
+      setClientesConAbono(`${clientesUnicos.size} de ${totalClientes}`);
+    }).catch(() => setClientesConAbono('0 de 0 (0%)'));
     api.get<{ total: number }>('/prestamos/suma-hoy')
       .then(res => {
         const total = res.data.total ?? 0;
@@ -60,15 +74,17 @@ const ReporteDiarioPage: React.FC = () => {
         setPrestadoHoyNum(0);
       });
     // Obtener gastos del día según zona horaria global
-    api.get<any[]>(`/gastos/del-dia?offset=${offset}`)
+    api.get<Gasto[]>(`/gastos/del-dia?offset=${offset}`)
       .then(res => {
         const total = res.data.reduce((acc, gasto) => acc + (gasto.monto || 0), 0);
         setGastosDelDia(`$${total}`);
         setGastosDelDiaNum(total);
+        setGastosDelDiaList(res.data);
       })
       .catch(() => {
         setGastosDelDia('$0');
         setGastosDelDiaNum(0);
+        setGastosDelDiaList([]);
       });
   }, []);
 
@@ -118,8 +134,21 @@ const ReporteDiarioPage: React.FC = () => {
                     onClose={() => setShowClientesNuevosModal(false)}
                     clientes={clientesNuevosList}
                   />
-            <SummaryCard title="Gastos del día" value={gastosDelDia} accentColor="#EF4444" icon={<span>🔴</span>} />
-            <SummaryCard title="Clientes con abono" value={clientesConAbono} accentColor="#E5E7EB" icon={<span>👥</span>} />
+            <SummaryCard
+              title="Gastos del día"
+              value={gastosDelDia}
+              accentColor="#EF4444"
+              icon={<span>🔴</span>}
+              onClick={() => setShowGastosDelDiaModal(true)}
+            />
+
+                  {/* Modal de gastos del día */}
+                  <GastosDelDiaModal
+                    isOpen={showGastosDelDiaModal}
+                    onClose={() => setShowGastosDelDiaModal(false)}
+                    gastos={gastosDelDiaList}
+                  />
+            <SummaryCard title="Clientes con abono" value={clientesConAbono} accentColor="#7C3AED" icon={<span>👥</span>} />
             <SummaryCard title="Total por cobrar" value={totalPorCobrar} accentColor="#4CAF7A" icon={<span>💰</span>} />
           </div>
         </div>
@@ -254,21 +283,7 @@ const ReporteDiarioPage: React.FC = () => {
         </div>
       )}
 
-      {/* Barra de navegación inferior (opcional) */}
-      <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--color-card)', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-around', alignItems: 'center', height: 60, boxShadow: '0 -2px 12px #0001' }}>
-        <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-          <span style={{ fontSize: 22 }}>🏠</span>
-          <div style={{ fontSize: 13 }}>Inicio</div>
-        </div>
-        <div style={{ textAlign: 'center', color: 'var(--color-primary)' }}>
-          <span style={{ fontSize: 22 }}>📊</span>
-          <div style={{ fontSize: 13, fontWeight: 600 }}>Reporte</div>
-        </div>
-        <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-          <span style={{ fontSize: 22 }}>💬</span>
-          <div style={{ fontSize: 13 }}>Mensajes</div>
-        </div>
-      </nav>
+      {/* Barra de navegación inferior eliminada por solicitud del usuario */}
     </div>
   );
 };

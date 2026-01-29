@@ -1,0 +1,69 @@
+import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import api from '../api/client';
+import { Cliente } from '../types/cliente';
+
+// Fix default marker icon issue in Leaflet with Webpack
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+const DefaultIcon = L.icon({
+  iconUrl,
+  shadowUrl: iconShadow,
+  iconAnchor: [12, 41],
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+const MiRutaPage: React.FC = () => {
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+
+  useEffect(() => {
+    api.get<Cliente[]>('/clientes').then(res => {
+      setClientes(res.data);
+    });
+  }, []);
+
+  // Filtrar clientes con dirección válida y parsear lat/lng
+  const clientesConUbicacion = clientes
+    .map(c => {
+      if (!c.direccion) return null;
+      const parts = c.direccion.split(',');
+      if (parts.length !== 2) return null;
+      const lat = parseFloat(parts[0]);
+      const lng = parseFloat(parts[1]);
+      if (isNaN(lat) || isNaN(lng)) return null;
+      return { ...c, lat, lng };
+    })
+    .filter(Boolean) as (Cliente & { lat: number; lng: number })[];
+
+  // Centrar el mapa en el primer cliente con ubicación, o un valor por defecto
+  const center = clientesConUbicacion.length > 0
+    ? [clientesConUbicacion[0].lat, clientesConUbicacion[0].lng]
+    : [0, 0];
+
+  return (
+    <div style={{ width: '100vw', height: '100vh', background: '#f5f6fa' }}>
+      <h2 style={{ textAlign: 'center', margin: 0, padding: 16 }}>Mi Ruta</h2>
+      <div style={{ width: '100%', height: '90vh', borderRadius: 12, boxShadow: '0 2px 16px #0001', margin: '0 auto', overflow: 'hidden' }}>
+        <MapContainer center={center as [number, number]} zoom={13} style={{ width: '100%', height: '100%' }}>
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {clientesConUbicacion.map(cliente => (
+            <Marker key={cliente.id} position={[cliente.lat, cliente.lng]}>
+              <Popup>
+                <b>{cliente.nombre}</b><br/>
+                {cliente.negocio && <span>Negocio: {cliente.negocio}<br/></span>}
+                {cliente.telefono && <span>Tel: {cliente.telefono}</span>}
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      </div>
+    </div>
+  );
+};
+
+export default MiRutaPage;

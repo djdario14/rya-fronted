@@ -1,32 +1,35 @@
-
 import React from 'react';
-import { Cliente } from '../types/cliente';
 
-interface NuevoClientesModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  clientes: Cliente[];
+interface Gasto {
+  id: number;
+  descripcion: string;
+  monto: number;
+  fecha: string;
 }
 
-const NuevoClientesModal: React.FC<NuevoClientesModalProps> = ({ isOpen, onClose, clientes }) => {
+interface GastosDelDiaModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  gastos: Gasto[];
+}
+
+const GastosDelDiaModal: React.FC<GastosDelDiaModalProps> = ({ isOpen, onClose, gastos }) => {
   if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">
       <div className="modal-content" style={{ color: '#222', maxHeight: '80vh', overflowY: 'auto' }}>
         <button onClick={onClose} className="close-btn" aria-label="Cerrar">×</button>
-        <h2>Clientes nuevos de hoy</h2>
+        <h2>Gastos del día</h2>
         <ul>
-          {clientes.length === 0 ? (
-            <li>No hay clientes nuevos hoy.</li>
+          {gastos.length === 0 ? (
+            <li>No hay gastos registrados hoy.</li>
           ) : (
-            clientes.map(cliente => (
-              <li key={cliente.id} style={{marginBottom: '1em'}}>
-                <div><strong>Nombre:</strong> {cliente.nombre}</div>
-                {cliente.cedula && <div><strong>Cédula:</strong> {cliente.cedula}</div>}
-                {cliente.direccion && <div><strong>Dirección:</strong> {cliente.direccion}</div>}
-                {cliente.negocio && <div><strong>Negocio:</strong> {cliente.negocio}</div>}
-                {cliente.telefono && <div><strong>Teléfono:</strong> {cliente.telefono}</div>}
+            gastos.map(gasto => (
+              <li key={gasto.id} style={{marginBottom: '1em'}}>
+                <div><strong>Descripción:</strong> {gasto.descripcion}</div>
+                <div><strong>Monto:</strong> ${gasto.monto}</div>
+                <div><strong>Fecha:</strong> {gasto.fecha.split('-').reverse().join('/')}</div>
               </li>
             ))
           )}
@@ -49,13 +52,14 @@ const NuevoClientesModal: React.FC<NuevoClientesModalProps> = ({ isOpen, onClose
           min-width: 320px;
           max-width: 90vw;
           box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+          position: relative;
         }
         .close-btn {
           position: absolute;
           top: 12px;
           right: 16px;
           background: transparent;
-          color: #6366F1;
+          color: #EF4444;
           border: none;
           font-size: 2rem;
           font-weight: bold;
@@ -67,4 +71,4 @@ const NuevoClientesModal: React.FC<NuevoClientesModalProps> = ({ isOpen, onClose
   );
 };
 
-export default NuevoClientesModal;
+export default GastosDelDiaModal;

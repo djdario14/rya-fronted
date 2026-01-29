@@ -11,8 +11,14 @@
 .menu-btn {
     background: none;
     border: none;
-    font-size: 24px;
-    color: var(--color-primary-dark, #3E8E68);
+    padding: 0;
+    margin: 0 0 0 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    cursor: pointer;
 }
 
 .header-title {
