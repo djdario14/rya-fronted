@@ -702,7 +702,7 @@ const ClientesPage: React.FC = () => {
             <span className="notif-icon" title="Notificaciones" style={{ fontSize: 22, color: '#FFD600', marginRight: 2 }}>🔔</span>
             <div style={{ background: '#f6f8fa', border: '1px solid #e0e0e0', borderRadius: 12, padding: '4px 12px', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, fontSize: 15 }}>
               <span className="user-icon" style={{ fontSize: 18, marginRight: 2 }}>👤</span>
-              Usuario
+              <span className="hide-on-mobile">Usuario</span>
               <span className="user-alert" style={{ background: '#e53935', color: '#fff', borderRadius: 10, fontWeight: 700, fontSize: 13, padding: '1px 7px', marginLeft: 4 }}>1</span>
             </div>
           </div>
@@ -733,7 +733,7 @@ const ClientesPage: React.FC = () => {
             }}
             onClick={() => setShowNuevoSelector(true)}
           >
-            NUEVO <span style={{ fontSize: 18, marginLeft: 2 }}>+</span>
+            <span className="hide-on-mobile">NUEVO</span> <span style={{ fontSize: 18, marginLeft: 2 }}>+</span>
           </button>
         </div>
       </header>

@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import RyaMenuIcon from '../components/RyaMenuIcon';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -16,6 +18,7 @@ const DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const MiRutaPage: React.FC = () => {
+  const navigate = useNavigate();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   // Obtener ubicación del usuario al cargar la página
@@ -63,7 +66,21 @@ const MiRutaPage: React.FC = () => {
 
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#f5f6fa' }}>
-      <h2 style={{ textAlign: 'center', margin: 0, padding: 16 }}>Mi Ruta</h2>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '18px 0 0 0', width: '100%' }}>
+        <div style={{ width: 64, display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginLeft: 8 }}
+            aria-label="Volver"
+          >
+            <RyaMenuIcon size={48} />
+          </button>
+        </div>
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <h2 style={{ textAlign: 'center', margin: 0, fontSize: 32, fontWeight: 700 }}>Mi Ruta</h2>
+        </div>
+        <div style={{ width: 64 }}></div>
+      </div>
       <div style={{ width: '100%', height: '90vh', borderRadius: 12, boxShadow: '0 2px 16px #0001', margin: '0 auto', overflow: 'hidden' }}>
         <MapContainer center={center as [number, number]} zoom={13} style={{ width: '100%', height: '100%' }}>
           <TileLayer
