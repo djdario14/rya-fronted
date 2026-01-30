@@ -17,6 +17,21 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 const MiRutaPage: React.FC = () => {
   const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  // Obtener ubicación del usuario al cargar la página
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation([pos.coords.latitude, pos.coords.longitude]);
+        },
+        (err) => {
+          // Si el usuario no da permiso, no pasa nada
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+  }, []);
 
   useEffect(() => {
     api.get<Cliente[]>('/clientes').then(res => {
@@ -37,10 +52,14 @@ const MiRutaPage: React.FC = () => {
     })
     .filter(Boolean) as (Cliente & { lat: number; lng: number })[];
 
-  // Centrar el mapa en el primer cliente con ubicación, o un valor por defecto
-  const center = clientesConUbicacion.length > 0
-    ? [clientesConUbicacion[0].lat, clientesConUbicacion[0].lng]
-    : [0, 0];
+
+  // Centrar el mapa en la ubicación del usuario si está disponible,
+  // si no, en el primer cliente, y si no, en Guayaquil
+  const center = userLocation
+    ? userLocation
+    : clientesConUbicacion.length > 0
+      ? [clientesConUbicacion[0].lat, clientesConUbicacion[0].lng]
+      : [-2.170998, -79.922359];
 
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#f5f6fa' }}>
