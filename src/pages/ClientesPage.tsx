@@ -382,7 +382,32 @@ const ClientesPage: React.FC = () => {
 
   // Cargar todos los clientes al montar el componente
   useEffect(() => {
-    fetchClientes();
+    async function fetchAndOrderClientes() {
+      setLoading(true);
+      try {
+        const res = await api.get('/clientes/con-saldo');
+        let clientesData = res.data as Cliente[];
+        // Intentar obtener el orden del backend para usuario 1
+        try {
+          const ordenRes = await api.get(`/clientes/orden-usuario/1`);
+          let ordenIds: number[] = [];
+          if (ordenRes.data && typeof ordenRes.data === 'object' && 'orden' in ordenRes.data && Array.isArray((ordenRes.data as any).orden)) {
+            ordenIds = (ordenRes.data as { orden: number[] }).orden;
+          }
+          // Ordenar los clientes según el orden guardado
+          if (ordenIds.length > 0) {
+            clientesData = ordenIds.map(id => clientesData.find(c => c.id === id)).filter(Boolean) as Cliente[];
+          }
+        } catch (e) {
+          // Si no hay orden guardado, usar el orden original
+        }
+        setClientes(clientesData);
+      } catch (err) {
+        setError('No se pudo cargar la lista de clientes');
+      }
+      setLoading(false);
+    }
+    fetchAndOrderClientes();
   }, []);
 
   // Detectar país por IP y setear código de país
@@ -647,8 +672,17 @@ const ClientesPage: React.FC = () => {
         open={showOrdenarModal}
         clientes={clientes.map(c => ({ id: c.id, nombre: c.nombre }))}
         onClose={() => setShowOrdenarModal(false)}
-        onSave={orden => {
-          localStorage.setItem('orden_clientes', JSON.stringify(orden.map((o: any) => o.id)));
+        onSave={async orden => {
+          // Guardar orden en backend para usuario 1
+          try {
+            await api.post('/clientes/orden-usuario', {
+              usuario_id: 1,
+              orden: orden.map((o: any) => o.id)
+            });
+          } catch (e) {
+            // Si falla, igual lo guarda local
+            localStorage.setItem('orden_clientes', JSON.stringify(orden.map((o: any) => o.id)));
+          }
           setClientes(prev => orden.map((o: any) => prev.find((c: any) => c.id === o.id) || { id: o.id, nombre: o.nombre }));
           setShowOrdenarModal(false);
         }}
