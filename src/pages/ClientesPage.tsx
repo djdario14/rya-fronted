@@ -1,4 +1,8 @@
+// (Removed duplicate ClientesPage definition. Reminder state and logic should be in the main ClientesPage component after Cliente type.)
+
+// --- Recordatorios globales (en memoria, por cliente) ---
 import React, { useState, useEffect } from 'react';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import api from '../api/client';
 import SidebarMenu from '../components/SidebarMenu';
 import OrdenarClientesModal from '../components/OrdenarClientesModal';
@@ -9,6 +13,7 @@ import CreditoModal from '../components/CreditoModal';
 import RyaMenuIcon from '../components/RyaMenuIcon';
 
 // --- Modal para registrar pago ---
+
 type PrestamoActivo = {
   id: number;
   cliente_id: number;
@@ -21,6 +26,7 @@ type PrestamoActivo = {
   valor_cuota: number;
   forma_pago: string;
 };
+
 
 function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, cliente: Cliente | null, onClose: () => void, onSuccess: () => void }) {
   const [monto, setMonto] = React.useState('');
@@ -78,9 +84,9 @@ function PagoModal({ open, cliente, onClose, onSuccess }: { open: boolean, clien
           try {
             if (!prestamoId) throw new Error('No se encontró préstamo activo');
             if (noPago) {
-              await api.post(`/pagos/`, { prestamo_id: prestamoId, monto: 0, motivo_no_pago: motivo, fecha: new Date().toISOString().slice(0, 10) });
+              await api.post(`/pagos/`, { prestamo_id: prestamoId, monto: 0, motivo_no_pago: motivo, fecha: new Date().toISOString() });
             } else {
-              await api.post(`/pagos/`, { prestamo_id: prestamoId, monto: parseFloat(monto), fecha: new Date().toISOString().slice(0, 10) });
+              await api.post(`/pagos/`, { prestamo_id: prestamoId, monto: parseFloat(monto), fecha: new Date().toISOString() });
             }
             setMonto('');
             onSuccess();
@@ -209,6 +215,93 @@ type Cliente = {
 };
 
 const ClientesPage: React.FC = () => {
+      // --- Modal para agendar visita (recordatorio) ---
+      const [showAgendarVisita, setShowAgendarVisita] = useState(false);
+      const [clienteParaVisita, setClienteParaVisita] = useState<Cliente | null>(null);
+      const [fechaVisita, setFechaVisita] = useState('');
+      const [notaVisita, setNotaVisita] = useState('');
+      const [savingVisita, setSavingVisita] = useState(false);
+      const [errorVisita, setErrorVisita] = useState('');
+
+      function abrirAgendarVisita(cliente: Cliente) {
+        setClienteParaVisita(cliente);
+        setShowAgendarVisita(true);
+        setFechaVisita('');
+        setNotaVisita('');
+        setErrorVisita('');
+      }
+
+      async function guardarVisita(e: React.FormEvent) {
+        e.preventDefault();
+        if (!clienteParaVisita) return;
+        setSavingVisita(true);
+        setErrorVisita('');
+        try {
+          if (!fechaVisita) throw new Error('Selecciona una fecha');
+          if (!notaVisita) throw new Error('La nota es obligatoria');
+          const payload = {
+            cliente_id: clienteParaVisita.id,
+            fecha: fechaVisita, // enviar hora local seleccionada
+            nota: notaVisita,
+            creado_en: new Date().toISOString(),
+            leido: 0
+          };
+          console.log('Payload recordatorio:', payload);
+          await api.post('/recordatorios/', payload);
+          setShowAgendarVisita(false);
+          setClienteParaVisita(null);
+          setFechaVisita('');
+          setNotaVisita('');
+          setErrorVisita('');
+          await refreshRecordatorios();
+        } catch (err: any) {
+          let mensaje = 'Error al guardar el recordatorio';
+          if (err && err.response && err.response.data) {
+            const data = err.response.data;
+            if (typeof data === 'string') mensaje = data;
+            else if (typeof data === 'object' && data.detail) mensaje = data.detail;
+            else if (typeof data === 'object') mensaje = JSON.stringify(data);
+          } else if (err && err.message) {
+            mensaje = err.message;
+          }
+          setErrorVisita(mensaje);
+          // También mostrar el error en consola para depuración
+          console.error('Error al guardar recordatorio:', err);
+        }
+        setSavingVisita(false);
+      }
+    // --- Recordatorios globales (persistentes en backend, por cliente) ---
+    type Recordatorio = {
+      id: number;
+      cliente_id: number;
+      fecha: string;
+      nota: string;
+      creado_en: string;
+      leido: number;
+    };
+    const [recordatorios, setRecordatorios] = useState<Recordatorio[]>([]);
+    const [showNotif, setShowNotif] = useState(false);
+    const now = new Date();
+    const pendientes = recordatorios.filter(r => !r.leido && new Date(r.fecha) <= now);
+
+    // Cargar recordatorios desde el backend al montar
+    useEffect(() => {
+      async function fetchRecordatorios() {
+        try {
+          const res = await api.get('/recordatorios/');
+          setRecordatorios(res.data as Recordatorio[]);
+        } catch {}
+      }
+      fetchRecordatorios();
+    }, []);
+
+    // Refrescar recordatorios desde backend cuando se marca como leído
+    async function refreshRecordatorios() {
+      try {
+        const res = await api.get('/recordatorios/');
+        setRecordatorios(res.data as Recordatorio[]);
+      } catch {}
+    }
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showOrdenarModal, setShowOrdenarModal] = useState(false);
   const navigate = useNavigate();
@@ -467,6 +560,41 @@ const ClientesPage: React.FC = () => {
 
   return (
     <div className="mobile-page">
+        {/* Modal para agendar visita */}
+        {showAgendarVisita && clienteParaVisita && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0008', zIndex: 3100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 8px 32px #0004', padding: 28, minWidth: 320, width: 340, position: 'relative' }}>
+              <button onClick={() => setShowAgendarVisita(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
+              <h3 style={{ marginTop: 0, marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Agendar visita</h3>
+              <div style={{ marginBottom: 10, fontWeight: 600 }}>Cliente: <span style={{ color: '#2563EB' }}>{clienteParaVisita.nombre}</span></div>
+              <form onSubmit={guardarVisita}>
+                <div style={{ marginBottom: 14 }}>
+                  <label>Fecha y hora</label>
+                  <input
+                    type="datetime-local"
+                    required
+                    value={fechaVisita}
+                    onChange={e => setFechaVisita(e.target.value)}
+                    style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc' }}
+                  />
+                </div>
+                <div style={{ marginBottom: 14 }}>
+                  <label>Nota <span style={{ color: 'red' }}>*</span></label>
+                  <textarea
+                    required
+                    value={notaVisita}
+                    onChange={e => setNotaVisita(e.target.value)}
+                    style={{ width: '100%', padding: 8, borderRadius: 8, border: '1px solid #ccc', minHeight: 60 }}
+                  />
+                </div>
+                {errorVisita && <div style={{ color: '#e53935', marginBottom: 10 }}>{errorVisita}</div>}
+                <button type="submit" disabled={savingVisita} style={{ width: '100%', background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 0', cursor: 'pointer' }}>
+                  {savingVisita ? 'Guardando...' : 'Guardar'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       {/* Modales globales */}
       {showNuevoSelector && (
         <div style={{
@@ -699,13 +827,53 @@ const ClientesPage: React.FC = () => {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span className="notif-icon" title="Notificaciones" style={{ fontSize: 22, color: '#FFD600', marginRight: 2 }}>🔔</span>
+            <button onClick={() => setShowNotif(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', position: 'relative' }}>
+              <NotificationsIcon style={{
+                fontSize: 32,
+                color: '#FFC107',
+                filter: 'drop-shadow(0 2px 6px #FFB30055)',
+                transition: 'all 0.2s',
+                padding: 0
+              }} />
+              {pendientes.length > 0 && (
+                <span style={{ position: 'absolute', top: 2, right: 2, background: '#e53935', color: '#fff', borderRadius: 10, fontWeight: 700, fontSize: 13, padding: '1px 7px' }}>{pendientes.length}</span>
+              )}
+            </button>
             <div style={{ background: '#f6f8fa', border: '1px solid #e0e0e0', borderRadius: 12, padding: '4px 12px', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, fontSize: 15 }}>
               <span className="user-icon" style={{ fontSize: 18, marginRight: 2 }}>👤</span>
               <span className="hide-on-mobile">Usuario</span>
               <span className="user-alert" style={{ background: '#e53935', color: '#fff', borderRadius: 10, fontWeight: 700, fontSize: 13, padding: '1px 7px', marginLeft: 4 }}>1</span>
             </div>
           </div>
+              {showNotif && (
+                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ background: '#fff', borderRadius: 16, padding: 24, minWidth: 320, maxWidth: 400, boxShadow: '0 4px 24px #0002', textAlign: 'center' }}>
+                    <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Recordatorio de visita</h3>
+                    {pendientes.length > 0 ? (
+                      pendientes.map((r, i) => {
+                        const cliente = clientes.find(c => c.id === r.cliente_id);
+                        return (
+                          <div key={i} style={{ marginBottom: 18 }}>
+                            <div style={{ fontWeight: 600, fontSize: 17 }}>{new Date(r.fecha).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}</div>
+                            <div style={{ color: '#2563EB', margin: '8px 0', fontWeight: 500 }}>{r.nota}</div>
+                            {cliente && <div style={{ color: '#888', fontSize: 15, marginBottom: 4 }}>Cliente: <b>{cliente.nombre}</b></div>}
+                            <button onClick={async () => {
+                              try {
+                                await api.put(`/recordatorios/${r.id}`, { ...r, leido: 1 });
+                                await refreshRecordatorios();
+                              } catch {}
+                              setShowNotif(false);
+                            }} style={{ background: '#2563EB', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer', marginTop: 8 }}>OK</button>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div style={{ color: '#888', fontSize: 16, margin: '24px 0' }}>No hay recordatorios pendientes</div>
+                    )}
+                    <button onClick={() => setShowNotif(false)} style={{ background: '#eee', color: '#333', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer', marginTop: 8 }}>Cerrar</button>
+                  </div>
+                </div>
+              )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, padding: '0 12px' }}>
           <input
@@ -911,6 +1079,29 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle, onNuevoCredito }: {
             </span>
           </div>
         )}
+        {/* Botón para agendar visita */}
+        <button
+          className="btn-agendar-visita"
+          style={{
+            background: 'linear-gradient(90deg, #FFC107 0%, #1976d2 100%)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            fontWeight: 700,
+            fontSize: 15,
+            padding: '6px 16px',
+            marginTop: 10,
+            marginRight: 8,
+            cursor: 'pointer',
+            transition: 'background 0.2s'
+          }}
+          // onClick={e => {
+          //   e.stopPropagation();
+          //   /* onAgendarVisita(); */
+          // }}
+        >
+          Agendar visita
+        </button>
       </div>
       {mostrarNuevoCredito && (
         <button
