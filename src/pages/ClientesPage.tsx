@@ -239,9 +239,16 @@ const ClientesPage: React.FC = () => {
         try {
           if (!fechaVisita) throw new Error('Selecciona una fecha');
           if (!notaVisita) throw new Error('La nota es obligatoria');
+          // Enviar la fecha local seleccionada tal cual, sin convertir a UTC
+          // Convertir la fecha local seleccionada a UTC ISO 8601 antes de enviarla
+          let fechaUtc = '';
+          if (fechaVisita) {
+            const localDate = new Date(fechaVisita);
+            fechaUtc = localDate.toISOString(); // UTC
+          }
           const payload = {
             cliente_id: clienteParaVisita.id,
-            fecha: fechaVisita, // enviar hora local seleccionada
+            fecha: fechaUtc,
             nota: notaVisita,
             creado_en: new Date().toISOString(),
             leido: 0
@@ -281,15 +288,26 @@ const ClientesPage: React.FC = () => {
     };
     const [recordatorios, setRecordatorios] = useState<Recordatorio[]>([]);
     const [showNotif, setShowNotif] = useState(false);
-    const now = new Date();
-    const pendientes = recordatorios.filter(r => !r.leido && new Date(r.fecha) <= now);
+    const [now, setNow] = useState(new Date());
+    useEffect(() => {
+      const timer = setInterval(() => setNow(new Date()), 60000); // Actualiza cada minuto
+      return () => clearInterval(timer);
+    }, []);
+    // Ajuste: comparar fechas en UTC para evitar problemas de zona horaria
+    const pendientes = recordatorios.filter(r => {
+      if (r.leido) return false;
+      // El backend entrega la fecha en UTC (ISO 8601). El navegador ajusta automáticamente a la zona local con new Date().
+      const fechaRecordatorio = new Date(r.fecha);
+      const ahora = new Date();
+      return fechaRecordatorio <= ahora;
+    });
 
     // Cargar recordatorios desde el backend al montar
     useEffect(() => {
       async function fetchRecordatorios() {
         try {
           const res = await api.get('/recordatorios/');
-          setRecordatorios(res.data as Recordatorio[]);
+            setRecordatorios(res.data as Recordatorio[]);
         } catch {}
       }
       fetchRecordatorios();
@@ -299,7 +317,7 @@ const ClientesPage: React.FC = () => {
     async function refreshRecordatorios() {
       try {
         const res = await api.get('/recordatorios/');
-        setRecordatorios(res.data as Recordatorio[]);
+          setRecordatorios(res.data as Recordatorio[]);
       } catch {}
     }
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -847,8 +865,10 @@ const ClientesPage: React.FC = () => {
           </div>
               {showNotif && (
                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ background: '#fff', borderRadius: 16, padding: 24, minWidth: 320, maxWidth: 400, boxShadow: '0 4px 24px #0002', textAlign: 'center' }}>
+                  <div style={{ background: '#fff', borderRadius: 16, padding: 24, minWidth: 320, maxWidth: 400, boxShadow: '0 4px 24px #0002', textAlign: 'center', maxHeight: '80vh', overflowY: 'auto', position: 'relative' }}>
+                    <button onClick={() => setShowNotif(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
                     <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Recordatorio de visita</h3>
+                      {/* depuración eliminada */}
                     {pendientes.length > 0 ? (
                       pendientes.map((r, i) => {
                         const cliente = clientes.find(c => c.id === r.cliente_id);
@@ -870,7 +890,7 @@ const ClientesPage: React.FC = () => {
                     ) : (
                       <div style={{ color: '#888', fontSize: 16, margin: '24px 0' }}>No hay recordatorios pendientes</div>
                     )}
-                    <button onClick={() => setShowNotif(false)} style={{ background: '#eee', color: '#333', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer', marginTop: 8 }}>Cerrar</button>
+                    {/* Botón 'Cerrar' eliminado, ahora se usa la 'X' arriba */}
                   </div>
                 </div>
               )}
@@ -1079,29 +1099,7 @@ function ClienteCardRealtime({ cliente, onAbonar, onDetalle, onNuevoCredito }: {
             </span>
           </div>
         )}
-        {/* Botón para agendar visita */}
-        <button
-          className="btn-agendar-visita"
-          style={{
-            background: 'linear-gradient(90deg, #FFC107 0%, #1976d2 100%)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 8,
-            fontWeight: 700,
-            fontSize: 15,
-            padding: '6px 16px',
-            marginTop: 10,
-            marginRight: 8,
-            cursor: 'pointer',
-            transition: 'background 0.2s'
-          }}
-          // onClick={e => {
-          //   e.stopPropagation();
-          //   /* onAgendarVisita(); */
-          // }}
-        >
-          Agendar visita
-        </button>
+        {/* ...el resto del card sin el botón de agendar visita... */}
       </div>
       {mostrarNuevoCredito && (
         <button
