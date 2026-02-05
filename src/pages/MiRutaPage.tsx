@@ -17,6 +17,15 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
+// Icono de flecha para la ubicación del usuario
+const arrowIcon = L.divIcon({
+  html: `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="16,2 30,30 16,24 2,30" fill="#1976d2" stroke="#fff" stroke-width="2"/></svg>` ,
+  className: '',
+  iconSize: [32, 32],
+  iconAnchor: [16, 28],
+  popupAnchor: [0, -28],
+});
+
 const MiRutaPage: React.FC = () => {
   const navigate = useNavigate();
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -83,6 +92,12 @@ const MiRutaPage: React.FC = () => {
       </div>
       <div style={{ width: '100%', height: '90vh', borderRadius: 12, boxShadow: '0 2px 16px #0001', margin: '0 auto', overflow: 'hidden' }}>
         <MapContainer center={center as [number, number]} zoom={13} style={{ width: '100%', height: '100%' }}>
+          {/* Marcador de la ubicación del usuario como flecha */}
+          {userLocation && (
+            <Marker position={userLocation} icon={arrowIcon}>
+              <Popup>Tu ubicación actual</Popup>
+            </Marker>
+          )}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

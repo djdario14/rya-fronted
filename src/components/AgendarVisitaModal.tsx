@@ -44,7 +44,13 @@ const AgendarVisitaModal: React.FC<AgendarVisitaModalProps> = ({ open, onClose, 
           <textarea value={nota} onChange={e => setNota(e.target.value)} required style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ddd", fontSize: 16, minHeight: 60 }} />
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-          <button onClick={() => { if (fecha && nota) { onSave(fecha.toISOString(), nota); }}} style={{ background: "#2563EB", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontWeight: 600, fontSize: 15, cursor: "pointer" }} disabled={!fecha || !nota}>Guardar</button>
+          <button onClick={() => {
+            if (fecha && nota) {
+              // Convertir la fecha local a UTC antes de enviar
+              const fechaUtc = new Date(fecha.getTime() - fecha.getTimezoneOffset() * 60000).toISOString();
+              onSave(fechaUtc, nota);
+            }
+          }} style={{ background: "#2563EB", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontWeight: 600, fontSize: 15, cursor: "pointer" }} disabled={!fecha || !nota}>Guardar</button>
         </div>
       </div>
     </div>
