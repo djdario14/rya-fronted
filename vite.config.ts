@@ -24,7 +24,10 @@ export default defineConfig({
     allowedHosts: [
       "rya-cobranza.up.railway.app",
       "unmonetary-antone-nonspontaneously.ngrok-free.dev"
-    ]
+    ],
+    proxy: {
+      '/api': 'http://localhost:8000'
+    }
   },
   preview: {
     host: true,

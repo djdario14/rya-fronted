@@ -49,9 +49,9 @@ const OrdenarClientesModal: React.FC<OrdenarClientesModalProps> = ({ open, clien
         borderRadius: 16,
         boxShadow: "0 8px 32px #0004",
         padding: 36,
-        minWidth: 340,
-        width: 400,
-        maxHeight: 600,
+        minWidth: 260,
+        width: 300,
+        maxHeight: 420,
         overflowY: "auto",
         position: "relative"
       }}>

@@ -15,8 +15,8 @@ interface CreditoModalProps {
 }
 
 const CreditoModal: React.FC<CreditoModalProps> = ({ clienteNombre, onClose, onSubmit }) => {
-  const [valor, setValor] = useState(0);
-  const [interes, setInteres] = useState(20);
+  const [valor, setValor] = useState<number | "">(0);
+  const [interes, setInteres] = useState<number | "">(20);
   const [formaPago, setFormaPago] = useState(formasPago[0].label);
   // Fecha editable, solo YYYY-MM-DD
   const offset = useTimezoneOffset();
@@ -29,8 +29,8 @@ const CreditoModal: React.FC<CreditoModalProps> = ({ clienteNombre, onClose, onS
   });
 
   const cuotas = formasPago.find(f => f.label === formaPago)?.cuotas || 1;
-  const total = valor + (valor * interes / 100);
-  const valorCuota = cuotas ? total / cuotas : 0;
+  const total = typeof valor === "number" && typeof interes === "number" ? valor + (valor * interes / 100) : 0;
+  const valorCuota = typeof total === "number" && cuotas ? total / cuotas : 0;
 
   return (
     <div style={{
@@ -49,9 +49,10 @@ const CreditoModal: React.FC<CreditoModalProps> = ({ clienteNombre, onClose, onS
         background: "#fff",
         borderRadius: 16,
         boxShadow: "0 8px 32px #0004",
-        padding: 36,
-        minWidth: 400,
-        width: 420,
+        padding: 24,
+        minWidth: 260,
+        width: 320,
+        maxWidth: "95vw",
         position: "relative"
       }}>
         <h3 style={{ marginTop: 0, marginBottom: 24, fontWeight: 700, fontSize: 24 }}>Registrar Crédito para {clienteNombre}</h3>
@@ -61,15 +62,35 @@ const CreditoModal: React.FC<CreditoModalProps> = ({ clienteNombre, onClose, onS
         }}>
           <div style={{ marginBottom: 16 }}>
             <label>Valor del préstamo</label>
-            <input type="number" required min={1} value={valor} onChange={e => setValor(Number(e.target.value))} style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
+            <input
+              type="number"
+              required
+              min={1}
+              value={valor === "" ? "" : valor}
+              onChange={e => {
+                const v = e.target.value;
+                setValor(v === "" ? "" : Number(v));
+              }}
+              style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+            />
           </div>
           <div style={{ marginBottom: 16 }}>
             <label>Interés (%)</label>
-            <input type="number" required min={0} value={interes} onChange={e => setInteres(Number(e.target.value))} style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
+            <input
+              type="number"
+              required
+              min={0}
+              value={interes === "" ? "" : interes}
+              onChange={e => {
+                const v = e.target.value;
+                setInteres(v === "" ? "" : Number(v));
+              }}
+              style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+            />
           </div>
           <div style={{ marginBottom: 16 }}>
             <label>Total a pagar</label>
-            <input type="number" value={total} readOnly style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc", background: "#f7f7f7" }} />
+            <input type="number" value={isNaN(total) ? "" : total} readOnly style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc", background: "#f7f7f7" }} />
           </div>
           <div style={{ marginBottom: 16 }}>
             <label>Forma de pago</label>
@@ -81,11 +102,11 @@ const CreditoModal: React.FC<CreditoModalProps> = ({ clienteNombre, onClose, onS
           </div>
           <div style={{ marginBottom: 16 }}>
             <label>Número de cuotas</label>
-            <input type="number" value={cuotas} readOnly style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc", background: "#f7f7f7" }} />
+            <input type="number" value={isNaN(cuotas) ? "" : cuotas} readOnly style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc", background: "#f7f7f7" }} />
           </div>
           <div style={{ marginBottom: 16 }}>
             <label>Valor de la cuota</label>
-            <input type="number" value={valorCuota} readOnly style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc", background: "#f7f7f7" }} />
+            <input type="number" value={isNaN(valorCuota) ? "" : valorCuota} readOnly style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc", background: "#f7f7f7" }} />
           </div>
           <div style={{ marginBottom: 16 }}>
             <label>Fecha del crédito</label>

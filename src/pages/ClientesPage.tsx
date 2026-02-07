@@ -156,7 +156,7 @@ const RegistrarClienteModal = ({ open, onClose }: { open: boolean, onClose: () =
               if (error) return;
               setLoading(true);
               try {
-                const res = await fetch('/api/clientes', {
+                const res = await fetch('https://rya-backend-production.up.railway.app/clientes/', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -164,18 +164,24 @@ const RegistrarClienteModal = ({ open, onClose }: { open: boolean, onClose: () =
                     cedula,
                     negocio,
                     telefono: `${codigoPais} ${telefono}`,
-                    ubicacion
+                    ubicacion,
+                    direccion: ubicacion
                   })
                 });
                 if (res.ok) {
                   setNombre(''); setCedula(''); setNegocio(''); setTelefono(''); setUbicacion('');
                   setTocado(false);
+                  let nuevoCliente = null;
+                  try {
+                    nuevoCliente = await res.json();
+                  } catch {}
                   if (typeof window !== 'undefined' && window.dispatchEvent) {
-                    window.dispatchEvent(new CustomEvent('cliente-registrado'));
+                    window.dispatchEvent(new CustomEvent('cliente-registrado', { detail: nuevoCliente }));
                   }
+                  // Forzar cierre del modal antes de mostrar el de crédito
                   onClose();
                   if (typeof window !== 'undefined' && window.dispatchEvent) {
-                    window.dispatchEvent(new CustomEvent('cliente-registrado-exito'));
+                    window.dispatchEvent(new CustomEvent('cliente-registrado-exito', { detail: nuevoCliente }));
                   }
                 } else {
                   alert('Error al registrar cliente');
@@ -195,14 +201,41 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 const ClientesPage: React.FC = () => {
   // Mostrar modal de éxito y recargar clientes al registrar cliente
   useEffect(() => {
-    const handler = () => {
-      setShowSuccess(true);
+    // Cuando se registra un cliente exitosamente, abrir el modal de crédito automáticamente
+    const handler = (e: any) => {
       // Recargar clientes
       setLoading(true);
       api.get('/clientes/con-saldo')
         .then(res => {
-          setClientes((res.data ?? []) as any[]);
+          const data = res.data as any[];
+          setClientes(data ?? []);
           setLoading(false);
+          // Buscar el cliente recién creado por id, o por nombre y cédula
+          let clienteNuevo = null;
+          if (e && e.detail && e.detail.id) {
+            clienteNuevo = data.find((c: any) => c.id === e.detail.id);
+          }
+          if (!clienteNuevo && e && e.detail && e.detail.nombre && e.detail.cedula) {
+            clienteNuevo = data.find((c: any) => c.nombre === e.detail.nombre && c.cedula === e.detail.cedula);
+          }
+          // Si no se encuentra, usar los datos del evento para abrir el modal de crédito
+          if (!clienteNuevo && e && e.detail && (e.detail.nombre || e.detail.cedula)) {
+            setShowSuccess(false); // Oculta el modal de éxito si está visible
+            setTimeout(() => {
+              setNuevoCliente(e.detail);
+              setShowCreditoModal(true);
+            }, 100); // Pequeño delay para asegurar el cierre del modal de éxito
+            return;
+          }
+          if (clienteNuevo) {
+            setShowSuccess(false);
+            setTimeout(() => {
+              setNuevoCliente(clienteNuevo);
+              setShowCreditoModal(true);
+            }, 100);
+          } else {
+            setShowSuccess(true);
+          }
         })
         .catch(() => {
           setLoading(false);
@@ -220,6 +253,7 @@ const ClientesPage: React.FC = () => {
   const [tab, setTab] = useState<'pendientes' | 'todos'>('pendientes');
   const [loading, setLoading] = useState(false);
   const [showPagoModal, setShowPagoModal] = useState(false);
+    const [pagoCuota, setPagoCuota] = useState<number | undefined>(undefined);
   const [pagoCliente, setPagoCliente] = useState<any | null>(null);
   const [showCreditoModal, setShowCreditoModal] = useState(false);
   const [nuevoCliente, setNuevoCliente] = useState<any | null>(null);
@@ -228,6 +262,7 @@ const ClientesPage: React.FC = () => {
   const [showOrdenarModal, setShowOrdenarModal] = useState(false);
   const [pendientes, setPendientes] = useState<any[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showRegistrarCliente, setShowRegistrarCliente] = useState(false);
   const navigate = useNavigate();
 
@@ -235,8 +270,23 @@ const ClientesPage: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     api.get('/clientes/con-saldo')
-      .then(res => {
-        setClientes((res.data ?? []) as any[]);
+      .then(async res => {
+        const data = res.data as any[];
+        // Obtener el orden guardado
+        try {
+          const ordenRes = await api.get('/clientes/orden-usuario/1');
+          const ordenIds = (ordenRes.data as { orden: number[] }).orden;
+          if (Array.isArray(ordenIds) && ordenIds.length > 0) {
+            const idSet = new Set(ordenIds);
+            const ordered = ordenIds.map(id => data.find(c => c.id === id)).filter(Boolean);
+            const extras = data.filter(c => !idSet.has(c.id));
+            setClientes([...ordered, ...extras]);
+          } else {
+            setClientes(data ?? []);
+          }
+        } catch {
+          setClientes(data ?? []);
+        }
         setLoading(false);
       })
       .catch(() => {
@@ -268,18 +318,33 @@ const ClientesPage: React.FC = () => {
           const hoy = new Date().toISOString().slice(0, 10);
           const saldoPositivo = (cliente.saldo ?? 0) > 0;
           const prestamoActivo = cliente.estado === 'activo';
-          const pagoHoy = cliente.ultimo_pago === hoy;
+          // Comparar solo la parte de la fecha (YYYY-MM-DD) aunque venga con hora
+          let fechaUltimoPago = '';
+          if (typeof cliente.ultimo_pago === 'string' && cliente.ultimo_pago.length >= 10) {
+            fechaUltimoPago = cliente.ultimo_pago.slice(0, 10);
+          }
+          const pagoHoy = fechaUltimoPago === hoy;
           return (saldoPositivo || prestamoActivo) && !pagoHoy;
         }
         return true;
       })
-  , [clientes, search, tab]);
+, [clientes, search, tab]);
 
   // --- Handlers ---
   const handleAbonar = useCallback((cliente: any) => {
     setPagoCliente(cliente);
     setShowPagoModal(true);
   }, []);
+
+  // Autocompletar pagoCuota al abrir el modal de pago
+  React.useEffect(() => {
+    if (showPagoModal && pagoCliente) {
+      setPagoCuota(pagoCliente.valor_cuota ?? '');
+    }
+    if (!showPagoModal) {
+      setPagoCuota(undefined);
+    }
+  }, [showPagoModal, pagoCliente]);
 
   const handleDetalle = useCallback((cliente: any) => {
     navigate(`/clientes/${cliente.id}`);
@@ -294,7 +359,39 @@ const ClientesPage: React.FC = () => {
   return (
     <div className="mobile-page">
       <SidebarMenu open={sidebarOpen} onClose={() => setSidebarOpen(false)} onEnrutarClientes={() => setShowOrdenarModal(true)} />
-      <OrdenarClientesModal open={showOrdenarModal} clientes={clientes.map((c: any) => ({ id: c.id, nombre: c.nombre }))} onClose={() => setShowOrdenarModal(false)} onSave={() => setShowOrdenarModal(false)} />
+      <OrdenarClientesModal
+        open={showOrdenarModal}
+        clientes={clientes.map((c: any) => ({ id: c.id, nombre: c.nombre }))}
+        onClose={() => setShowOrdenarModal(false)}
+        onSave={async (orden) => {
+          try {
+            // usuario_id fijo en 1 (usuario de prueba)
+            await api.post('/clientes/orden-usuario', {
+              usuario_id: 1,
+              orden: orden.map((c: any) => c.id),
+            });
+            // Obtener el orden guardado y actualizar la lista
+            const res = await api.get('/clientes/orden-usuario/1');
+            const ordenIds = (res.data as { orden: number[] }).orden;
+            // Reordenar clientes según el orden guardado
+            setClientes(prev => {
+              // Si hay orden guardada, reordenar
+              if (Array.isArray(ordenIds) && ordenIds.length > 0) {
+                // Mantener solo los clientes que están en la lista
+                const idSet = new Set(ordenIds);
+                const ordered = ordenIds.map(id => prev.find(c => c.id === id)).filter(Boolean);
+                // Agregar los que no están en el orden guardado al final
+                const extras = prev.filter(c => !idSet.has(c.id));
+                return [...ordered, ...extras];
+              }
+              return prev;
+            });
+          } catch (e) {
+            alert('Error al guardar el orden');
+          }
+          setShowOrdenarModal(false);
+        }}
+      />
       <header style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '0 0 10px 0', marginBottom: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 12px 0 12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -405,8 +502,6 @@ const ClientesPage: React.FC = () => {
               totalCount={filteredClientes.length}
               itemContent={index => {
                 const cliente = filteredClientes[index];
-                // Calcular saldo: saldo = Valor del préstamo + intereses - cuotas pagadas
-                // Usar el saldo que viene del backend, igual que en el detalle
                 const saldoCalculado = Number(cliente.saldo ?? 0);
                 return (
                   <div
@@ -433,37 +528,38 @@ const ClientesPage: React.FC = () => {
                           ${saldoCalculado.toFixed(2)}
                         </span>
                         <span style={{ color: '#888', fontSize: 14, fontWeight: 500 }}>Saldo</span>
-                      </div>
-                      <div className="cliente-nombre" style={{ fontWeight: 700, fontSize: 17, marginBottom: 2 }}>{cliente.nombre}</div>
-                      {typeof cliente.atraso === 'number' && cliente.atraso > 0 && (
-                        <div style={{ marginTop: 2 }}>
-                          <span style={{ color: '#b77b00', fontWeight: 600, fontSize: 15, background: '#fff7e6', borderRadius: 8, padding: '2px 10px' }}>
+                        {typeof cliente.atraso === 'number' && cliente.atraso > 0 && (
+                          <span style={{ color: '#b77b00', fontWeight: 600, fontSize: 14, background: '#fff7e6', borderRadius: 8, padding: '2px 10px', marginLeft: 10 }}>
                             {cliente.atraso} días atraso
                           </span>
-                        </div>
-                      )}
+                        )}
+                      </div>
+                      <div className="cliente-nombre" style={{ fontWeight: 700, fontSize: 17, marginBottom: 2 }}>{cliente.nombre}</div>
                     </div>
-                    <button
-                      style={{
-                        background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: 8,
-                        fontWeight: 700,
-                        fontSize: 16,
-                        padding: '8px 22px',
-                        marginLeft: 12,
-                        boxShadow: '0 2px 8px #0001',
-                        cursor: 'pointer',
-                        transition: 'background 0.2s'
-                      }}
-                      onClick={e => {
-                        e.stopPropagation();
-                        handleAbonar(cliente);
-                      }}
-                    >
-                      Abonar
-                    </button>
+                    {saldoCalculado > 0 && (
+                      <button
+                        style={{
+                          background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 8,
+                          fontWeight: 700,
+                          fontSize: 16,
+                          padding: '8px 22px',
+                          marginLeft: 12,
+                          boxShadow: '0 2px 8px #0001',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s'
+                        }}
+                        onClick={e => {
+                          e.stopPropagation();
+                          setPagoCliente(cliente);
+                          setShowPagoModal(true);
+                        }}
+                      >
+                        Abonar
+                      </button>
+                    )}
                     {saldoCalculado === 0 && (
                       <button
                         style={{
@@ -514,7 +610,7 @@ const ClientesPage: React.FC = () => {
               </button>
               <button
                 style={{ background: '#43a047', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 18, padding: '12px 0', cursor: 'pointer' }}
-                onClick={() => { setShowAddModal(false); setShowPrestamoModal(true); }}
+                onClick={() => { setShowPrestamoModal(true); }}
               >
                 Préstamo
               </button>
@@ -535,7 +631,13 @@ const ClientesPage: React.FC = () => {
                               <button
                                 key={c.id}
                                 style={{ background: '#f6f8fa', border: '1px solid #e0e0e0', borderRadius: 8, fontWeight: 600, fontSize: 16, padding: '10px 0', cursor: 'pointer', color: '#1976d2' }}
-                                onClick={() => { setShowPrestamoModal(false); setClientePrestamo(c); setShowCreditoModal(true); }}
+                                onClick={() => {
+                                  setShowPrestamoModal(false);
+                                  setShowAddModal(false);
+                                  setClientePrestamo(c);
+                                  setNuevoCliente(c);
+                                  setShowCreditoModal(true);
+                                }}
                               >
                                 {c.nombre}
                               </button>
@@ -553,12 +655,93 @@ const ClientesPage: React.FC = () => {
         <RegistrarClienteModal open={showRegistrarCliente} onClose={() => setShowRegistrarCliente(false)} />
       )}
       {showSuccess && (
-        <SuccessModal message="¡Cliente añadido exitosamente!" onClose={() => setShowSuccess(false)} />
+        <SuccessModal message={successMessage || "¡Operación exitosa!"} onClose={() => setShowSuccess(false)} />
       )}
-      {showCreditoModal && (
-        <CreditoModal clienteNombre={nuevoCliente?.nombre || ''} onClose={() => setShowCreditoModal(false)} onSubmit={() => {}} />
+      {showCreditoModal && nuevoCliente && (
+        <CreditoModal
+          clienteNombre={nuevoCliente?.nombre || ''}
+          onClose={() => setShowCreditoModal(false)}
+          onSubmit={async (data: any) => {
+            // Lógica para guardar el préstamo en el backend
+            try {
+              const interes = typeof data.valor === 'number' ? data.valor * 0.20 : 0;
+              const total = typeof data.valor === 'number' ? data.valor + interes : 0;
+              await api.post('/prestamos/', {
+                cliente_id: nuevoCliente.id,
+                monto: data.valor,
+                fecha: data.fecha,
+                estado: 'activo',
+                interes,
+                total,
+                cuotas: data.cuotas,
+                valor_cuota: data.valorCuota,
+                forma_pago: data.formaPago
+              });
+              setShowCreditoModal(false);
+              setSuccessMessage('¡Cliente añadido exitosamente!');
+              setShowSuccess(true);
+              // Opcional: recargar clientes para reflejar el nuevo saldo
+              setLoading(true);
+              const res = await api.get('/clientes/con-saldo');
+              setClientes(Array.isArray(res.data) ? res.data : []);
+              setLoading(false);
+            } catch (e) {
+              alert('No se pudo registrar el crédito');
+            }
+          }}
+        />
       )}
-      {/* Aquí puedes agregar el modal de pago real */}
+      {showPagoModal && pagoCliente && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', zIndex: 6000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: 32, minWidth: 260, maxWidth: 320, boxShadow: '0 4px 24px #0002', textAlign: 'center', position: 'relative' }}>
+            <button onClick={() => setShowPagoModal(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
+            <h3 style={{ margin: 0, marginBottom: 24, fontWeight: 700, fontSize: 22 }}>Registrar Pago</h3>
+            <div style={{ marginBottom: 16, fontWeight: 600 }}>Cliente: {pagoCliente.nombre}</div>
+            <form onSubmit={async e => {
+              e.preventDefault();
+              const monto = Number((e.target as any).monto.value);
+              if (!monto || monto <= 0) {
+                alert('Ingresa un monto válido');
+                return;
+              }
+              try {
+                // Buscar préstamo activo
+                const resPrestamo = await api.get(`/prestamos/activo/${pagoCliente.id}`);
+                const prestamo = resPrestamo.data as { id: number, valorCuota?: number };
+                await api.post('/pagos/', {
+                  prestamo_id: prestamo.id,
+                  monto,
+                  fecha: new Date().toISOString().slice(0, 10),
+                  motivo_no_pago: ''
+                });
+                setShowPagoModal(false);
+                setLoading(true);
+                const resClientes = await api.get('/clientes/con-saldo');
+                setClientes(Array.isArray(resClientes.data) ? resClientes.data : []);
+                setLoading(false);
+                setSuccessMessage('¡Pago registrado exitosamente!');
+                setShowSuccess(true);
+              } catch {
+                alert('No se pudo registrar el pago');
+              }
+            }}>
+              <input
+                name="monto"
+                type="number"
+                min={1}
+                placeholder="Monto a abonar"
+                style={{ width: '100%', marginBottom: 18, padding: 8, borderRadius: 6, border: '1px solid #ccc' }}
+                value={pagoCuota ?? ''}
+                onChange={e => setPagoCuota(Number(e.target.value))}
+              />
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                <button type="button" onClick={() => setShowPagoModal(false)} style={{ background: '#eee', color: '#333', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 16, padding: '10px 24px', cursor: 'pointer' }}>Cancelar</button>
+                <button type="submit" style={{ background: '#1976d2', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 16, padding: '10px 24px', cursor: 'pointer' }}>Registrar Pago</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
