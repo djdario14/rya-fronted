@@ -1,3 +1,6 @@
+// ...existing code...
+import '../reactSelectOverride.css';
+import Select from 'react-select';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import RoomIcon from '@mui/icons-material/Room';
 import { Virtuoso } from 'react-virtuoso';
@@ -16,7 +19,7 @@ const RegistrarClienteModal = ({ open, onClose }: { open: boolean, onClose: () =
   const [cedula, setCedula] = React.useState('');
   const [negocio, setNegocio] = React.useState('');
   const [telefono, setTelefono] = React.useState('');
-  const [codigoPais, setCodigoPais] = React.useState('');
+  const [codigoPais, setCodigoPais] = React.useState('+593');
   const [ubicacion, setUbicacion] = React.useState('');
   const [tocado, setTocado] = React.useState(false);
   const [errorUbicacion, setErrorUbicacion] = React.useState(false);
@@ -26,25 +29,7 @@ const RegistrarClienteModal = ({ open, onClose }: { open: boolean, onClose: () =
   const [errorNegocio, setErrorNegocio] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
-  // Detectar país por IP y establecer código de país por defecto
-  React.useEffect(() => {
-    if (!codigoPais) {
-      fetch('https://ipapi.co/json/')
-        .then(res => res.json())
-        .then(data => {
-          // Mapeo simple país-código
-          const map: Record<string, string> = {
-            'MX': '+52',
-            'CO': '+57',
-            'US': '+1',
-            'AR': '+54',
-            'ES': '+34',
-          };
-          setCodigoPais(map[data.country_code] || '+52');
-        })
-        .catch(() => setCodigoPais('+52'));
-    }
-  }, [codigoPais]);
+  // Ya no se detecta país por IP, Ecuador es el valor por defecto
 
   // Handler para autocompletar ubicación con GPS
   const handleObtenerUbicacion = () => {
@@ -81,31 +66,88 @@ const RegistrarClienteModal = ({ open, onClose }: { open: boolean, onClose: () =
           style={{ width: '100%', marginBottom: 12, padding: 8, borderRadius: 6, border: errorCedula && tocado && !cedula ? '2px solid #e53935' : '1px solid #ccc', background: errorCedula && tocado && !cedula ? '#fff6f6' : undefined }}
         />
         <div style={{ display: 'flex', marginBottom: 12, gap: 6 }}>
-          <select value={codigoPais} onChange={e => setCodigoPais(e.target.value)} style={{ border: '1px solid #ccc', borderRadius: 6, padding: 8, width: 90 }}>
-            <option value="+52">🇲🇽 México +52</option>
-            <option value="+54">🇦🇷 Argentina +54</option>
-            <option value="+591">🇧🇴 Bolivia +591</option>
-            <option value="+55">🇧🇷 Brasil +55</option>
-            <option value="+56">🇨🇱 Chile +56</option>
-            <option value="+57">🇨🇴 Colombia +57</option>
-            <option value="+506">🇨🇷 Costa Rica +506</option>
-            <option value="+53">🇨🇺 Cuba +53</option>
-            <option value="+593">🇪🇨 Ecuador +593</option>
-            <option value="+503">🇸🇻 El Salvador +503</option>
-            <option value="+502">🇬🇹 Guatemala +502</option>
-            <option value="+504">🇭🇳 Honduras +504</option>
-            <option value="+52">🇲🇽 México +52</option>
-            <option value="+505">🇳🇮 Nicaragua +505</option>
-            <option value="+507">🇵🇦 Panamá +507</option>
-            <option value="+595">🇵🇾 Paraguay +595</option>
-            <option value="+51">🇵🇪 Perú +51</option>
-            <option value="+1">🇵🇷 Puerto Rico +1</option>
-            <option value="+1">🇩🇴 República Dominicana +1</option>
-            <option value="+598">🇺🇾 Uruguay +598</option>
-            <option value="+58">🇻🇪 Venezuela +58</option>
-            <option value="+34">🇪🇸 España +34</option>
-            <option value="+1">🇺🇸 USA +1</option>
-          </select>
+          <div style={{ width: 140 }}>
+            <Select
+              options={[
+                { value: '+52', label: '🇲🇽 México +52' },
+                { value: '+54', label: '🇦🇷 Argentina +54' },
+                { value: '+591', label: '🇧🇴 Bolivia +591' },
+                { value: '+55', label: '🇧🇷 Brasil +55' },
+                { value: '+56', label: '🇨🇱 Chile +56' },
+                { value: '+57', label: '🇨🇴 Colombia +57' },
+                { value: '+506', label: '🇨🇷 Costa Rica +506' },
+                { value: '+53', label: '🇨🇺 Cuba +53' },
+                { value: '+593', label: '🇪🇨 Ecuador +593' },
+                { value: '+503', label: '🇸🇻 El Salvador +503' },
+                { value: '+502', label: '🇬🇹 Guatemala +502' },
+                { value: '+504', label: '🇭🇳 Honduras +504' },
+                { value: '+505', label: '🇳🇮 Nicaragua +505' },
+                { value: '+507', label: '🇵🇦 Panamá +507' },
+                { value: '+595', label: '🇵🇾 Paraguay +595' },
+                { value: '+51', label: '🇵🇪 Perú +51' },
+                { value: '+1', label: '🇵🇷 Puerto Rico +1' },
+                { value: '+1', label: '🇩🇴 República Dominicana +1' },
+                { value: '+598', label: '🇺🇾 Uruguay +598' },
+                { value: '+58', label: '🇻🇪 Venezuela +58' },
+                { value: '+34', label: '🇪🇸 España +34' },
+                { value: '+1', label: '🇺🇸 USA +1' },
+              ]}
+              value={[
+                { value: '+52', label: '🇲🇽 México +52' },
+                { value: '+54', label: '🇦🇷 Argentina +54' },
+                { value: '+591', label: '🇧🇴 Bolivia +591' },
+                { value: '+55', label: '🇧🇷 Brasil +55' },
+                { value: '+56', label: '🇨🇱 Chile +56' },
+                { value: '+57', label: '🇨🇴 Colombia +57' },
+                { value: '+506', label: '🇨🇷 Costa Rica +506' },
+                { value: '+53', label: '🇨🇺 Cuba +53' },
+                { value: '+593', label: '🇪🇨 Ecuador +593' },
+                { value: '+503', label: '🇸🇻 El Salvador +503' },
+                { value: '+502', label: '🇬🇹 Guatemala +502' },
+                { value: '+504', label: '🇭🇳 Honduras +504' },
+                { value: '+505', label: '🇳🇮 Nicaragua +505' },
+                { value: '+507', label: '🇵🇦 Panamá +507' },
+                { value: '+595', label: '🇵🇾 Paraguay +595' },
+                { value: '+51', label: '🇵🇪 Perú +51' },
+                { value: '+1', label: '🇵🇷 Puerto Rico +1' },
+                { value: '+1', label: '🇩🇴 República Dominicana +1' },
+                { value: '+598', label: '🇺🇾 Uruguay +598' },
+                { value: '+58', label: '🇻🇪 Venezuela +58' },
+                { value: '+34', label: '🇪🇸 España +34' },
+                { value: '+1', label: '🇺🇸 USA +1' },
+              ].find(opt => opt.value === codigoPais)}
+              onChange={opt => setCodigoPais(opt?.value || '+593')}
+              styles={{
+                menu: (provided) => ({
+                  ...provided,
+                  maxHeight: 180,
+                  backgroundColor: '#fff',
+                  border: '1px solid #e0e0e0',
+                  boxShadow: '0 2px 8px #0002',
+                  opacity: 1,
+                  zIndex: 9999,
+                  // Aplica clase global para fondo blanco
+                  className: 'react-select-menu-override',
+                }),
+                control: (provided) => ({
+                  ...provided,
+                  minHeight: 38,
+                  border: '1px solid #ccc',
+                  borderRadius: 6,
+                  boxShadow: 'none',
+                  padding: '0 8px',
+                  fontSize: 16,
+                }),
+                singleValue: (provided) => ({ ...provided, fontSize: 16 }),
+                valueContainer: (provided) => ({ ...provided, padding: '0 8px' }),
+                input: (provided) => ({ ...provided, margin: 0, padding: 0 }),
+                dropdownIndicator: (provided) => ({ ...provided, padding: 4 }),
+                indicatorSeparator: () => ({ display: 'none' }),
+              }}
+              placeholder="Código país"
+              menuPlacement="auto"
+            />
+          </div>
           <input
             placeholder="Teléfono"
             value={telefono}
@@ -294,10 +336,21 @@ const ClientesPage: React.FC = () => {
       });
   }, []);
 
-  // --- Cargar recordatorios (simulado) ---
+  // --- Cargar recordatorios reales ---
   useEffect(() => {
-    // Aquí deberías llamar a tu API de recordatorios
-    setPendientes([]); // Simulación
+    // Llama a la API de recordatorios y filtra los que están pendientes y cuya fecha ya pasó
+    api.get('/recordatorios/')
+      .then(res => {
+        const ahora = new Date();
+        const data = Array.isArray(res.data) ? res.data : [];
+        const pendientes = data.filter((r: any) => {
+          // Solo mostrar los que no han sido leídos y cuya fecha ya pasó
+          const fecha = new Date(r.fecha);
+          return (!r.leido || r.leido === 0) && fecha <= ahora;
+        });
+        setPendientes(pendientes);
+      })
+      .catch(() => setPendientes([]));
   }, []);
 
   // --- Filtrado de clientes ---
@@ -427,7 +480,27 @@ const ClientesPage: React.FC = () => {
                       <div style={{ fontWeight: 600, fontSize: 17 }}>{new Date(r.fecha).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}</div>
                       <div style={{ color: '#2563EB', margin: '8px 0', fontWeight: 500 }}>{r.nota}</div>
                       <div style={{ color: '#888', fontSize: 15, marginBottom: 4 }}>Cliente: <b>{r.cliente_nombre}</b></div>
-                      <button style={{ background: '#2563EB', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer', marginTop: 8 }}>OK</button>
+                      <button
+                        style={{ background: '#2563EB', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer', marginTop: 8 }}
+                        onClick={async () => {
+                          try {
+                            // Marcar como leído
+                            await api.put(`/recordatorios/${r.id}`, {
+                              ...r,
+                              leido: 1
+                            });
+                            // Actualizar lista
+                            const res = await api.get('/recordatorios/');
+                            const ahora = new Date();
+                            const data = Array.isArray(res.data) ? res.data : [];
+                            const nuevosPendientes = data.filter((rec: any) => {
+                              const fecha = new Date(rec.fecha);
+                              return (!rec.leido || rec.leido === 0) && fecha <= ahora;
+                            });
+                            setPendientes(nuevosPendientes);
+                          } catch {}
+                        }}
+                      >OK</button>
                     </div>
                   ))
                 ) : (
@@ -595,59 +668,110 @@ const ClientesPage: React.FC = () => {
       {/* Modal para elegir acción al dar click en + */}
       {showAddModal && (
         <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', zIndex: 4000,
-          display: 'flex', alignItems: 'center', justifyContent: 'center'
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.18)', zIndex: 4000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <div style={{ background: '#fff', borderRadius: 16, padding: 32, minWidth: 260, maxWidth: 320, boxShadow: '0 4px 24px #0002', textAlign: 'center', position: 'relative' }}>
-            <button onClick={() => setShowAddModal(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
-            <h3 style={{ margin: 0, marginBottom: 24, fontWeight: 700, fontSize: 22 }}>¿Qué deseas agregar?</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div style={{ background: '#fff', borderRadius: 20, padding: '24px 12px 18px 12px', minWidth: 250, maxWidth: 340, boxShadow: '0 8px 40px #0001', textAlign: 'center', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <button onClick={() => setShowAddModal(false)} style={{ position: 'absolute', top: 10, right: 16, background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#7b8190' }}>×</button>
+            <h2 style={{ margin: 0, marginBottom: 18, fontWeight: 800, fontSize: 20, color: '#23294a', letterSpacing: '-1px' }}>¿Qué deseas elegir?</h2>
+            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', alignItems: 'center', marginTop: 6 }}>
               <button
-                style={{ background: '#1976d2', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 18, padding: '12px 0', cursor: 'pointer' }}
+                style={{
+                  background: '#f7f7fd',
+                  border: '2px solid #cfcff7',
+                  borderRadius: 14,
+                  minWidth: 90,
+                  minHeight: 100,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 1px 6px #b3c6f722',
+                  cursor: 'pointer',
+                  transition: 'box-shadow 0.2s, border 0.2s',
+                  fontWeight: 700,
+                  fontSize: 15,
+                  color: '#23294a',
+                  outline: 'none',
+                  marginBottom: 0,
+                  padding: 0,
+                  gap: 6,
+                }}
                 onClick={() => { setShowAddModal(false); setShowRegistrarCliente(true); }}
               >
-                Cliente
+                <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 2 }}>
+                  {/* Silueta persona tipo usuario */}
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="12" r="7" fill="#6c3fc5"/>
+                    <ellipse cx="16" cy="25" rx="10" ry="6" fill="#6c3fc5" fillOpacity="0.15"/>
+                  </svg>
+                </span>
+                <span style={{ fontWeight: 700, fontSize: 15, color: '#6c3fc5', marginTop: 2 }}>Cliente</span>
               </button>
               <button
-                style={{ background: '#43a047', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, fontSize: 18, padding: '12px 0', cursor: 'pointer' }}
+                style={{
+                  background: '#f6fdf7',
+                  border: '2px solid #b6f7c6',
+                  borderRadius: 14,
+                  minWidth: 90,
+                  minHeight: 100,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 1px 6px #b3f7c622',
+                  cursor: 'pointer',
+                  transition: 'box-shadow 0.2s, border 0.2s',
+                  fontWeight: 700,
+                  fontSize: 15,
+                  color: '#2bbf5a',
+                  outline: 'none',
+                  marginBottom: 0,
+                  padding: 0,
+                  gap: 6,
+                }}
                 onClick={() => { setShowPrestamoModal(true); }}
               >
-                Préstamo
+                <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 2 }}>
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="8" width="24" height="16" rx="4" fill="#2bbf5a"/><circle cx="24" cy="24" r="5" fill="#2bbf5a"/><text x="24" y="27" textAnchor="middle" fontSize="10" fill="#fff" fontWeight="bold">$</text></svg>
+                  <svg width="22" height="22" viewBox="0 0 22 22" style={{marginTop:-18}}><rect x="3" y="5" width="16" height="12" rx="2" fill="#bbb"/><rect x="7" y="9" width="8" height="4" rx="1" fill="#fff"/></svg>
+                </span>
+                <span style={{ fontWeight: 700, fontSize: 15, color: '#2bbf5a', marginTop: 2 }}>Préstamo</span>
               </button>
-                  {/* Modal para seleccionar cliente con saldo 0 para préstamo */}
-                  {showPrestamoModal && (
-                    <div style={{
-                      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', zIndex: 4100,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                      <div style={{ background: '#fff', borderRadius: 16, padding: 24, minWidth: 280, maxWidth: 350, boxShadow: '0 4px 24px #0002', textAlign: 'center', position: 'relative', maxHeight: '80vh', overflowY: 'auto' }}>
-                        <button onClick={() => setShowPrestamoModal(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
-                        <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 700, fontSize: 20 }}>Selecciona un cliente</h3>
-                        {clientes.filter((c: any) => Number(c.saldo ?? 0) === 0).length === 0 ? (
-                          <div style={{ color: '#888', fontSize: 16, margin: '24px 0' }}>No hay clientes con saldo 0</div>
-                        ) : (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                            {clientes.filter((c: any) => Number(c.saldo ?? 0) === 0).map((c: any) => (
-                              <button
-                                key={c.id}
-                                style={{ background: '#f6f8fa', border: '1px solid #e0e0e0', borderRadius: 8, fontWeight: 600, fontSize: 16, padding: '10px 0', cursor: 'pointer', color: '#1976d2' }}
-                                onClick={() => {
-                                  setShowPrestamoModal(false);
-                                  setShowAddModal(false);
-                                  setClientePrestamo(c);
-                                  setNuevoCliente(c);
-                                  setShowCreditoModal(true);
-                                }}
-                              >
-                                {c.nombre}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+            </div>
+            {/* Modal para seleccionar cliente con saldo 0 para préstamo */}
+            {showPrestamoModal && (
+              <div style={{
+                position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', zIndex: 4100,
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <div style={{ background: '#fff', borderRadius: 16, padding: 24, minWidth: 280, maxWidth: 350, boxShadow: '0 4px 24px #0002', textAlign: 'center', position: 'relative', maxHeight: '80vh', overflowY: 'auto' }}>
+                  <button onClick={() => setShowPrestamoModal(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
+                  <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 700, fontSize: 20 }}>Selecciona un cliente</h3>
+                  {clientes.filter((c: any) => Number(c.saldo ?? 0) === 0).length === 0 ? (
+                    <div style={{ color: '#888', fontSize: 16, margin: '24px 0' }}>No hay clientes con saldo 0</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {clientes.filter((c: any) => Number(c.saldo ?? 0) === 0).map((c: any) => (
+                        <button
+                          key={c.id}
+                          style={{ background: '#f6f8fa', border: '1px solid #e0e0e0', borderRadius: 8, fontWeight: 600, fontSize: 16, padding: '10px 0', cursor: 'pointer', color: '#1976d2' }}
+                          onClick={() => {
+                            setShowPrestamoModal(false);
+                            setShowAddModal(false);
+                            setClientePrestamo(c);
+                            setNuevoCliente(c);
+                            setShowCreditoModal(true);
+                          }}
+                        >
+                          {c.nombre}
+                        </button>
+                      ))}
                     </div>
                   )}
-            </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
