@@ -29,7 +29,15 @@ const GastosDelDiaModal: React.FC<GastosDelDiaModalProps> = ({ isOpen, onClose, 
               <li key={gasto.id} style={{marginBottom: '1em'}}>
                 <div><strong>Descripción:</strong> {gasto.descripcion}</div>
                 <div><strong>Monto:</strong> ${gasto.monto}</div>
-                <div><strong>Fecha:</strong> {gasto.fecha.split('-').reverse().join('/')}</div>
+                <div><strong>Fecha:</strong> {new Date(gasto.fecha).toLocaleString('es-EC', {
+                  timeZone: 'America/Guayaquil',
+                  year: '2-digit',
+                  month: 'numeric',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true
+                })}</div>
               </li>
             ))
           )}

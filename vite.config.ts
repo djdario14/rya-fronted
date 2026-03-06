@@ -17,7 +17,7 @@ try {
 } catch (e) {}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react()], // react() ya activa el nuevo JSX transform
   server: {
     port: 3000,
     https: httpsConfig,

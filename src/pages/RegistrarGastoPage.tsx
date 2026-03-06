@@ -183,7 +183,15 @@ const RegistrarGastoPage: React.FC = () => {
             <div key={g.id} style={{ marginBottom: 14, padding: 12, background: '#f7f8fa', borderRadius: 8, boxShadow: '0 1px 4px #0001' }}>
               <div style={{ fontWeight: 700, color: '#219653', fontSize: 18 }}>${g.monto.toFixed(2)}</div>
               <div style={{ color: '#29487d', fontWeight: 600 }}>{g.descripcion}</div>
-              <div style={{ color: '#888', fontSize: 15 }}>{new Date(g.fecha).toLocaleDateString()}</div>
+              <div style={{ color: '#888', fontSize: 15 }}>{new Date(g.fecha).toLocaleString('es-EC', {
+                timeZone: 'America/Guayaquil',
+                year: '2-digit',
+                month: 'numeric',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+              })}</div>
             </div>
           ))
         )}

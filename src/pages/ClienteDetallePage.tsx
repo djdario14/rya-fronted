@@ -112,7 +112,19 @@ export default function ClienteDetallePage() {
             {pendientes.length > 0 ? (
               pendientes.map((r, i) => (
                 <div key={i} style={{ marginBottom: 18 }}>
-                  <div style={{ fontWeight: 600, fontSize: 17 }}>{new Date(r.fecha).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}</div>
+                  <div style={{ fontWeight: 600, fontSize: 17 }}>
+                    {(() => {
+                      // Asegurar que la fecha se interpreta como UTC
+                      const fechaUtc = typeof r.fecha === 'string' && r.fecha.endsWith('Z')
+                        ? new Date(r.fecha)
+                        : new Date(r.fecha + 'Z');
+                      return fechaUtc.toLocaleString('es-EC', {
+                        dateStyle: 'short',
+                        timeStyle: 'short',
+                        timeZone: 'America/Guayaquil',
+                      });
+                    })()}
+                  </div>
                   <div style={{ color: '#2563EB', margin: '8px 0', fontWeight: 500 }}>{r.nota}</div>
                   <button onClick={async () => {
                     try {
@@ -170,15 +182,15 @@ export default function ClienteDetallePage() {
                 onSave={async (fecha, nota) => {
                   if (!cliente) return;
                   try {
-                    // Enviar fecha y creado_en como string ISO completo (datetime)
-                    // Enviar la fecha local seleccionada tal cual, sin convertir a UTC
-                    const payload = {
-                      cliente_id: cliente.id,
-                      fecha: fecha,
-                      nota,
-                      creado_en: new Date().toISOString(),
-                      leido: 0
-                    };
+                              // Convertir la fecha local a UTC antes de enviar
+                              const fechaUtc = new Date(fecha).toISOString();
+                              const payload = {
+                                cliente_id: cliente.id,
+                                fecha: fechaUtc,
+                                nota,
+                                creado_en: new Date().toISOString(),
+                                leido: 0
+                              };
                     console.log('Payload recordatorio:', payload);
                     await api.post('/recordatorios/', payload);
                     // Refrescar lista desde backend para asegurar hora correcta
@@ -203,19 +215,7 @@ export default function ClienteDetallePage() {
                 }}
                 clienteNombre={cliente.nombre}
               />
-              {recordatorios.length > 0 && (
-                <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #0001', padding: 16, marginTop: 16 }}>
-                  <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8, color: '#2563EB' }}>Recordatorios de visita</div>
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {recordatorios.map((r, i) => (
-                      <li key={i} style={{ marginBottom: 8, fontSize: 15 }}>
-                        <span style={{ fontWeight: 600 }}>{new Date(r.fecha).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}</span>
-                        {r.nota && <span style={{ color: '#888', marginLeft: 8 }}>- {r.nota}</span>}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+
         <button style={{ width: '100%', height: 52, borderRadius: 16, fontSize: 16, fontWeight: 600, color: '#111827', background: '#fff', border: '1.5px solid #E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12, boxShadow: '0 2px 12px #0001', cursor: 'pointer' }}
           onClick={() => window.open(`https://wa.me/${cliente.telefono.replace(/[^\d]/g, '')}`, '_blank')}
         >
@@ -231,7 +231,15 @@ export default function ClienteDetallePage() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, marginTop: 8 }}>
               {pagos.map((p) => (
                 <li key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6, fontSize: 15 }}>
-                  <span>{p.fecha.split('-').reverse().join('/')}</span>
+                  <span>{new Date(p.fecha).toLocaleString('es-EC', {
+                    timeZone: 'America/Guayaquil',
+                    year: '2-digit',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                  })}</span>
                   <span style={{ fontWeight: 600, color: '#22C55E' }}>${p.monto}</span>
                   {p.motivo_no_pago && <span style={{ color: '#e53935', fontSize: 13, marginLeft: 8 }}>({p.motivo_no_pago})</span>}
                 </li>

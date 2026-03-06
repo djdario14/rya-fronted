@@ -14,6 +14,18 @@ interface AgendarVisitaModalProps {
 
 const AgendarVisitaModal: React.FC<AgendarVisitaModalProps> = ({ open, onClose, onSave, clienteNombre }) => {
   const [fecha, setFecha] = useState<Date | null>(null);
+  // Formato local para mostrar la fecha seleccionada
+  const fechaLocalStr = fecha
+    ? new Date(fecha).toLocaleString('es-EC', {
+        timeZone: 'America/Guayaquil',
+        year: '2-digit',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      })
+    : '';
   const [nota, setNota] = useState("");
 
   if (!open) return null;
@@ -38,6 +50,11 @@ const AgendarVisitaModal: React.FC<AgendarVisitaModalProps> = ({ open, onClose, 
               disablePast
             />
           </LocalizationProvider>
+          {fecha && (
+            <div style={{ marginTop: 8, color: '#2563EB', fontWeight: 500 }}>
+              {fechaLocalStr} <span style={{ color: '#888', fontSize: 14 }}>(Hora local)</span>
+            </div>
+          )}
         </div>
         <div style={{ marginBottom: 18 }}>
           <label style={{ fontWeight: 500 }}>Nota <span style={{color:'#e53935'}}>*</span>:</label><br />
@@ -46,9 +63,11 @@ const AgendarVisitaModal: React.FC<AgendarVisitaModalProps> = ({ open, onClose, 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           <button onClick={() => {
             if (fecha && nota) {
-              // Convertir la fecha local a UTC antes de enviar
-              const fechaUtc = new Date(fecha.getTime() - fecha.getTimezoneOffset() * 60000).toISOString();
-              onSave(fechaUtc, nota);
+              // Enviar la fecha local seleccionada en formato ISO con zona horaria de Ecuador (-05:00)
+              const pad = (n: number) => n.toString().padStart(2, '0');
+              const f = fecha;
+              const fechaEcuador = `${f.getFullYear()}-${pad(f.getMonth()+1)}-${pad(f.getDate())}T${pad(f.getHours())}:${pad(f.getMinutes())}:00-05:00`;
+              onSave(fechaEcuador, nota);
             }
           }} style={{ background: "#2563EB", color: "#fff", border: "none", borderRadius: 8, padding: "8px 18px", fontWeight: 600, fontSize: 15, cursor: "pointer" }} disabled={!fecha || !nota}>Guardar</button>
         </div>

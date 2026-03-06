@@ -337,21 +337,22 @@ const ClientesPage: React.FC = () => {
   }, []);
 
   // --- Cargar recordatorios reales ---
-  useEffect(() => {
-    // Llama a la API de recordatorios y filtra los que están pendientes y cuya fecha ya pasó
-    api.get('/recordatorios/')
-      .then(res => {
-        const ahora = new Date();
-        const data = Array.isArray(res.data) ? res.data : [];
-        const pendientes = data.filter((r: any) => {
-          // Solo mostrar los que no han sido leídos y cuya fecha ya pasó
-          const fecha = new Date(r.fecha);
-          return (!r.leido || r.leido === 0) && fecha <= ahora;
-        });
-        setPendientes(pendientes);
-      })
-      .catch(() => setPendientes([]));
-  }, []);
+  // Cargar recordatorios cada vez que se abre el modal de notificaciones
+  React.useEffect(() => {
+    if (showNotif) {
+      api.get('/recordatorios/')
+        .then(res => {
+          const ahora = new Date();
+          const data = Array.isArray(res.data) ? res.data : [];
+          const pendientes = data.filter((r: any) => {
+            const fecha = new Date(r.fecha);
+            return (!r.leido || r.leido === 0) && fecha <= ahora;
+          });
+          setPendientes(pendientes);
+        })
+        .catch(() => setPendientes([]));
+    }
+  }, [showNotif]);
 
   // --- Filtrado de clientes ---
   const filteredClientes = useMemo(() =>
@@ -418,22 +419,16 @@ const ClientesPage: React.FC = () => {
         onClose={() => setShowOrdenarModal(false)}
         onSave={async (orden) => {
           try {
-            // usuario_id fijo en 1 (usuario de prueba)
             await api.post('/clientes/orden-usuario', {
               usuario_id: 1,
               orden: orden.map((c: any) => c.id),
             });
-            // Obtener el orden guardado y actualizar la lista
             const res = await api.get('/clientes/orden-usuario/1');
             const ordenIds = (res.data as { orden: number[] }).orden;
-            // Reordenar clientes según el orden guardado
             setClientes(prev => {
-              // Si hay orden guardada, reordenar
               if (Array.isArray(ordenIds) && ordenIds.length > 0) {
-                // Mantener solo los clientes que están en la lista
                 const idSet = new Set(ordenIds);
                 const ordered = ordenIds.map(id => prev.find(c => c.id === id)).filter(Boolean);
-                // Agregar los que no están en el orden guardado al final
                 const extras = prev.filter(c => !idSet.has(c.id));
                 return [...ordered, ...extras];
               }
@@ -445,104 +440,157 @@ const ClientesPage: React.FC = () => {
           setShowOrdenarModal(false);
         }}
       />
-      <header style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '0 0 10px 0', marginBottom: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 12px 0 12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', fontSize: 26, color: '#4e7fa6', marginRight: 2, cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', height: 52 }}>
-              <RyaMenuIcon size={40} />
-            </button>
-            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 8 }}>
-              <span style={{ fontWeight: 700, color: '#29487d', fontSize: 20, lineHeight: 1 }}>RYA COBRANZA</span>
-              <span style={{ color: '#7eb6d9', fontSize: 15, lineHeight: 1, marginTop: 2 }}>Gestión de créditos</span>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button onClick={() => setShowNotif(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', position: 'relative' }}>
-              <NotificationsIcon style={{ fontSize: 32, color: '#FFC107', filter: 'drop-shadow(0 2px 6px #FFB30055)', transition: 'all 0.2s', padding: 0 }} />
-              {pendientes.length > 0 && (
-                <span style={{ position: 'absolute', top: 2, right: 2, background: '#e53935', color: '#fff', borderRadius: 10, fontWeight: 700, fontSize: 13, padding: '1px 7px' }}>{pendientes.length}</span>
-              )}
-            </button>
-            <div style={{ background: '#f6f8fa', border: '1px solid #e0e0e0', borderRadius: 12, padding: '4px 12px', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, fontSize: 15 }}>
-              <span className="user-icon" style={{ fontSize: 18, marginRight: 2 }}>👤</span>
-              <span className="hide-on-mobile">Usuario</span>
-              <span className="user-alert" style={{ background: '#e53935', color: '#fff', borderRadius: 10, fontWeight: 700, fontSize: 13, padding: '1px 7px', marginLeft: 4 }}>1</span>
-            </div>
-          </div>
-          {showNotif && (
-            <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ background: '#fff', borderRadius: 16, padding: 24, minWidth: 320, maxWidth: 400, boxShadow: '0 4px 24px #0002', textAlign: 'center', maxHeight: '80vh', overflowY: 'auto', position: 'relative' }}>
-                <button onClick={() => setShowNotif(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
-                <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Recordatorio de visita</h3>
-                {pendientes.length > 0 ? (
-                  pendientes.map((r, i) => (
-                    <div key={i} style={{ marginBottom: 18 }}>
-                      <div style={{ fontWeight: 600, fontSize: 17 }}>{new Date(r.fecha).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}</div>
-                      <div style={{ color: '#2563EB', margin: '8px 0', fontWeight: 500 }}>{r.nota}</div>
-                      <div style={{ color: '#888', fontSize: 15, marginBottom: 4 }}>Cliente: <b>{r.cliente_nombre}</b></div>
-                      <button
-                        style={{ background: '#2563EB', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer', marginTop: 8 }}
-                        onClick={async () => {
-                          try {
-                            // Marcar como leído
-                            await api.put(`/recordatorios/${r.id}`, {
-                              ...r,
-                              leido: 1
-                            });
-                            // Actualizar lista
-                            const res = await api.get('/recordatorios/');
-                            const ahora = new Date();
-                            const data = Array.isArray(res.data) ? res.data : [];
-                            const nuevosPendientes = data.filter((rec: any) => {
-                              const fecha = new Date(rec.fecha);
-                              return (!rec.leido || rec.leido === 0) && fecha <= ahora;
-                            });
-                            setPendientes(nuevosPendientes);
-                          } catch {}
-                        }}
-                      >OK</button>
-                    </div>
-                  ))
-                ) : (
-                  <div style={{ color: '#888', fontSize: 16, margin: '24px 0' }}>No hay recordatorios pendientes</div>
-                )}
+      <div>
+        <header style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '0 0 10px 0', marginBottom: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 12px 0 12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <button className="menu-btn" title="Menú" aria-label="Abrir menú lateral" onClick={() => setSidebarOpen(true)} style={{ background: 'none', border: 'none', fontSize: 26, color: '#4e7fa6', marginRight: 2, cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', height: 52 }}>
+                <RyaMenuIcon size={40} />
+              </button>
+              <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 8 }}>
+                <span style={{ fontWeight: 700, color: '#29487d', fontSize: 20, lineHeight: 1 }}>RYA COBRANZA</span>
+                <span style={{ color: '#7eb6d9', fontSize: 15, lineHeight: 1, marginTop: 2 }}>Gestión de créditos</span>
               </div>
             </div>
-          )}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, padding: '0 12px' }}>
-          <input
-            type="text"
-            placeholder="Buscar cliente"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ flex: 1, border: '1px solid #e0e0e0', borderRadius: 8, padding: '10px 14px', fontSize: 16, background: '#f6f8fa', outline: 'none', fontWeight: 500 }}
-          />
-          <button
-            title="Agregar cliente"
-            aria-label="Agregar cliente"
-            style={{
-              background: '#1976d2',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '50%',
-              width: 40,
-              height: 40,
-              fontSize: 28,
-              fontWeight: 700,
-              boxShadow: '0 2px 8px #0002',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 0
-            }}
-            onClick={() => setShowAddModal(true)}
-          >
-            +
-          </button>
-        </div>
-      </header>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <button onClick={() => setShowNotif(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', position: 'relative' }}>
+                <NotificationsIcon style={{ fontSize: 32, color: '#FFC107', filter: 'drop-shadow(0 2px 6px #FFB30055)', transition: 'all 0.2s', padding: 0 }} />
+                {pendientes.length > 0 && (
+                  <span style={{ position: 'absolute', top: 2, right: 2, background: '#e53935', color: '#fff', borderRadius: 10, fontWeight: 700, fontSize: 13, padding: '1px 7px' }}>{pendientes.length}</span>
+                )}
+              </button>
+              <div style={{ background: '#f6f8fa', border: '1px solid #e0e0e0', borderRadius: 12, padding: '4px 12px', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600, fontSize: 15 }}>
+                <span className="user-icon" style={{ fontSize: 18, marginRight: 2 }}>👤</span>
+                <span className="hide-on-mobile">Usuario</span>
+                <span className="user-alert" style={{ background: '#e53935', color: '#fff', borderRadius: 10, fontWeight: 700, fontSize: 13, padding: '1px 7px', marginLeft: 4 }}>1</span>
+              </div>
+            </div>
+            {showNotif && (
+              <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: '#0007', zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ background: '#fff', borderRadius: 16, padding: 24, minWidth: 320, maxWidth: 400, boxShadow: '0 4px 24px #0002', textAlign: 'center', maxHeight: '80vh', overflowY: 'auto', position: 'relative' }}>
+                  <button onClick={() => setShowNotif(false)} style={{ position: 'absolute', top: 10, right: 14, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#888' }}>×</button>
+                  <h3 style={{ margin: 0, marginBottom: 18, fontWeight: 700, fontSize: 22 }}>Recordatorio de visita</h3>
+                  {pendientes.length > 0 ? (
+                    pendientes.map((r, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          marginBottom: 18,
+                          border: '1.5px solid #e0e7ef',
+                          borderRadius: 12,
+                          padding: '14px 10px',
+                          boxShadow: '0 2px 8px #0001',
+                          background: '#f8fafc',
+                          textAlign: 'left',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: 17, color: '#29487d' }}>
+                            {(() => {
+                              const fechaUtc = typeof r.fecha === 'string' && r.fecha.endsWith('Z')
+                                ? new Date(r.fecha)
+                                : new Date(r.fecha + 'Z');
+                              return fechaUtc.toLocaleString('es-EC', {
+                                dateStyle: 'short',
+                                timeStyle: 'short',
+                                timeZone: 'America/Guayaquil',
+                              });
+                            })()}
+                          </div>
+                          <div style={{ color: '#2563EB', margin: '8px 0', fontWeight: 500 }}>{r.nota}</div>
+                          <div style={{ color: '#888', fontSize: 15, marginBottom: 4 }}>Cliente: <b>{r.cliente_nombre}</b></div>
+                          <div style={{ display: 'flex', flexDirection: 'row', gap: 10, marginTop: 8 }}>
+                            <button
+                              style={{ background: '#e8f5e9', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#43a047' }}
+                              onClick={async () => {
+                                try {
+                                  await api.put(`/recordatorios/${r.id}`, {
+                                    ...r,
+                                    leido: 1
+                                  });
+                                  const res = await api.get('/recordatorios/');
+                                  const ahora = new Date();
+                                  const data = Array.isArray(res.data) ? res.data : [];
+                                  const nuevosPendientes = data.filter((rec: any) => {
+                                    const fecha = new Date(rec.fecha);
+                                    return (!rec.leido || rec.leido === 0) && fecha <= ahora;
+                                  });
+                                  setPendientes(nuevosPendientes);
+                                } catch {}
+                              }}
+                            >
+                              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.5 16.5L4.5 11.5L6 10L9.5 13.5L18 5L19.5 6.5L9.5 16.5Z" fill="#43a047"/>
+                              </svg>
+                            </button>
+                            <button
+                              style={{ background: '#ffebee', border: 'none', borderRadius: 8, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#e53935' }}
+                              onClick={async () => {
+                                try {
+                                  await api.put(`/recordatorios/${r.id}`, {
+                                    ...r,
+                                    leido: 2
+                                  });
+                                  const res = await api.get('/recordatorios/');
+                                  const ahora = new Date();
+                                  const data = Array.isArray(res.data) ? res.data : [];
+                                  const nuevosPendientes = data.filter((rec: any) => {
+                                    const fecha = new Date(rec.fecha);
+                                    return (!rec.leido || rec.leido === 0) && fecha <= ahora;
+                                  });
+                                  setPendientes(nuevosPendientes);
+                                } catch {}
+                              }}
+                            >
+                              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 6L18 18M6 18L18 6" stroke="#e53935" strokeWidth="2.5" strokeLinecap="round"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ color: '#888', fontSize: 16, margin: '24px 0' }}>No hay recordatorios pendientes</div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 14, padding: '0 12px' }}>
+            <input
+              type="text"
+              placeholder="Buscar cliente"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ flex: 1, border: '1px solid #e0e0e0', borderRadius: 8, padding: '10px 14px', fontSize: 16, background: '#f6f8fa', outline: 'none', fontWeight: 500 }}
+            />
+            <button
+              title="Agregar cliente"
+              aria-label="Agregar cliente"
+              style={{
+                background: '#1976d2',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '50%',
+                width: 40,
+                height: 40,
+                fontSize: 28,
+                fontWeight: 700,
+                boxShadow: '0 2px 8px #0002',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0
+              }}
+              onClick={() => setShowAddModal(true)}
+            >
+              +
+            </button>
+          </div>
+        </header>
+      </div>
       <main className="mobile-content">
         <h2 className="clientes-title" style={{ marginBottom: 8 }}>Clientes</h2>
         <div className="tabs-row" style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
