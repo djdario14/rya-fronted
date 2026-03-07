@@ -1,13 +1,11 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
-
 import ClientesPage from '../pages/ClientesPage';
 import RegistrarGastoPage from '../pages/RegistrarGastoPage';
 import ReporteDiarioPage from '../pages/ReporteDiarioPage';
 import ClienteDetallePage from '../pages/ClienteDetallePage';
 import MiRutaPage from '../pages/MiRutaPage';
-import AgendaPage from '../pages/AgendaPage';
+import MiAgendaPage from '../pages/MiAgendaPage';
 
 const AppRoutes: React.FC = () => (
   <BrowserRouter>
@@ -18,7 +16,7 @@ const AppRoutes: React.FC = () => (
       <Route path="/cliente/:id" element={<ClienteDetallePage />} />
       <Route path="/clientes/:id" element={<ClienteDetallePage />} />
       <Route path="/gps" element={<MiRutaPage />} />
-      <Route path="/agenda" element={<AgendaPage />} />
+      <Route path="/mi-agenda" element={<MiAgendaPage />} />
     </Routes>
   </BrowserRouter>
 );
