@@ -31,12 +31,37 @@ const mockEvents = [
 ];
 
 const MiAgendaPage: React.FC = () => {
+    const weekDays: string[] = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
   const [selectedTab, setSelectedTab] = useState<'pendientes' | 'todas' | 'realizadas'>('pendientes');
   const [selectedDay, setSelectedDay] = useState<number>(2);
 
-  // Mock calendario simple (solo para UI)
-  const days = [29, 30, 1, 2, 3, 4, 5];
-  const weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+
+  // Estado para mes y año seleccionados
+  // Obtener la fecha actual
+  const today = new Date();
+  const [month, setMonth] = useState<number>(today.getMonth()); // 0=enero
+  const [year, setYear] = useState<number>(today.getFullYear());
+
+  // Calcular el primer día de la semana del mes (0=lunes, 6=domingo)
+  const jsFirstDay = new Date(year, month, 1).getDay(); // 0=domingo, 1=lunes...
+  // Ajustar para que 0=lunes, 6=domingo
+  const firstDayOfWeek = jsFirstDay === 0 ? 6 : jsFirstDay - 1;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  // Para mostrar días del mes anterior si el mes no empieza en lunes
+  const prevMonthDays = [];
+  if (firstDayOfWeek > 0) {
+    const prevMonth = month === 0 ? 11 : month - 1;
+    const prevYear = month === 0 ? year - 1 : year;
+    const prevMonthLastDay = new Date(prevYear, prevMonth + 1, 0).getDate();
+    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+      prevMonthDays.push(prevMonthLastDay - i);
+    }
+  }
+  const days = [
+    ...prevMonthDays,
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
+  const offset = 0; // Ya no se usa, grid lo alinea
 
   const navigate = useNavigate();
   return (
@@ -56,27 +81,59 @@ const MiAgendaPage: React.FC = () => {
       <div className={styles.title}>Mi Agenda</div>
       <div className={styles.calendarCard}>
         <div className={styles.monthSelector}>
-          <button style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#2563eb' }}>{'<'}</button>
-          <span>Mayo 2024</span>
-          <button style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#2563eb' }}>{'>'}</button>
+          <button
+            style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#2563eb' }}
+            onClick={() => {
+              if (month === 0) {
+                setMonth(11); setYear(year - 1);
+              } else {
+                setMonth(month - 1);
+              }
+            }}
+          >{'<'}</button>
+          <span>
+            {new Date(year, month).toLocaleString('es-EC', { month: 'long', year: 'numeric' }).replace(/^./, c => c.toUpperCase())}
+          </span>
+          <button
+            style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#2563eb' }}
+            onClick={() => {
+              if (month === 11) {
+                setMonth(0); setYear(year + 1);
+              } else {
+                setMonth(month + 1);
+              }
+            }}
+          >{'>'}</button>
         </div>
         <div className={styles.calendarDays}>
-          {weekDays.map((d, i) => <span key={i}>{d}</span>)}
+          {weekDays.map((d: string, i: number) => <span key={i}>{d}</span>)}
         </div>
         <div className={styles.calendarGrid}>
-          {days.map((d, i) => (
-            <div
-              key={d}
-              className={
-                styles.dayCell +
-                (d === selectedDay ? ' ' + styles.selected : '') +
-                (d === 2 || d === 4 ? ' ' + styles.hasEvent : '')
-              }
-              onClick={() => setSelectedDay(d)}
-            >
-              {d}
-            </div>
-          ))}
+          {days.map((d: number, i: number) => {
+            const isPrevMonth = i < prevMonthDays.length;
+            const isCurrentMonth = i >= prevMonthDays.length && i < prevMonthDays.length + daysInMonth;
+            const dayNumber = d;
+            const isToday =
+              isCurrentMonth &&
+              dayNumber === today.getDate() &&
+              month === today.getMonth() &&
+              year === today.getFullYear();
+            return (
+              <div
+                key={i + '-' + d}
+                className={
+                  styles.dayCell +
+                  (isCurrentMonth && dayNumber === selectedDay ? ' ' + styles.selected : '') +
+                  (isCurrentMonth && (dayNumber === 2 || dayNumber === 4) ? ' ' + styles.hasEvent : '') +
+                  (isToday ? ' ' + styles.today : '')
+                }
+                style={{ color: isPrevMonth ? '#bbb' : undefined, fontWeight: isCurrentMonth ? 500 : 400 }}
+                onClick={() => isCurrentMonth && setSelectedDay(dayNumber)}
+              >
+                {d}
+              </div>
+            );
+          })}
         </div>
       </div>
       <div className={styles.tabs}>

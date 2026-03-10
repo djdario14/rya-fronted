@@ -1,26 +1,26 @@
 .agendaContainer {
     max-width: 520px;
     margin: 0 auto;
-    padding: 32px 0 48px 0;
+    padding: 12px 0 32px 0;
 }
 
 .header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 2px;
 }
 
 .title {
     font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem;
 }
 
 .calendarCard {
     background: #f7f8fa;
     border-radius: 18px;
-    padding: 18px 16px 10px 16px;
+    padding: 10px 12px 10px 12px;
     margin-bottom: 18px;
     box-shadow: 0 2px 8px #2563eb11;
 }
@@ -36,11 +36,19 @@
 }
 
 .calendarDays {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     margin-bottom: 8px;
     color: #8a8a8a;
     font-size: 1rem;
+    text-align: center;
+}
+
+.calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 8px;
 }
 
 .calendarGrid {
@@ -80,28 +88,67 @@
 
 .tab {
     flex: 1;
+    min-width: 120px;
+    height: 40px;
     padding: 7px 0;
-    border-radius: 12px;
+    border-radius: 24px;
     background: #f0f2f7;
     color: #2563eb;
     font-weight: 600;
     text-align: center;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
+    line-height: 26px;
+    box-sizing: border-box;
 }
 
 .tab.selected {
     background: #22c55e;
     color: #fff;
+    border-radius: 24px;
+    font-weight: 700;
+    z-index: 1;
+    min-width: 120px;
+    height: 40px;
+    padding: 7px 0;
+    line-height: 26px;
+    box-sizing: border-box;
+}
+
+.tab.selected .badge {
+    background: #2563eb;
+    color: #fff;
+    border-radius: 50px;
+    font-weight: 700;
+    margin-left: 8px;
+    padding: 2px 14px 2px 14px;
+    font-size: 0.95rem;
+    position: relative;
+    top: 0;
+    left: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    min-width: 32px;
+    box-shadow: 0 2px 8px #2563eb22;
+    vertical-align: middle;
 }
 
 .tab.badge {
     background: #2563eb;
     color: #fff;
-    margin-left: 6px;
-    padding: 7px 12px;
-    border-radius: 12px;
+    margin-left: 8px;
+    padding: 2px 14px 2px 14px;
+    border-radius: 50px;
     font-size: 0.95rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    min-width: 32px;
+    vertical-align: middle;
 }
 
 .eventCard {
@@ -184,4 +231,26 @@
 
 .addVisitBtn:hover {
     background: #2563eb;
+}
+
+
+/* Día seleccionado (clic) */
+
+.selected {
+    background: #2563eb;
+    color: #fff !important;
+    border-radius: 50%;
+    font-weight: 700;
+}
+
+
+/* Día actual (hoy) */
+
+.today {
+    border: 2px solid #bbb;
+    background: transparent;
+    color: inherit;
+    border-radius: 50%;
+    font-weight: 700;
+    z-index: 1;
 }
