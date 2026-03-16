@@ -31,7 +31,7 @@ const mockEvents = [
 ];
 
 const MiAgendaPage: React.FC = () => {
-    const weekDays: string[] = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+    const weekDays: string[] = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
   const [selectedTab, setSelectedTab] = useState<'pendientes' | 'todas' | 'realizadas'>('pendientes');
   const [selectedDay, setSelectedDay] = useState<number>(2);
 
@@ -109,28 +109,27 @@ const MiAgendaPage: React.FC = () => {
           {weekDays.map((d: string, i: number) => <span key={i}>{d}</span>)}
         </div>
         <div className={styles.calendarGrid}>
-          {days.map((d: number, i: number) => {
-            const isPrevMonth = i < prevMonthDays.length;
-            const isCurrentMonth = i >= prevMonthDays.length && i < prevMonthDays.length + daysInMonth;
-            const dayNumber = d;
+          {Array.from({ length: daysInMonth }, (_, i) => {
+            const dayNumber = i + 1;
             const isToday =
-              isCurrentMonth &&
               dayNumber === today.getDate() &&
               month === today.getMonth() &&
               year === today.getFullYear();
+            // Calcular columna de inicio para el primer día
+            const gridColumn = i === 0 ? (firstDayOfWeek + 1) : undefined;
             return (
               <div
-                key={i + '-' + d}
+                key={dayNumber}
                 className={
                   styles.dayCell +
-                  (isCurrentMonth && dayNumber === selectedDay ? ' ' + styles.selected : '') +
-                  (isCurrentMonth && (dayNumber === 2 || dayNumber === 4) ? ' ' + styles.hasEvent : '') +
+                  (dayNumber === selectedDay ? ' ' + styles.selected : '') +
+                  ([2, 4].includes(dayNumber) ? ' ' + styles.hasEvent : '') +
                   (isToday ? ' ' + styles.today : '')
                 }
-                style={{ color: isPrevMonth ? '#bbb' : undefined, fontWeight: isCurrentMonth ? 500 : 400 }}
-                onClick={() => isCurrentMonth && setSelectedDay(dayNumber)}
+                style={gridColumn ? { gridColumnStart: gridColumn } : undefined}
+                onClick={() => setSelectedDay(dayNumber)}
               >
-                {d}
+                {dayNumber}
               </div>
             );
           })}
