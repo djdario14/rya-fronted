@@ -1,21 +1,47 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import RyaMenuIcon from '../components/RyaMenuIcon';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import api from '../api/client';
 import { Cliente } from '../types/cliente';
-
 // Fix default marker icon issue in Leaflet with Webpack
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+const selectedIcon = L.icon({
+  iconUrl,
+  shadowUrl: iconShadow,
+  iconAnchor: [12, 41],
+  iconSize: [38, 38],
+  className: 'selected-marker',
+});
+
 const DefaultIcon = L.icon({
   iconUrl,
   shadowUrl: iconShadow,
   iconAnchor: [12, 41],
 });
 L.Marker.prototype.options.icon = DefaultIcon;
+
+// Componente para abrir el popup del marcador seleccionado
+const OpenPopup: React.FC<{lat: number, lng: number}> = ({ lat, lng }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lng], 15, { animate: true });
+  }, [lat, lng, map]);
+  return null;
+};
+
+// Componente para centrar y hacer zoom en la ubicación del usuario
+const CenterOnUserLocation: React.FC<{lat: number, lng: number}> = ({ lat, lng }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lng], 17, { animate: true });
+  }, [lat, lng, map]);
+  return null;
+};
 
 // Icono de flecha para la ubicación del usuario
 const arrowIcon = L.divIcon({
@@ -28,6 +54,7 @@ const arrowIcon = L.divIcon({
 
 const MiRutaPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   // Obtener ubicación del usuario al cargar la página
@@ -65,13 +92,23 @@ const MiRutaPage: React.FC = () => {
     .filter(Boolean) as (Cliente & { lat: number; lng: number })[];
 
 
-  // Centrar el mapa en la ubicación del usuario si está disponible,
-  // si no, en el primer cliente, y si no, en Guayaquil
-  const center = userLocation
-    ? userLocation
-    : clientesConUbicacion.length > 0
-      ? [clientesConUbicacion[0].lat, clientesConUbicacion[0].lng]
-      : [-2.170998, -79.922359];
+  // Si se recibe una dirección por location.state, usarla como centro
+  let center: [number, number] = [-2.170998, -79.922359]; // Guayaquil por defecto
+  if (location.state && (location.state as any).direccion) {
+    const dir = (location.state as any).direccion;
+    const parts = dir.split(',');
+    if (parts.length === 2) {
+      const lat = parseFloat(parts[0]);
+      const lng = parseFloat(parts[1]);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        center = [lat, lng];
+      }
+    }
+  } else if (userLocation) {
+    center = userLocation;
+  } else if (clientesConUbicacion.length > 0) {
+    center = [clientesConUbicacion[0].lat, clientesConUbicacion[0].lng];
+  }
 
   return (
     <div style={{ width: '100vw', height: '100vh', background: '#f5f6fa' }}>
@@ -92,6 +129,8 @@ const MiRutaPage: React.FC = () => {
       </div>
       <div style={{ width: '100%', height: '90vh', borderRadius: 12, boxShadow: '0 2px 16px #0001', margin: '0 auto', overflow: 'hidden' }}>
         <MapContainer center={center as [number, number]} zoom={13} style={{ width: '100%', height: '100%' }}>
+          {/* Centrar y hacer zoom en la ubicación del usuario al cargar */}
+          {userLocation && <CenterOnUserLocation lat={userLocation[0]} lng={userLocation[1]} />}
           {/* Marcador de la ubicación del usuario como flecha */}
           {userLocation && (
             <Marker position={userLocation} icon={arrowIcon}>
@@ -102,15 +141,29 @@ const MiRutaPage: React.FC = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {clientesConUbicacion.map(cliente => (
-            <Marker key={cliente.id} position={[cliente.lat, cliente.lng]}>
-              <Popup>
-                <b>{cliente.nombre}</b><br/>
-                {cliente.negocio && <span>Negocio: {cliente.negocio}<br/></span>}
-                {cliente.telefono && <span>Tel: {cliente.telefono}</span>}
-              </Popup>
-            </Marker>
-          ))}
+          {clientesConUbicacion.map(cliente => {
+            // ¿Es el cliente seleccionado?
+            let isSelected = false;
+            if (location.state && (location.state as any).direccion && (location.state as any).cliente_nombre) {
+              const dir = (location.state as any).direccion;
+              const nombre = (location.state as any).cliente_nombre;
+              isSelected = cliente.direccion === dir && cliente.nombre === nombre;
+            }
+            return (
+              <Marker
+                key={cliente.id}
+                position={[cliente.lat, cliente.lng]}
+                icon={isSelected ? selectedIcon : DefaultIcon}
+              >
+                {isSelected && <OpenPopup lat={cliente.lat} lng={cliente.lng} />}
+                <Popup autoPan={true} autoClose={!isSelected} closeOnClick={!isSelected} open={isSelected}>
+                  <b>{cliente.nombre}</b><br/>
+                  {cliente.negocio && <span>Negocio: {cliente.negocio}<br/></span>}
+                  {cliente.telefono && <span>Tel: {cliente.telefono}</span>}
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
       </div>
     </div>

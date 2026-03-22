@@ -51,13 +51,6 @@
     margin-bottom: 8px;
 }
 
-.calendarGrid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2px;
-    margin-bottom: 8px;
-}
-
 .dayCell {
     width: 36px;
     height: 36px;
