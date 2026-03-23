@@ -8,6 +8,14 @@ export default function BalanceCard({ balance, loan, installments, delayDays, da
   delayDays: string;
   date?: string;
 }) {
+  // Formatear la fecha a dd/mm/yyyy si es posible
+  let fechaFormateada = 'Sin fecha';
+  if (date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const [y, m, d] = date.split('-');
+    fechaFormateada = `${d}/${m}/${y}`;
+  } else if (date && date.trim() !== '') {
+    fechaFormateada = date;
+  }
   return (
     <div className="balance-card modern-balance-info-card">
       <div className="bc-row bc-row-top">
@@ -17,7 +25,7 @@ export default function BalanceCard({ balance, loan, installments, delayDays, da
         </div>
         <div className="bc-col bc-col-right">
           <div className="bc-label bc-label-right">PRESTAMO REGISTRADO:</div>
-          <div className="bc-date">{date}</div>
+          <div className="bc-date" style={{ color: '#888' }}>{fechaFormateada}</div>
         </div>
       </div>
       <div className="bc-divider" />

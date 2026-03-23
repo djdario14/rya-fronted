@@ -96,8 +96,7 @@ const MiAgendaPage: React.FC = () => {
 
   // Filtrar por tab
   const pendientes = recordatoriosDelDia.filter((r: any) => {
-    const fecha = new Date(r.fecha);
-    return (!r.leido || r.leido === 0) && fecha <= ahora;
+    return !r.leido || r.leido === 0;
   });
   const recordatoriosFiltrados = selectedTab === 'pendientes' ? pendientes : recordatoriosDelDia;
 
@@ -203,7 +202,23 @@ const MiAgendaPage: React.FC = () => {
         <div style={{ textAlign: 'center', color: '#888', margin: 24 }}>No hay recordatorios</div>
       ) : (
         recordatoriosFiltrados.map((r, i) => {
-          // Fecha y hora
+          // Fecha y hora de creación (creado_en)
+          let fechaCreacion = '';
+          if (r.creado_en) {
+            const match = r.creado_en.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+            if (match) {
+              const [, y, m, d, hh, mm] = match;
+              fechaCreacion = `${d}/${m}/${y} ${hh}:${mm}`;
+            } else {
+              // Si no hay hora, solo fecha
+              const match2 = r.creado_en.match(/^(\d{4})-(\d{2})-(\d{2})/);
+              if (match2) {
+                const [, y, m, d] = match2;
+                fechaCreacion = `${d}/${m}/${y}`;
+              }
+            }
+          }
+          // Fecha y hora del recordatorio principal
           const fechaUtc = typeof r.fecha === 'string' && r.fecha.endsWith('Z')
             ? new Date(r.fecha)
             : new Date(r.fecha + 'Z');
@@ -224,28 +239,27 @@ const MiAgendaPage: React.FC = () => {
           // Teléfono
           const telefono = r.telefono || r.telefono_cliente || '';
           // Botones de acción
-            // Mostrar el botón de ubicación y, si hay teléfono, el botón de WhatsApp
-            const acciones = direccion ? (
-              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
-                  <button
-                    onClick={() => navigate('/gps', { state: { direccion, cliente_nombre: r.cliente_nombre } })}
-                    style={{ background: '#e3f2fd', border: 'none', borderRadius: 8, padding: '8px', fontWeight: 600, fontSize: 15, cursor: 'pointer', color: '#d72660', display: 'inline-flex', alignItems: 'center' }}
-                    title="Ubicación"
-                  >
-                    <img src={LocationPinFilled} alt="Ubicación" style={{ width: 24, height: 24, display: 'block' }} />
-                  </button>
-                {telefono && (
-                  <>
-                    <a href={`https://wa.me/${telefono.replace(/[^\d]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ background: '#e8f5e9', border: 'none', borderRadius: 8, padding: '8px', fontWeight: 600, fontSize: 15, cursor: 'pointer', color: '#25d366', display: 'inline-flex', alignItems: 'center' }} title="WhatsApp">
-                      <img src={WhatsappIcon} alt="WhatsApp" style={{ width: 24, height: 24, display: 'block' }} />
-                    </a>
-                    <a href={`tel:${telefono.replace(/[^\d+]/g, '')}`} style={{ background: '#e3f2fd', border: 'none', borderRadius: 8, padding: '8px', fontWeight: 600, fontSize: 15, cursor: 'pointer', color: '#2563eb', display: 'inline-flex', alignItems: 'center' }} title="Llamar">
-                      <PhoneIcon />
-                    </a>
-                  </>
-                )}
-              </div>
-            ) : null;
+          const acciones = direccion ? (
+            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+              <button
+                onClick={() => navigate('/gps', { state: { direccion, cliente_nombre: r.cliente_nombre } })}
+                style={{ background: '#e3f2fd', border: 'none', borderRadius: 8, padding: '8px', fontWeight: 600, fontSize: 15, cursor: 'pointer', color: '#d72660', display: 'inline-flex', alignItems: 'center' }}
+                title="Ubicación"
+              >
+                <img src={LocationPinFilled} alt="Ubicación" style={{ width: 24, height: 24, display: 'block' }} />
+              </button>
+              {telefono && (
+                <>
+                  <a href={`https://wa.me/${telefono.replace(/[^\d]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ background: '#e8f5e9', border: 'none', borderRadius: 8, padding: '8px', fontWeight: 600, fontSize: 15, cursor: 'pointer', color: '#25d366', display: 'inline-flex', alignItems: 'center' }} title="WhatsApp">
+                    <img src={WhatsappIcon} alt="WhatsApp" style={{ width: 24, height: 24, display: 'block' }} />
+                  </a>
+                  <a href={`tel:${telefono.replace(/[^\d+]/g, '')}`} style={{ background: '#e3f2fd', border: 'none', borderRadius: 8, padding: '8px', fontWeight: 600, fontSize: 15, cursor: 'pointer', color: '#2563eb', display: 'inline-flex', alignItems: 'center' }} title="Llamar">
+                    <PhoneIcon />
+                  </a>
+                </>
+              )}
+            </div>
+          ) : null;
           return (
             <div className={styles.eventCard} key={r.id || i}>
               <div className={styles.eventHeader}>
@@ -278,6 +292,10 @@ const MiAgendaPage: React.FC = () => {
               </div>
               {r.nota && (
                 <div style={{ color: '#2563EB', margin: '8px 0 2px 0', fontWeight: 500 }}>{r.nota}</div>
+              )}
+              {/* Mostrar fecha de creación si existe */}
+              {fechaCreacion && (
+                <div style={{ color: '#888', fontSize: 13, margin: '2px 0 0 0' }}>Creado: {fechaCreacion}</div>
               )}
               {/* Botones de acción (ubicación, WhatsApp, llamada) */}
               {acciones}

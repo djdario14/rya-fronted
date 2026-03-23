@@ -15,17 +15,7 @@ interface AgendarVisitaModalProps {
 const AgendarVisitaModal: React.FC<AgendarVisitaModalProps> = ({ open, onClose, onSave, clienteNombre }) => {
   const [fecha, setFecha] = useState<Date | null>(null);
   // Formato local para mostrar la fecha seleccionada
-  const fechaLocalStr = fecha
-    ? new Date(fecha).toLocaleString('es-EC', {
-        timeZone: 'America/Guayaquil',
-        year: '2-digit',
-        month: 'numeric',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      })
-    : '';
+
   const [nota, setNota] = useState("");
 
   if (!open) return null;
@@ -50,11 +40,7 @@ const AgendarVisitaModal: React.FC<AgendarVisitaModalProps> = ({ open, onClose, 
               disablePast
             />
           </LocalizationProvider>
-          {fecha && (
-            <div style={{ marginTop: 8, color: '#2563EB', fontWeight: 500 }}>
-              {fechaLocalStr} <span style={{ color: '#888', fontSize: 14 }}>(Hora local)</span>
-            </div>
-          )}
+
         </div>
         <div style={{ marginBottom: 18 }}>
           <label style={{ fontWeight: 500 }}>Nota <span style={{color:'#e53935'}}>*</span>:</label><br />

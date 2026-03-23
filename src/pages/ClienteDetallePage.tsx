@@ -80,15 +80,18 @@ export default function ClienteDetallePage() {
 
   useEffect(() => {
     if (id) {
-      api.get(`/clientes/${id}`).then(res => setCliente(res.data as Cliente));
-      api.get(`/clientes/${id}/saldo`).then(res => {
-        const data = res.data as SaldoResponse;
-        setSaldo(data);
-        if ('creado_en' in data && data.creado_en) {
-          setFechaCredito(data.creado_en);
+      api.get(`/clientes/${id}`).then(res => {
+        const clienteData = res.data as Cliente;
+        setCliente(clienteData);
+        if ('creado_en' in clienteData && typeof clienteData.creado_en === 'string' && clienteData.creado_en) {
+          setFechaCredito(clienteData.creado_en);
         } else {
           setFechaCredito(null);
         }
+      });
+      api.get(`/clientes/${id}/saldo`).then(res => {
+        const data = res.data as SaldoResponse;
+        setSaldo(data);
       });
       api.get(`/clientes/${id}/pagos`).then(res => setPagos(res.data as Pago[]));
     }
@@ -164,13 +167,22 @@ export default function ClienteDetallePage() {
         {(() => {
           const cuotasPagadas = saldo.valor_cuota > 0 ? Math.round((saldo.total_credito - saldo.saldo) / saldo.valor_cuota) : 0;
           return (
-            <BalanceCard
-              balance={`$${saldo.saldo}`}
-              loan={`$${saldo.prestamo}`}
-              installments={`${cuotasPagadas} / ${saldo.cuotasTotal}`}
-              delayDays={`${saldo.atraso} días`}
-              date={fechaCredito ? fechaCredito.split('-').reverse().join('/') : ''}
-            />
+              <BalanceCard
+                balance={`$${saldo.saldo}`}
+                loan={`$${saldo.prestamo}`}
+                installments={`${cuotasPagadas} / ${saldo.cuotasTotal}`}
+                delayDays={`${saldo.atraso} días`}
+                date={(() => {
+                  if (!fechaCredito) return '';
+                  // Handle both 'YYYY-MM-DD' and 'YYYY-MM-DDTHH:MM:SS' formats
+                  const match = fechaCredito.match(/^(\d{4})-(\d{2})-(\d{2})/);
+                  if (match) {
+                    const [, y, m, d] = match;
+                    return `${d}/${m}/${y}`;
+                  }
+                  return fechaCredito;
+                })()}
+              />
           );
         })()}
         {/* Botón 'Registrar nuevo crédito' eliminado */}

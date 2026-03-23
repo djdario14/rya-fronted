@@ -112,19 +112,7 @@ const CreditoModal: React.FC<CreditoModalProps> = ({ clienteNombre, onClose, onS
             <label>Fecha del crédito</label>
             <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #ccc" }} />
                       {/* Mostrar fecha seleccionada en formato local si existe */}
-                      {fecha && (
-                        <div style={{ marginTop: 8, color: '#2563EB', fontWeight: 500 }}>
-                          {new Date(fecha).toLocaleString('es-EC', {
-                            timeZone: 'America/Guayaquil',
-                            year: '2-digit',
-                            month: 'numeric',
-                            day: 'numeric',
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                          })} <span style={{ color: '#888', fontSize: 14 }}>(Hora local)</span>
-                        </div>
-                      )}
+
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 12 }}>
             <button type="button" onClick={onClose} style={{ background: "#eee", color: "#333", border: "none", borderRadius: 10, padding: "10px 24px", fontWeight: 600, fontSize: 16, cursor: "pointer" }}>Cancelar</button>
