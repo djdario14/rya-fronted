@@ -591,7 +591,7 @@ const ClientesPage: React.FC = () => {
           </div>
         </header>
       </div>
-      <main className="mobile-content">
+      <main className="mobile-content" style={{ overflowY: 'auto', minHeight: '100vh' }}>
         <h2 className="clientes-title" style={{ marginBottom: 8 }}>Clientes</h2>
         <div className="tabs-row" style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
           <button
@@ -612,7 +612,7 @@ const ClientesPage: React.FC = () => {
             Todos
           </button>
         </div>
-        <div className="clientes-list" style={{ height: '60vh', minHeight: 320 }}>
+        <div className="clientes-list" style={{ minHeight: 320 }}>
           {loading ? (
             <div className="clientes-loading">Cargando clientes...</div>
           ) : clientes.length === 0 ? (
@@ -630,12 +630,15 @@ const ClientesPage: React.FC = () => {
                       background: '#fff',
                       borderRadius: 16,
                       boxShadow: '0 2px 12px #0001',
-                      padding: '18px 16px 18px 18px',
+                      padding: '10px 10px 10px 12px',
                       display: 'flex',
                       alignItems: 'center',
-                      minHeight: 60,
-                      marginBottom: 12,
-                      cursor: 'pointer'
+                      minHeight: 48,
+                      marginBottom: 8,
+                      cursor: 'pointer',
+                      gap: 8,
+                      overflow: 'hidden',
+                      flexWrap: 'wrap'
                     }}
                     key={cliente.id}
                     onClick={e => {
@@ -644,43 +647,51 @@ const ClientesPage: React.FC = () => {
                     }}
                   >
                     <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' }}>
                         <span style={{ fontWeight: 700, color: '#2d7b5f', fontSize: 20, background: '#e6f4ef', borderRadius: 8, padding: '2px 12px' }}>
                           ${saldoCalculado.toFixed(2)}
                         </span>
-                        <span style={{ color: '#888', fontSize: 14, fontWeight: 500 }}>Saldo</span>
-                        {typeof cliente.atraso === 'number' && cliente.atraso > 0 && (
-                          <span style={{ color: '#b77b00', fontWeight: 600, fontSize: 14, background: '#fff7e6', borderRadius: 8, padding: '2px 10px', marginLeft: 10 }}>
-                            {cliente.atraso} días atraso
-                          </span>
-                        )}
                       </div>
                       <div className="cliente-nombre" style={{ fontWeight: 700, fontSize: 17, marginBottom: 2 }}>{cliente.nombre}</div>
                     </div>
-                    {saldoCalculado > 0 && (
-                      <button
-                        style={{
-                          background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: 8,
-                          fontWeight: 700,
-                          fontSize: 16,
-                          padding: '8px 22px',
-                          marginLeft: 12,
-                          boxShadow: '0 2px 8px #0001',
-                          cursor: 'pointer',
-                          transition: 'background 0.2s'
-                        }}
-                        onClick={e => {
-                          e.stopPropagation();
-                          setPagoCliente(cliente);
-                          setShowPagoModal(true);
-                        }}
-                      >
-                        Abonar
-                      </button>
-                    )}
+                    {(typeof cliente.atraso === 'number' && cliente.atraso > 0) || saldoCalculado > 0 ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 8 }}>
+                        {typeof cliente.atraso === 'number' && cliente.atraso > 0 && (
+                          <span style={{ color: '#b77b00', fontWeight: 600, fontSize: 14, background: '#fff7e6', borderRadius: 8, padding: '2px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'inline', verticalAlign: 'middle' }}>
+                              <circle cx="10" cy="10" r="9" stroke="#b77b00" strokeWidth="2" fill="#fff7e6" />
+                              <rect x="9.2" y="5" width="1.6" height="5.5" rx="0.8" fill="#b77b00" />
+                              <rect x="9.2" y="10" width="5.5" height="1.6" rx="0.8" fill="#b77b00" />
+                            </svg>
+                            Atraso
+                          </span>
+                        )}
+                        {saldoCalculado > 0 && (
+                          <button
+                            style={{
+                              background: 'linear-gradient(90deg, #4e7fa6 0%, #5fa37a 100%)',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 8,
+                              fontWeight: 700,
+                              fontSize: 16,
+                              padding: '8px 22px',
+                              marginLeft: 0,
+                              boxShadow: '0 2px 8px #0001',
+                              cursor: 'pointer',
+                              transition: 'background 0.2s'
+                            }}
+                            onClick={e => {
+                              e.stopPropagation();
+                              setPagoCliente(cliente);
+                              setShowPagoModal(true);
+                            }}
+                          >
+                            Abonar
+                          </button>
+                        )}
+                      </div>
+                    ) : null}
                     {saldoCalculado === 0 && (
                       <button
                         style={{

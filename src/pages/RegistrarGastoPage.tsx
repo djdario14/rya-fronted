@@ -9,13 +9,19 @@ const cardStyle: React.CSSProperties = {
   background: '#fff',
   borderRadius: 16,
   boxShadow: '0 4px 24px #0002',
-  padding: 36,
-  maxWidth: 440,
-  margin: '40px auto',
+  padding: '24px',
+  maxWidth: '98vw',
+  margin: '24px auto',
   fontFamily: 'Inter, sans-serif',
+  boxSizing: 'border-box',
 };
+
+// Media query para pantallas pequeñas (opcional, si quieres más responsividad)
+// Puedes agregar esto con una librería de CSS-in-JS o en un CSS externo:
+// @media (max-width: 480px) { .card { padding: 12px !important; } }
 const inputStyle: React.CSSProperties = {
   width: '100%',
+  maxWidth: '100%',
   padding: '12px 16px',
   borderRadius: 10,
   border: '1.5px solid #e0e0e0',
@@ -24,6 +30,7 @@ const inputStyle: React.CSSProperties = {
   outline: 'none',
   marginBottom: 8,
   transition: 'border 0.2s',
+  boxSizing: 'border-box',
 };
 const labelStyle: React.CSSProperties = {
   display: 'block',
@@ -66,9 +73,9 @@ const errorStyle: React.CSSProperties = {
 };
 const gastosCardStyle: React.CSSProperties = {
   ...cardStyle,
-  maxWidth: 440,
-  margin: '32px auto 0 auto',
-  padding: 28,
+  maxWidth: '98vw',
+  margin: '20px auto 0 auto',
+  padding: '5vw',
 };
 
 const RegistrarGastoPage: React.FC = () => {
@@ -100,8 +107,8 @@ const RegistrarGastoPage: React.FC = () => {
     e.preventDefault();
     setError('');
     setSuccess(false);
-    if (!monto || isNaN(Number(monto))) {
-      setError('Ingrese un monto válido');
+    if (!monto || isNaN(Number(monto)) || Number(monto) <= 0) {
+      setError('Ingrese un monto válido (mayor a 0)');
       return;
     }
     if (!descripcion) {
@@ -127,35 +134,44 @@ const RegistrarGastoPage: React.FC = () => {
     }
   };
   return (
-    <div style={{ minHeight: '100vh', background: '#f7f8fa', padding: '32px 0' }}>
-      <button
-        onClick={() => navigate(-1)}
-        style={{
-          background: '#2e7d5a',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 10,
-          fontWeight: 700,
-          fontSize: 16,
-          padding: '7px 22px',
-          marginBottom: 18,
-          marginLeft: 'calc((100% - 440px) / 2)',
-          width: 120,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          cursor: 'pointer',
-          boxShadow: '0 2px 8px #2e7d5a22',
-        }}
-      >
-        <span style={{ fontSize: 20 }}>←</span> Volver
-      </button>
-      <div style={cardStyle}>
+    <div style={{ minHeight: '100vh', background: '#f7f8fa', padding: '4vw 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ width: '100%', maxWidth: 600, display: 'flex', alignItems: 'flex-start' }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            background: '#2e7d5a',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 10,
+            fontWeight: 700,
+            fontSize: 16,
+            padding: '7px 22px',
+            marginBottom: 18,
+            marginLeft: 0,
+            width: 'auto',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            cursor: 'pointer',
+            boxShadow: '0 2px 8px #2e7d5a22',
+          }}
+        >
+          <span style={{ fontSize: 20 }}>←</span> Volver
+        </button>
+      </div>
+      <div style={{ ...cardStyle, width: '100%', maxWidth: 600 }}>
         <h2 style={sectionTitleStyle}>Registrar Gasto</h2>
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: 18 }}>
             <label style={labelStyle}>Monto</label>
-            <input type="number" value={monto} onChange={e => setMonto(e.target.value)} style={inputStyle} />
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              value={monto}
+              onChange={e => setMonto(e.target.value)}
+              style={inputStyle}
+            />
           </div>
           <div style={{ marginBottom: 18 }}>
             <label style={labelStyle}>Descripción</label>
@@ -172,7 +188,7 @@ const RegistrarGastoPage: React.FC = () => {
           </button>
         </form>
       </div>
-      <div style={gastosCardStyle}>
+      <div style={{ ...gastosCardStyle, width: '100%', maxWidth: 600 }}>
         <h3 style={{ ...sectionTitleStyle, fontSize: 24, marginBottom: 18 }}>Gastos de la semana</h3>
         {loading ? (
           <div style={{ color: '#888', fontSize: 16 }}>Cargando gastos...</div>
